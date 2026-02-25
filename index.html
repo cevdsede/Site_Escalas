@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ministerios Louvor e Mídia CEVD</title>
+  <!-- Tipografia Moderna -->
+  <link
+    href="https://fonts.googleapis.com/css?family=Montserrat:700,400&display=swap"
+    rel="stylesheet"
+  />
+  <!-- Ícones FontAwesome -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+  />
+  <style>
+    body {
+      background: linear-gradient(135deg, #e3f0ff 0%, #faf3e3 100%);
+      font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      color: #222;
+      min-height: 100vh;
+    }
+
+    .wrapper {
+      display: flex;
+      max-width: 1400px;
+      margin: 40px auto;
+      gap: 40px;
+      padding: 0 16px;
+      box-sizing: border-box;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .container {
+      background: #fff;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+      border-radius: 16px;
+      padding: 32px 16px;
+      animation: fadeIn 1.2s;
+      flex: 1 1 600px;
+      max-width: 600px;
+      box-sizing: border-box;
+      min-width: 280px;
+    }
+
+    .logo {
+      display: block;
+      margin: 0 auto 18px auto;
+      max-width: 120px;
+      border-radius: 50%;
+      box-shadow: 0 2px 8px rgba(63, 81, 181, 0.17);
+      background: #fff;
+      animation: fadeIn 1.2s;
+    }
+
+    h1 {
+      text-align: center;
+      color: #3f51b5;
+      margin-bottom: 24px;
+      margin-top: 0;
+      font-weight: 700;
+      letter-spacing: 1px;
+      font-size: 2.1em;
+      animation: fadeIn 1.4s;
+    }
+
+    .group {
+      margin-bottom: 30px;
+      padding: 20px 16px;
+      border-radius: 12px;
+      background: #f7f8fe;
+      box-shadow: 0 2px 8px rgba(63, 81, 181, 0.09);
+      transition: transform 0.18s, box-shadow 0.18s;
+      animation: fadeIn 1.6s;
+      position: relative;
+    }
+
+    .group:hover {
+      transform: scale(1.03);
+      box-shadow: 0 6px 22px rgba(63, 81, 181, 0.18);
+    }
+
+    .group-title {
+      font-size: 1.25em;
+      font-weight: 700;
+      color: #222;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .group-title i {
+      color: #3f51b5;
+    }
+
+    .names {
+      margin-bottom: 8px;
+      color: #444;
+      font-size: 1em;
+      font-weight: 400;
+      letter-spacing: 0.5px;
+    }
+
+    .link {
+      display: inline-block;
+      background: #3f51b5;
+      color: #fff;
+      padding: 8px 18px;
+      border-radius: 7px;
+      text-decoration: none;
+      transition: background 0.2s, box-shadow 0.2s;
+      margin-bottom: 6px;
+      font-weight: 600;
+      font-size: 1em;
+      box-shadow: 0 1px 5px rgba(63, 81, 181, 0.1);
+      animation: fadeIn 1.8s;
+    }
+
+    .link i {
+      margin-right: 6px;
+    }
+
+    .link:hover {
+      background: #283593;
+      box-shadow: 0 4px 16px rgba(63, 81, 181, 0.2);
+    }
+
+    .spreadsheet {
+      text-align: center;
+      margin-top: 32px;
+      animation: fadeIn 2s;
+    }
+
+    .spreadsheet a {
+      background: #43a047;
+      padding: 10px 26px;
+      border-radius: 9px;
+      color: #fff;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 1.05em;
+      transition: background 0.2s, box-shadow 0.2s;
+      box-shadow: 0 1px 5px rgba(67, 160, 71, 0.1);
+      display: inline-block;
+    }
+
+    .spreadsheet a i {
+      margin-right: 7px;
+    }
+
+    .spreadsheet a:hover {
+      background: #2e7031;
+      box-shadow: 0 4px 16px rgba(67, 160, 71, 0.18);
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(25px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 960px) {
+      .wrapper {
+        gap: 24px;
+      }
+    }
+
+    @media (max-width: 650px) {
+      .wrapper {
+        flex-direction: column;
+        align-items: center;
+        gap: 32px;
+      }
+      .container {
+        max-width: 100%;
+        flex-basis: auto;
+        min-width: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <!-- Ministério Louvor -->
+    <div class="container">
+      <img src="logo louvor.png" alt="Logo Valentes de Davi" class="logo" />
+      <h1>Ministerio de Louvor</h1>
+
+      <div class="group">
+        <div class="group-title">
+          <i class="fa-solid fa-mobile-screen-button"></i><span class="title-text">APP 1</span>
+        </div>
+        <div class="names">Adjanio, Gabriel, Jesse, Lucas, Rosy, Veronica, Vitoria Mesquita</div>
+        <a
+          class="link"
+          href="https://www.appsheet.com/newshortcut/01d862ad-1676-4368-8536-b2c1c2d5f5ce"
+          target="_blank"
+          ><i class="fa-solid fa-arrow-up-right-from-square"></i>Acessar AppSheet</a
+        >
+      </div>
+
+      <div class="group">
+        <div class="group-title">
+          <i class="fa-solid fa-mobile-screen-button"></i><span class="title-text">APP 2</span>
+        </div>
+        <div class="names">
+          Aleane, Ana Clara, Eduardo, Felipe, Isis, Jhordan, Mikeias, Naira,
+          Vitoria Rodrigues
+        </div>
+        <a
+          class="link"
+          href="https://www.appsheet.com/newshortcut/01185661-8dc1-4c1a-a357-70abd9c4b4f1"
+          target="_blank"
+          ><i class="fa-solid fa-arrow-up-right-from-square"></i>Acessar AppSheet</a
+        >
+      </div>
+
+      <div class="spreadsheet">
+        <a
+          href="https://docs.google.com/spreadsheets/d/1K47eF2raU_RB69ziWpV7P7NS5cyWfRhlsofXt9MWOz8/edit?usp=sharing"
+          target="_blank"
+        >
+          <i class="fa-solid fa-table"></i> Link das Escala em Planilha
+        </a>
+      </div>
+    </div>
+
+    <!-- Ministério CEVD Mídia -->
+    <div class="container">
+      <img src="logo midia.jpg" alt="Logo CEVD Mídia" class="logo" />
+      <h1>Ministério de Mídia</h1>
+
+      <div class="group">
+        <div class="group-title">
+          <i class="fa-solid fa-mobile-screen-button"></i><span class="title-text">APP 1</span>
+        </div>
+        <div class="names">
+          Felipe Silva, Jhordan, Vitoria Rodrigues, Eduardo, Aleane, Ana Clara,
+          Daniel, Paulo, Vitoria Mesquita
+        </div>
+        <a
+          class="link"
+          href="https://www.appsheet.com/newshortcut/7a48a848-2762-4d5d-bafe-128c1749accf"
+          target="_blank"
+          ><i class="fa-solid fa-arrow-up-right-from-square"></i>Acessar AppSheet</a
+        >
+      </div>
+
+      <div class="group">
+        <div class="group-title">
+          <i class="fa-solid fa-mobile-screen-button"></i><span class="title-text">APP 2</span>
+        </div>
+        <div class="names">João Paulo, Asafe, Samuel, Nycolly, Vitoria Mesquita</div>
+        <a
+          class="link"
+          href="https://www.appsheet.com/newshortcut/55e3f91a-7b91-44a4-b78f-afb39341d4ec"
+          target="_blank"
+          ><i class="fa-solid fa-arrow-up-right-from-square"></i>Acessar AppSheet</a
+        >
+      </div>
+
+      <div class="spreadsheet">
+        <a
+          href="https://docs.google.com/spreadsheets/d/1ArtFT8Q2A9QqQWmgI_o0K_JHdebOJC_i1GmPKtdi7qA/edit?pli=1&gid=1293141292#gid=1293141292"
+          target="_blank"
+        >
+          <i class="fa-solid fa-table"></i> Link das Escala em Planilha
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.querySelectorAll(".group").forEach(group => {
+      const names = group.querySelector(".names").innerText.split(",");
+      const count = names.filter(n => n.trim() !== "").length;
+      const title = group.querySelector(".title-text");
+      title.textContent += ` - ${count} Pessoas`;
+    });
+  </script>
+</body>
+</html>
