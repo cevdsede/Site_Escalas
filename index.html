@@ -187,6 +187,232 @@
         min-width: auto;
       }
     }
+
+    /* Modal Styles */
+    .music-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.8);
+      z-index: 1000;
+      overflow-y: auto;
+    }
+
+    .modal-content {
+      background: white;
+      margin: 50px auto;
+      padding: 0;
+      border-radius: 16px;
+      max-width: 900px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    }
+
+    .modal-header {
+      background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+      color: white;
+      padding: 30px;
+      border-radius: 16px 16px 0 0;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .modal-header h2 {
+      font-size: 2em;
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+
+    .close-btn {
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: white;
+      font-size: 1.5em;
+      cursor: pointer;
+      padding: 8px 15px;
+      border-radius: 50px;
+      float: right;
+      transition: all 0.3s ease;
+      margin-top: -10px;
+    }
+
+    .close-btn:hover {
+      background: rgba(255,255,255,0.3);
+    }
+
+    .music-list {
+      padding: 30px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .device-desktop .music-list {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+    }
+
+    .device-tablet .music-list {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    .device-mobile .music-list {
+      grid-template-columns: 1fr;
+      gap: 16px;
+      padding: 20px;
+    }
+
+    .music-item {
+      background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+      border-radius: 16px;
+      padding: 24px;
+
+      border-left: 5px solid #ff6b6b;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .music-item::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 107, 107, 0.1), transparent);
+      transition: left 0.6s ease;
+    }
+
+    .music-item:hover::before {
+      left: 100%;
+    }
+
+    .music-item:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 12px 40px rgba(255, 107, 107, 0.2);
+      border-left-color: #ff5252;
+    }
+
+    .music-title {
+      font-size: 1.4em;
+      font-weight: 800;
+      color: #2c3e50;
+      margin-bottom: 10px;
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .music-title::before {
+      content: '🎵';
+      font-size: 0.8em;
+      opacity: 0.7;
+    }
+
+    .music-artist {
+      color: #7f8c8d;
+      margin-bottom: 18px;
+      font-style: italic;
+      font-size: 1.05em;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .music-artist::before {
+      content: '🎤';
+      font-size: 0.9em;
+    }
+
+    .music-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 15px;
+    }
+
+    .music-link {
+      background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+      color: white;
+      text-decoration: none;
+      padding: 10px 18px;
+      border-radius: 30px;
+      font-size: 0.9em;
+      font-weight: 600;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 15px rgba(74, 85, 104, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .music-link::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .music-link:hover::before {
+      left: 100%;
+    }
+
+    .music-link:hover {
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 8px 25px rgba(74, 85, 104, 0.4);
+    }
+
+
+    .playlist-link {
+      background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+      color: white;
+      text-decoration: none;
+      padding: 15px 30px;
+      border-radius: 50px;
+      font-size: 1.1em;
+      display: inline-block;
+      font-weight: 700;
+      box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .playlist-link:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+    }
+
+    @media (max-width: 768px) {
+      .modal-content {
+        margin: 20px;
+        width: calc(100% - 40px);
+      }
+      
+      .music-links {
+        flex-direction: column;
+      }
+      
+      .music-link {
+        text-align: center;
+        justify-content: center;
+      }
+    }
   </style>
 </head>
 <body>
@@ -202,6 +428,16 @@
           target="_blank"
         >
           <i class="fa-solid fa-table"></i> Link das Escala em Planilha
+        </a>
+      </div>
+
+      <div class="spreadsheet">
+        <a
+          href="#"
+          onclick="openMusicModal(); return false;"
+          style="background: #ff6b6b;"
+        >
+          <i class="fa-solid fa-music"></i> Lista música Passos de Fé
         </a>
       </div>
     </div>
@@ -251,12 +487,372 @@
     </div>
   </div>
 
+  <!-- Modal de Músicas -->
+  <div id="musicModal" class="music-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button class="close-btn" onclick="closeMusicModal()">&times;</button>
+        <h2>🎵 Lista música Passos de Fé</h2>
+        <p>Clique nos links para acessar letra, cifra ou ouvir no Spotify</p>
+        <div style="text-align: center; margin-top: 20px;">
+          <a href="https://music.youtube.com/playlist?list=PLXBrOMx1jKOD9VeCl7CZ34H29x4gSOY9n&si=ZlGxVbCV6Nu5wPfF" target="_blank" class="playlist-link">
+            🎧 Playlist Completa no YouTube Music
+          </a>
+        </div>
+      </div>
+      
+      <div class="music-list">
+        <div class="music-item">
+          <div class="music-title">1. Milagres São Reais</div>
+          <div class="music-artist">Thiago Godoi</div>
+          <div class="music-links">
+            <a href="https://www.letras.mus.br/thiago-godoi/milagres-sao-reais/" target="_blank" class="music-link">📝 Letra</a>
+            <a href="https://www.cifraclub.com.br/thiago-godoi/milagres-sao-reais/" target="_blank" class="music-link">🎸 Cifra</a>
+            <a href="https://open.spotify.com/search/Milagres%20S%C3%A3o%20Reais%20Thiago%20Godoi" target="_blank" class="music-link">🎵 Spotify</a>
+          </div>
+        </div>
+
+        <div class="music-item">
+          <div class="music-title">2. O Escudo + Sou Um Milagre</div>
+          <div class="music-artist">Lukas Agustinho</div>
+          <div class="music-links">
+            <a href="https://www.letras.mus.br/lukas-agustinho/o-escudo-sou-um-milagre/" target="_blank" class="music-link">📝 Letra</a>
+            <a href="https://www.cifraclub.com.br/lukas-agustinho/o-escudo-sou-um-milagre/" target="_blank" class="music-link">🎸 Cifra</a>
+            <a href="https://open.spotify.com/search/Lukas%20Agustinho%20O%20Escudo%2B%20Sou%20Um%20Milagre" target="_blank" class="music-link">🎵 Spotify</a>
+          </div>
+        </div>
+
+        <div class="music-item">
+          <div class="music-title">3. Cadeias Quebrar</div>
+          <div class="music-artist">Sarah Oliveira</div>
+          <div class="music-links">
+            <a href="https://www.letras.mus.br/sarah-oliveira/cadeias-quebrar/" target="_blank" class="music-link">📝 Letra</a>
+            <a href="https://www.cifraclub.com.br/sarah-oliveira/cadeias-quebrar/" target="_blank" class="music-link">🎸 Cifra</a>
+            <a href="https://open.spotify.com/search/Cadeias%20Quebrar%20Sarah%20Oliveira" target="_blank" class="music-link">🎵 Spotify</a>
+          </div>
+        </div>
+
+        <div class="music-item">
+          <div class="music-title">4. Jeová Jireh</div>
+          <div class="music-artist">Aline Barros</div>
+          <div class="music-links">
+            <a href="https://www.letras.mus.br/aline-barros/jehovah-jireh/" target="_blank" class="music-link">📝 Letra</a>
+            <a href="https://www.cifraclub.com.br/aline-barros/jehovah-jireh/" target="_blank" class="music-link">🎸 Cifra</a>
+            <a href="https://open.spotify.com/search/Jeov%C3%A1%20Jireh%20Aline%20Barros" target="_blank" class="music-link">🎵 Spotify</a>
+          </div>
+        </div>
+
+        <div class="music-item">
+          <div class="music-title">5. Deus Proverá</div>
+          <div class="music-artist">Gabriela Gomes</div>
+          <div class="music-links">
+            <a href="https://www.letras.mus.br/gabriela-gomes/deus-provera/" target="_blank" class="music-link">📝 Letra</a>
+            <a href="https://www.cifraclub.com.br/gabriela-gomes/deus-provera/" target="_blank" class="music-link">🎸 Cifra</a>
+            <a href="https://open.spotify.com/search/Deus%20Prover%C3%A1%20Gabriela%20Gomes" target="_blank" class="music-link">🎵 Spotify</a>
+          </div>
+        </div>
+
+        <div class="music-item">
+          <div class="music-title">6. Vem Espírito</div>
+          <div class="music-artist">Gabriela Gomes</div>
+          <div class="music-links">
+            <a href="https://www.letras.mus.br/gabriela-gomes/vem-espirito/" target="_blank" class="music-link">📝 Letra</a>
+            <a href="https://www.cifraclub.com.br/gabriela-gomes/vem-espirito/" target="_blank" class="music-link">🎸 Cifra</a>
+            <a href="https://open.spotify.com/search/Vem%20Esp%C3%ADrito%20Gabriela%20Gomes" target="_blank" class="music-link">🎵 Spotify</a>
+          </div>
+        </div>
+
+        <div class="music-item">
+          <div class="music-title">7. Todavia Me Alegrarei</div>
+          <div class="music-artist">Samuel Messias</div>
+          <div class="music-links">
+            <a href="https://www.letras.mus.br/samuel-messias/todavia-me-alegrarei/" target="_blank" class="music-link">📝 Letra</a>
+            <a href="https://www.cifraclub.com.br/samuel-messias/todavia-me-alegrarei/" target="_blank" class="music-link">🎸 Cifra</a>
+            <a href="https://open.spotify.com/search/Todavia%20Me%20Alegrarei%20Samuel%20Messias" target="_blank" class="music-link">🎵 Spotify</a>
+          </div>
+        </div>
+
+        <div class="music-item">
+          <div class="music-title">8. Palavras</div>
+          <div class="music-artist">Carol Braga</div>
+          <div class="music-links">
+            <a href="https://www.letras.mus.br/carol-braga/palavras/" target="_blank" class="music-link">📝 Letra</a>
+            <a href="https://www.cifraclub.com.br/carol-braga/palavras/" target="_blank" class="music-link">🎸 Cifra</a>
+            <a href="https://open.spotify.com/search/Palavras%20Carol%20Braga" target="_blank" class="music-link">🎵 Spotify</a>
+          </div>
+        </div>
+
+        <div class="music-item">
+          <div class="music-title">9. Clamo Jesus</div>
+          <div class="music-artist">Jadson Moreno</div>
+          <div class="music-links">
+            <a href="https://www.letras.mus.br/jadson-moreno/clamo-jesus/" target="_blank" class="music-link">📝 Letra</a>
+            <a href="https://www.cifraclub.com.br/jadson-moreno/clamo-jesus/" target="_blank" class="music-link">🎸 Cifra</a>
+            <a href="https://open.spotify.com/search/Clamo%20Jesus%20Jadson%20Moreno" target="_blank" class="music-link">🎵 Spotify</a>
+          </div>
+        </div>
+
+        <div class="music-item">
+          <div class="music-title">10. Em Teu Nome</div>
+          <div class="music-artist">Family Worship</div>
+          <div class="music-links">
+            <a href="https://www.letras.mus.br/family-worship/em-teu-nome/" target="_blank" class="music-link">📝 Letra</a>
+            <a href="https://www.cifraclub.com.br/family-worship/em-teu-nome/" target="_blank" class="music-link">🎸 Cifra</a>
+            <a href="https://open.spotify.com/search/Em%20Teu%20Nome%20Family%20Worship" target="_blank" class="music-link">🎵 Spotify</a>
+          </div>
+        </div>
+
+        <div class="music-item">
+          <div class="music-title">11. Tu Podes</div>
+          <div class="music-artist">Régis Danese</div>
+          <div class="music-links">
+            <a href="https://www.letras.mus.br/regis-danese/tu-podes/" target="_blank" class="music-link">📝 Letra</a>
+            <a href="https://www.cifraclub.com.br/regis-danese/tu-podes/" target="_blank" class="music-link">🎸 Cifra</a>
+            <a href="https://open.spotify.com/search/Tu%20Podes%20R%C3%A9gis%20Danese" target="_blank" class="music-link">🎵 Spotify</a>
+          </div>
+        </div>
+
+        <div class="music-item">
+          <div class="music-title">12. Além do Impossível</div>
+          <div class="music-artist">Felipe Rodrigues</div>
+          <div class="music-links">
+            <a href="https://www.letras.mus.br/felipe-rodrigues/alem-do-impossivel/" target="_blank" class="music-link">📝 Letra</a>
+            <a href="https://www.cifraclub.com.br/felipe-rodrigues/alem-do-impossivel/" target="_blank" class="music-link">🎸 Cifra</a>
+            <a href="https://open.spotify.com/search/Al%C3%A9m%20do%20Imposs%C3%ADvel%20Felipe%20Rodrigues" target="_blank" class="music-link">🎵 Spotify</a>
+          </div>
+        </div>
+
+        <div class="music-item">
+          <div class="music-title">13. Yahweh Se Manifestará</div>
+          <div class="music-artist">Marcos Freire, Julliany Souza e Léo Brandão</div>
+          <div class="music-links">
+            <a href="https://www.letras.mus.br/marcos-freire/yahweh-se-manifestara/" target="_blank" class="music-link">📝 Letra</a>
+            <a href="https://www.cifraclub.com.br/marcos-freire/yahweh-se-manifestara/" target="_blank" class="music-link">🎸 Cifra</a>
+            <a href="https://open.spotify.com/search/Yahweh%20Se%20Manifestar%C3%A1%20Marcos%20Freire" target="_blank" class="music-link">🎵 Spotify</a>
+          </div>
+        </div>
+
+        <div class="music-item">
+          <div class="music-title">14. Sobre As Águas</div>
+          <div class="music-artist">Davi Sacer</div>
+          <div class="music-links">
+            <a href="https://www.letras.mus.br/davi-sacer/sobre-as-aguas/" target="_blank" class="music-link">📝 Letra</a>
+            <a href="https://www.cifraclub.com.br/davi-sacer/sobre-as-aguas/" target="_blank" class="music-link">🎸 Cifra</a>
+            <a href="https://open.spotify.com/search/Sobre%20As%20%C3%81guas%20Davi%20Sacer" target="_blank" class="music-link">🎵 Spotify</a>
+          </div>
+        </div>
+
+        <div class="music-item">
+          <div class="music-title">15. Escape + Nunca Pare de Lutar</div>
+          <div class="music-artist">Jadson Moreno</div>
+          <div class="music-links">
+            <a href="https://www.letras.mus.br/jadson-moreno/escape-nunca-pare-de-lutar/" target="_blank" class="music-link">📝 Letra</a>
+            <a href="https://www.cifraclub.com.br/jadson-moreno/escape-nunca-pare-de-lutar/" target="_blank" class="music-link">🎸 Cifra</a>
+            <a href="https://open.spotify.com/search/Escape%2B%20Nunca%20Pare%20de%20Lutar%20Jadson%20Moreno" target="_blank" class="music-link">🎵 Spotify</a>
+          </div>
+        </div>
+
+        <div class="music-item">
+          <div class="music-title">16. Restitui</div>
+          <div class="music-artist">Davi Sacer</div>
+          <div class="music-links">
+            <a href="https://www.letras.mus.br/davi-sacer/restitui/" target="_blank" class="music-link">📝 Letra</a>
+            <a href="https://www.cifraclub.com.br/davi-sacer/restitui/" target="_blank" class="music-link">🎸 Cifra</a>
+            <a href="https://open.spotify.com/search/Restitui%20Davi%20Sacer" target="_blank" class="music-link">🎵 Spotify</a>
+          </div>
+        </div>
+
+        <div class="music-item">
+          <div class="music-title">17. Deserto + Aquieta Minh'alma</div>
+          <div class="music-artist">Jadson Moreno</div>
+          <div class="music-links">
+            <a href="https://www.letras.mus.br/jadson-moreno/deserto-aquieta-minhalma/" target="_blank" class="music-link">📝 Letra</a>
+            <a href="https://www.cifraclub.com.br/jadson-moreno/deserto-aquieta-minhalma/" target="_blank" class="music-link">🎸 Cifra</a>
+            <a href="https://open.spotify.com/search/Deserto%2B%20Aquieta%20Minhalma%20Jadson%20Moreno" target="_blank" class="music-link">🎵 Spotify</a>
+          </div>
+        </div>
+
+        <div class="music-item">
+          <div class="music-title">18. Ressuscita-me</div>
+          <div class="music-artist">Aline Barros</div>
+          <div class="music-links">
+            <a href="https://www.letras.mus.br/aline-barros/ressuscita-me/" target="_blank" class="music-link">📝 Letra</a>
+            <a href="https://www.cifraclub.com.br/aline-barros/ressuscita-me/" target="_blank" class="music-link">🎸 Cifra</a>
+            <a href="https://open.spotify.com/search/Ressuscita-me%20Aline%20Barros" target="_blank" class="music-link">🎵 Spotify</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
+    // Detecção de dispositivo
+    function detectDevice() {
+      const userAgent = navigator.userAgent.toLowerCase();
+      const isMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent);
+      const isTablet = /ipad|android(?!.*mobile)/i.test(userAgent);
+      const isDesktop = !isMobile && !isTablet;
+      
+      return {
+        isMobile: isMobile && !isTablet,
+        isTablet: isTablet,
+        isDesktop: isDesktop,
+        deviceType: isMobile && !isTablet ? 'mobile' : isTablet ? 'tablet' : 'desktop'
+      };
+    }
+
+    // Aplicar classes específicas do dispositivo
+    function applyDeviceClasses() {
+      const device = detectDevice();
+      const body = document.body;
+      
+      // Remover classes existentes
+      body.classList.remove('device-mobile', 'device-tablet', 'device-desktop');
+      
+      // Adicionar classe do dispositivo atual
+      body.classList.add(`device-${device.deviceType}`);
+      
+      // Adicionar estilos específicos para mobile
+      if (device.isMobile) {
+        const style = document.createElement('style');
+        style.textContent = `
+          .device-mobile .music-item {
+            padding: 16px;
+            margin-bottom: 16px;
+          }
+          
+          .device-mobile .music-title {
+            font-size: 1.2em;
+          }
+          
+          .device-mobile .music-links {
+            flex-direction: column;
+            gap: 8px;
+          }
+          
+          .device-mobile .music-link {
+            width: 100%;
+            justify-content: center;
+            padding: 12px 16px;
+          }
+          
+          .device-mobile .modal-content {
+            margin: 10px;
+            width: calc(100% - 20px);
+            max-height: 90vh;
+          }
+          
+          .device-mobile .modal-header {
+            padding: 20px;
+          }
+          
+          .device-mobile .modal-header h2 {
+            font-size: 1.5em;
+          }
+          
+          .device-mobile .music-list {
+            padding: 20px;
+          }
+        `;
+        document.head.appendChild(style);
+      }
+      
+      // Adicionar estilos específicos para tablet
+      if (device.isTablet) {
+        const style = document.createElement('style');
+        style.textContent = `
+          .device-tablet .music-item {
+            padding: 20px;
+          }
+          
+          .device-tablet .music-links {
+            gap: 10px;
+          }
+          
+          .device-tablet .music-link {
+            padding: 10px 16px;
+          }
+          
+          .device-tablet .modal-content {
+            margin: 30px;
+            width: calc(100% - 60px);
+          }
+        `;
+        document.head.appendChild(style);
+      }
+      
+      console.log(`Dispositivo detectado: ${device.deviceType}`);
+      return device;
+    }
+
+    // Exibir informações do dispositivo (para debug)
+    function showDeviceInfo() {
+      const device = detectDevice();
+      const info = document.createElement('div');
+      info.style.cssText = `
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        background: rgba(0,0,0,0.8);
+        color: white;
+        padding: 8px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        z-index: 9999;
+        font-family: monospace;
+      `;
+      info.textContent = `📱 ${device.deviceType.toUpperCase()}`;
+      document.body.appendChild(info);
+      
+      // Remover após 3 segundos
+      setTimeout(() => {
+        if (info.parentNode) {
+          info.parentNode.removeChild(info);
+        }
+      }, 3000);
+    }
+
+    // Inicializar detecção quando a página carregar
+    document.addEventListener('DOMContentLoaded', function() {
+      applyDeviceClasses();
+      showDeviceInfo();
+    });
+
+    // Redetectar quando a orientação mudar (mobile/tablet)
+    window.addEventListener('orientationchange', function() {
+      setTimeout(applyDeviceClasses, 100);
+    });
+
     document.querySelectorAll(".group").forEach(group => {
       const names = group.querySelector(".names").innerText.split(",");
       const count = names.filter(n => n.trim() !== "").length;
       const title = group.querySelector(".title-text");
       title.textContent += ` - ${count} Pessoas`;
+    });
+
+    function openMusicModal() {
+      document.getElementById('musicModal').style.display = 'block';
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeMusicModal() {
+      document.getElementById('musicModal').style.display = 'none';
+      document.body.style.overflow = 'auto';
+    }
+
+    // Fechar modal ao clicar fora do conteúdo
+    window.onclick = function(event) {
+      const modal = document.getElementById('musicModal');
+      if (event.target == modal) {
+        closeMusicModal();
+      }
+    }
+
+    // Fechar modal com a tecla ESC
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        closeMusicModal();
+      }
     });
   </script>
 </body>
