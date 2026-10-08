@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Ministerios Louvor e Mídia CEVD</title>
+  <title>Ministerio de Louvor CEVD</title>
   <!-- Tipografia Moderna -->
   <link
     href="https://fonts.googleapis.com/css?family=Montserrat:700,400&display=swap"
@@ -460,50 +460,6 @@
         </button>
       </div>
     </div>
-
-    <!-- Ministério CEVD Mídia -->
-    <div class="container">
-      <img src="logo midia.jpg" alt="Logo CEVD Mídia" class="logo" />
-      <h1>Ministério de Mídia</h1>
-
-      <div class="group">
-        <div class="group-title">
-          <i class="fa-solid fa-mobile-screen-button"></i><span class="title-text">APP 1</span>
-        </div>
-        <div class="names">
-          Felipe Silva, Jhordan, Vitoria Rodrigues, Eduardo, Aleane, Ana Clara,
-          Daniel, Paulo, Vitoria Mesquita
-        </div>
-        <a
-          class="link"
-          href="https://www.appsheet.com/newshortcut/7a48a848-2762-4d5d-bafe-128c1749accf"
-          target="_blank" rel="noopener noreferrer"
-          ><i class="fa-solid fa-arrow-up-right-from-square"></i>Acessar AppSheet</a
-        >
-      </div>
-
-      <div class="group">
-        <div class="group-title">
-          <i class="fa-solid fa-mobile-screen-button"></i><span class="title-text">APP 2</span>
-        </div>
-        <div class="names">João Paulo, Asafe, Samuel, Nycolly, Vitoria Mesquita</div>
-        <a
-          class="link"
-          href="https://www.appsheet.com/newshortcut/55e3f91a-7b91-44a4-b78f-afb39341d4ec"
-          target="_blank" rel="noopener noreferrer"
-          ><i class="fa-solid fa-arrow-up-right-from-square"></i>Acessar AppSheet</a
-        >
-      </div>
-
-      <div class="spreadsheet">
-        <a
-          href="https://docs.google.com/spreadsheets/d/1ArtFT8Q2A9QqQWmgI_o0K_JHdebOJC_i1GmPKtdi7qA/edit?pli=1&gid=1293141292#gid=1293141292"
-          target="_blank" rel="noopener noreferrer"
-        >
-          <i class="fa-solid fa-table"></i> Link das Escala em Planilha
-        </a>
-      </div>
-    </div>
   </div>
 
   <!-- Modal de Músicas -->
@@ -705,13 +661,6 @@
   </div>
 
   <script>
-    document.querySelectorAll(".group").forEach(group => {
-      const names = group.querySelector(".names").innerText.split(",");
-      const count = names.filter(n => n.trim() !== "").length;
-      const title = group.querySelector(".title-text");
-      title.textContent += ` - ${count} Pessoas`;
-    });
-
     var musicModal = document.getElementById('musicModal');
     var openBtn = document.getElementById('openMusic');
     var closeBtn = document.getElementById('closeMusic');
