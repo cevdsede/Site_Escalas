@@ -3,6 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#1d6b73">
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="icon" type="image/png" href="../icons/icon-192.png">
+<link rel="apple-touch-icon" href="../icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Escala">
 <title>Escala Louvor</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=DM+Sans:wght@400;500;600&display=swap">
 <style>
@@ -82,7 +88,7 @@ h1 { font-family: var(--font-display); font-weight: 700; font-size: clamp(30px, 
 .who span.me { background: var(--accent-soft); color: var(--accent); border-radius: 4px; padding: 0 5px; margin-inline: -5px; box-shadow: 0 0 0 1px var(--accent) inset; }
 .tbd { color: var(--empty); font-style: italic; font-size: 14px; }
 .none { color: var(--muted); padding: 24px; text-align: center; border: 1px dashed var(--line); border-radius: 10px; }
-footer { color: var(--muted); font-size: 13px; }
+footer { color: var(--muted); font-size: 13px; display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
 @media (max-width: 480px) {
   .svc { grid-template-columns: 52px minmax(0, 1fr); padding: 12px; gap: 4px 12px; }
   .date .d { font-size: 26px; }
@@ -109,7 +115,11 @@ body { margin: 0; }
     <div class="summary" id="summary" aria-live="polite"></div>
   </div>
   <main id="weeks" class="wrap" style="gap:28px"></main>
-  <footer id="status">Carregando…</footer>
+  <footer>
+    <div id="status">Carregando…</div>
+    <button type="button" class="pill" id="install" hidden>Instalar app</button>
+    <div id="iosHint" hidden>No iPhone: toque em Compartilhar e depois em "Adicionar à Tela de Início".</div>
+  </footer>
 </div>
 
 <script>
@@ -359,18 +369,53 @@ function load() {
     if (!groups.length) throw new Error("empty");
     data = build(groups);
     loaded = true; failed = false;
+    save("escala.csv", text);
+    save("escala.csvAt", String(Date.now()));
     renderPills();
     render();
     setStatus("Planilha atualizada às " + new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) + ". Atualiza sozinha a cada minuto.");
   }).catch(function () {
     if (!loaded) { failed = true; render(); setStatus("Sem conexão com a planilha."); }
-    else setStatus("Não consegui atualizar agora. Mostrando a última leitura.");
+    else setStatus("Sem conexão com a planilha. Mostrando a escala salva" + savedLabel() + ".");
   });
 }
-setStatus("Conectando à planilha…");
+function savedLabel() {
+  try {
+    var t = +localStorage.getItem("escala.csvAt");
+    if (!t) return "";
+    var d = new Date(t);
+    return " em " + pad(d.getDate()) + "/" + pad(d.getMonth() + 1) + " às " + pad(d.getHours()) + ":" + pad(d.getMinutes());
+  } catch (e) { return ""; }
+}
+// Mostra na hora a última escala vista, mesmo sem internet.
+try {
+  var cachedCsv = localStorage.getItem("escala.csv");
+  if (cachedCsv) {
+    var cachedGroups = groupsFromCsv(cachedCsv);
+    if (cachedGroups.length) { data = build(cachedGroups); loaded = true; renderPills(); render(); }
+  }
+} catch (e) {}
+setStatus(loaded ? "Mostrando a escala salva" + savedLabel() + ". Atualizando…" : "Conectando à planilha…");
 load();
 setInterval(load, 60000);
 document.addEventListener("visibilitychange", function () { if (!document.hidden) load(); });
+// App instalável (PWA) e funcionamento sem internet.
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("../sw.js").catch(function () {});
+var installBtn = document.getElementById("install"), installEvt = null;
+window.addEventListener("beforeinstallprompt", function (e) {
+  e.preventDefault();
+  installEvt = e;
+  installBtn.hidden = false;
+});
+installBtn.addEventListener("click", function () {
+  if (!installEvt) return;
+  installEvt.prompt();
+  installEvt.userChoice.then(function () { installEvt = null; installBtn.hidden = true; });
+});
+window.addEventListener("appinstalled", function () { installBtn.hidden = true; });
+var isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
+var standalone = window.matchMedia("(display-mode: standalone)").matches || navigator.standalone;
+if (isIos && !standalone) document.getElementById("iosHint").hidden = false;
 </script>
 </body>
 </html>
