@@ -160,6 +160,7 @@
       d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
   };
   let savedAt = 0;
+  let urlTema = new URLSearchParams(location.search).get('tema') || ''; // vem do link do Passos de Fé
 
   function applyData(data) {
     pinRequired = Boolean(data.pin_obrigatorio);
@@ -180,6 +181,7 @@
 
     $('updated').textContent = 'Atualizado em ' + new Date(data.atualizado_em).toLocaleString('pt-BR');
     fillFilters();
+    if (urlTema) { $('themeFilter').value = urlTema; urlTema = ''; }
     $('stTotal').textContent = songs.length.toLocaleString('pt-BR');
     $('stTemas').textContent = new Set(songs.map((s) => s.theme)).size.toLocaleString('pt-BR');
     renderSongs();

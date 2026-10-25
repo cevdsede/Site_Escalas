@@ -14,6 +14,7 @@ var SHELL = [
   "theme.css",
   "theme.js",
   "site.js",
+  "passos-de-fe.json",
   "icons/icon-192.png",
   "icons/icon-512.png"
 ];

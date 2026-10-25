@@ -300,6 +300,10 @@
     }
     .playlist-link:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4); }
 
+    .music-empty { grid-column: 1 / -1; text-align: center; color: var(--muted); margin: 20px 0; }
+    .modal-header .more { text-align: center; margin: 16px 0 0; font-size: 0.9em; }
+    .modal-header .more a { color: #fff; text-decoration: underline; }
+
     @media (max-width: 768px) {
       .music-list { grid-template-columns: 1fr; gap: 16px; padding: 20px; }
       .music-item { padding: 16px; }
@@ -361,193 +365,45 @@
             🎧 Playlist Completa no YouTube Music
           </a>
         </div>
+        <p class="more"><a href="musicas/biblioteca-musicas.html?tema=Passos%20de%20F%C3%A9">Ver todas as músicas do tema Passos de Fé na Biblioteca ›</a></p>
       </div>
       
-      <div class="music-list">
-        <div class="music-item">
-          <div class="music-title">1. Milagres São Reais</div>
-          <div class="music-artist">Thiago Godoi</div>
-          <div class="music-links">
-            <a href="https://www.letras.mus.br/thiago-godoi/milagres-sao-reais/" target="_blank" rel="noopener noreferrer" class="music-link">📝 Letra</a>
-            <a href="https://www.cifraclub.com.br/thiago-godoi/milagres-sao-reais/" target="_blank" rel="noopener noreferrer" class="music-link">🎸 Cifra</a>
-            <a href="https://open.spotify.com/search/Milagres%20S%C3%A3o%20Reais%20Thiago%20Godoi" target="_blank" rel="noopener noreferrer" class="music-link">🎵 Spotify</a>
-          </div>
-        </div>
-
-        <div class="music-item">
-          <div class="music-title">2. O Escudo + Sou Um Milagre</div>
-          <div class="music-artist">Lukas Agustinho</div>
-          <div class="music-links">
-            <a href="https://www.letras.mus.br/lukas-agustinho/o-escudo-sou-um-milagre/" target="_blank" rel="noopener noreferrer" class="music-link">📝 Letra</a>
-            <a href="https://www.cifraclub.com.br/lukas-agustinho/o-escudo-sou-um-milagre/" target="_blank" rel="noopener noreferrer" class="music-link">🎸 Cifra</a>
-            <a href="https://open.spotify.com/search/Lukas%20Agustinho%20O%20Escudo%2B%20Sou%20Um%20Milagre" target="_blank" rel="noopener noreferrer" class="music-link">🎵 Spotify</a>
-          </div>
-        </div>
-
-        <div class="music-item">
-          <div class="music-title">3. Cadeias Quebrar</div>
-          <div class="music-artist">Sarah Oliveira</div>
-          <div class="music-links">
-            <a href="https://www.letras.mus.br/sarah-oliveira/cadeias-quebrar/" target="_blank" rel="noopener noreferrer" class="music-link">📝 Letra</a>
-            <a href="https://www.cifraclub.com.br/sarah-oliveira/cadeias-quebrar/" target="_blank" rel="noopener noreferrer" class="music-link">🎸 Cifra</a>
-            <a href="https://open.spotify.com/search/Cadeias%20Quebrar%20Sarah%20Oliveira" target="_blank" rel="noopener noreferrer" class="music-link">🎵 Spotify</a>
-          </div>
-        </div>
-
-        <div class="music-item">
-          <div class="music-title">4. Jeová Jireh</div>
-          <div class="music-artist">Aline Barros</div>
-          <div class="music-links">
-            <a href="https://www.letras.mus.br/aline-barros/jehovah-jireh/" target="_blank" rel="noopener noreferrer" class="music-link">📝 Letra</a>
-            <a href="https://www.cifraclub.com.br/aline-barros/jehovah-jireh/" target="_blank" rel="noopener noreferrer" class="music-link">🎸 Cifra</a>
-            <a href="https://open.spotify.com/search/Jeov%C3%A1%20Jireh%20Aline%20Barros" target="_blank" rel="noopener noreferrer" class="music-link">🎵 Spotify</a>
-          </div>
-        </div>
-
-        <div class="music-item">
-          <div class="music-title">5. Deus Proverá</div>
-          <div class="music-artist">Gabriela Gomes</div>
-          <div class="music-links">
-            <a href="https://www.letras.mus.br/gabriela-gomes/deus-provera/" target="_blank" rel="noopener noreferrer" class="music-link">📝 Letra</a>
-            <a href="https://www.cifraclub.com.br/gabriela-gomes/deus-provera/" target="_blank" rel="noopener noreferrer" class="music-link">🎸 Cifra</a>
-            <a href="https://open.spotify.com/search/Deus%20Prover%C3%A1%20Gabriela%20Gomes" target="_blank" rel="noopener noreferrer" class="music-link">🎵 Spotify</a>
-          </div>
-        </div>
-
-        <div class="music-item">
-          <div class="music-title">6. Vem Espírito</div>
-          <div class="music-artist">Gabriela Gomes</div>
-          <div class="music-links">
-            <a href="https://www.letras.mus.br/gabriela-gomes/vem-espirito/" target="_blank" rel="noopener noreferrer" class="music-link">📝 Letra</a>
-            <a href="https://www.cifraclub.com.br/gabriela-gomes/vem-espirito/" target="_blank" rel="noopener noreferrer" class="music-link">🎸 Cifra</a>
-            <a href="https://open.spotify.com/search/Vem%20Esp%C3%ADrito%20Gabriela%20Gomes" target="_blank" rel="noopener noreferrer" class="music-link">🎵 Spotify</a>
-          </div>
-        </div>
-
-        <div class="music-item">
-          <div class="music-title">7. Todavia Me Alegrarei</div>
-          <div class="music-artist">Samuel Messias</div>
-          <div class="music-links">
-            <a href="https://www.letras.mus.br/samuel-messias/todavia-me-alegrarei/" target="_blank" rel="noopener noreferrer" class="music-link">📝 Letra</a>
-            <a href="https://www.cifraclub.com.br/samuel-messias/todavia-me-alegrarei/" target="_blank" rel="noopener noreferrer" class="music-link">🎸 Cifra</a>
-            <a href="https://open.spotify.com/search/Todavia%20Me%20Alegrarei%20Samuel%20Messias" target="_blank" rel="noopener noreferrer" class="music-link">🎵 Spotify</a>
-          </div>
-        </div>
-
-        <div class="music-item">
-          <div class="music-title">8. Palavras</div>
-          <div class="music-artist">Carol Braga</div>
-          <div class="music-links">
-            <a href="https://www.letras.mus.br/carol-braga/palavras/" target="_blank" rel="noopener noreferrer" class="music-link">📝 Letra</a>
-            <a href="https://www.cifraclub.com.br/carol-braga/palavras/" target="_blank" rel="noopener noreferrer" class="music-link">🎸 Cifra</a>
-            <a href="https://open.spotify.com/search/Palavras%20Carol%20Braga" target="_blank" rel="noopener noreferrer" class="music-link">🎵 Spotify</a>
-          </div>
-        </div>
-
-        <div class="music-item">
-          <div class="music-title">9. Clamo Jesus</div>
-          <div class="music-artist">Jadson Moreno</div>
-          <div class="music-links">
-            <a href="https://www.letras.mus.br/jadson-moreno/clamo-jesus/" target="_blank" rel="noopener noreferrer" class="music-link">📝 Letra</a>
-            <a href="https://www.cifraclub.com.br/jadson-moreno/clamo-jesus/" target="_blank" rel="noopener noreferrer" class="music-link">🎸 Cifra</a>
-            <a href="https://open.spotify.com/search/Clamo%20Jesus%20Jadson%20Moreno" target="_blank" rel="noopener noreferrer" class="music-link">🎵 Spotify</a>
-          </div>
-        </div>
-
-        <div class="music-item">
-          <div class="music-title">10. Em Teu Nome</div>
-          <div class="music-artist">Family Worship</div>
-          <div class="music-links">
-            <a href="https://www.letras.mus.br/family-worship/em-teu-nome/" target="_blank" rel="noopener noreferrer" class="music-link">📝 Letra</a>
-            <a href="https://www.cifraclub.com.br/family-worship/em-teu-nome/" target="_blank" rel="noopener noreferrer" class="music-link">🎸 Cifra</a>
-            <a href="https://open.spotify.com/search/Em%20Teu%20Nome%20Family%20Worship" target="_blank" rel="noopener noreferrer" class="music-link">🎵 Spotify</a>
-          </div>
-        </div>
-
-        <div class="music-item">
-          <div class="music-title">11. Tu Podes</div>
-          <div class="music-artist">Régis Danese</div>
-          <div class="music-links">
-            <a href="https://www.letras.mus.br/regis-danese/tu-podes/" target="_blank" rel="noopener noreferrer" class="music-link">📝 Letra</a>
-            <a href="https://www.cifraclub.com.br/regis-danese/tu-podes/" target="_blank" rel="noopener noreferrer" class="music-link">🎸 Cifra</a>
-            <a href="https://open.spotify.com/search/Tu%20Podes%20R%C3%A9gis%20Danese" target="_blank" rel="noopener noreferrer" class="music-link">🎵 Spotify</a>
-          </div>
-        </div>
-
-        <div class="music-item">
-          <div class="music-title">12. Além do Impossível</div>
-          <div class="music-artist">Felipe Rodrigues</div>
-          <div class="music-links">
-            <a href="https://www.letras.mus.br/felipe-rodrigues/alem-do-impossivel/" target="_blank" rel="noopener noreferrer" class="music-link">📝 Letra</a>
-            <a href="https://www.cifraclub.com.br/felipe-rodrigues/alem-do-impossivel/" target="_blank" rel="noopener noreferrer" class="music-link">🎸 Cifra</a>
-            <a href="https://open.spotify.com/search/Al%C3%A9m%20do%20Imposs%C3%ADvel%20Felipe%20Rodrigues" target="_blank" rel="noopener noreferrer" class="music-link">🎵 Spotify</a>
-          </div>
-        </div>
-
-        <div class="music-item">
-          <div class="music-title">13. Yahweh Se Manifestará</div>
-          <div class="music-artist">Marcos Freire, Julliany Souza e Léo Brandão</div>
-          <div class="music-links">
-            <a href="https://www.letras.mus.br/marcos-freire/yahweh-se-manifestara/" target="_blank" rel="noopener noreferrer" class="music-link">📝 Letra</a>
-            <a href="https://www.cifraclub.com.br/marcos-freire/yahweh-se-manifestara/" target="_blank" rel="noopener noreferrer" class="music-link">🎸 Cifra</a>
-            <a href="https://open.spotify.com/search/Yahweh%20Se%20Manifestar%C3%A1%20Marcos%20Freire" target="_blank" rel="noopener noreferrer" class="music-link">🎵 Spotify</a>
-          </div>
-        </div>
-
-        <div class="music-item">
-          <div class="music-title">14. Sobre As Águas</div>
-          <div class="music-artist">Davi Sacer</div>
-          <div class="music-links">
-            <a href="https://www.letras.mus.br/davi-sacer/sobre-as-aguas/" target="_blank" rel="noopener noreferrer" class="music-link">📝 Letra</a>
-            <a href="https://www.cifraclub.com.br/davi-sacer/sobre-as-aguas/" target="_blank" rel="noopener noreferrer" class="music-link">🎸 Cifra</a>
-            <a href="https://open.spotify.com/search/Sobre%20As%20%C3%81guas%20Davi%20Sacer" target="_blank" rel="noopener noreferrer" class="music-link">🎵 Spotify</a>
-          </div>
-        </div>
-
-        <div class="music-item">
-          <div class="music-title">15. Escape + Nunca Pare de Lutar</div>
-          <div class="music-artist">Jadson Moreno</div>
-          <div class="music-links">
-            <a href="https://www.letras.mus.br/jadson-moreno/escape-nunca-pare-de-lutar/" target="_blank" rel="noopener noreferrer" class="music-link">📝 Letra</a>
-            <a href="https://www.cifraclub.com.br/jadson-moreno/escape-nunca-pare-de-lutar/" target="_blank" rel="noopener noreferrer" class="music-link">🎸 Cifra</a>
-            <a href="https://open.spotify.com/search/Escape%2B%20Nunca%20Pare%20de%20Lutar%20Jadson%20Moreno" target="_blank" rel="noopener noreferrer" class="music-link">🎵 Spotify</a>
-          </div>
-        </div>
-
-        <div class="music-item">
-          <div class="music-title">16. Restitui</div>
-          <div class="music-artist">Davi Sacer</div>
-          <div class="music-links">
-            <a href="https://www.letras.mus.br/davi-sacer/restitui/" target="_blank" rel="noopener noreferrer" class="music-link">📝 Letra</a>
-            <a href="https://www.cifraclub.com.br/davi-sacer/restitui/" target="_blank" rel="noopener noreferrer" class="music-link">🎸 Cifra</a>
-            <a href="https://open.spotify.com/search/Restitui%20Davi%20Sacer" target="_blank" rel="noopener noreferrer" class="music-link">🎵 Spotify</a>
-          </div>
-        </div>
-
-        <div class="music-item">
-          <div class="music-title">17. Deserto + Aquieta Minh'alma</div>
-          <div class="music-artist">Jadson Moreno</div>
-          <div class="music-links">
-            <a href="https://www.letras.mus.br/jadson-moreno/deserto-aquieta-minhalma/" target="_blank" rel="noopener noreferrer" class="music-link">📝 Letra</a>
-            <a href="https://www.cifraclub.com.br/jadson-moreno/deserto-aquieta-minhalma/" target="_blank" rel="noopener noreferrer" class="music-link">🎸 Cifra</a>
-            <a href="https://open.spotify.com/search/Deserto%2B%20Aquieta%20Minhalma%20Jadson%20Moreno" target="_blank" rel="noopener noreferrer" class="music-link">🎵 Spotify</a>
-          </div>
-        </div>
-
-        <div class="music-item">
-          <div class="music-title">18. Ressuscita-me</div>
-          <div class="music-artist">Aline Barros</div>
-          <div class="music-links">
-            <a href="https://www.letras.mus.br/aline-barros/ressuscita-me/" target="_blank" rel="noopener noreferrer" class="music-link">📝 Letra</a>
-            <a href="https://www.cifraclub.com.br/aline-barros/ressuscita-me/" target="_blank" rel="noopener noreferrer" class="music-link">🎸 Cifra</a>
-            <a href="https://open.spotify.com/search/Ressuscita-me%20Aline%20Barros" target="_blank" rel="noopener noreferrer" class="music-link">🎵 Spotify</a>
-          </div>
-        </div>
-      </div>
+      <div class="music-list" id="musicList"><p class="music-empty" id="musicEmpty">Carregando a lista…</p></div>
     </div>
   </div>
 
   <script>
+    // Lista do Passos de Fé: vem de passos-de-fe.json (edite o arquivo para mudar as músicas)
+    function carregarPassosDeFe() {
+      var box = document.getElementById('musicList');
+      fetch('passos-de-fe.json').then(function (r) {
+        if (!r.ok) throw new Error('http ' + r.status);
+        return r.json();
+      }).then(function (d) {
+        box.textContent = '';
+        (d.musicas || []).forEach(function (m, i) {
+          var item = document.createElement('div'); item.className = 'music-item';
+          var t = document.createElement('div'); t.className = 'music-title'; t.textContent = (i + 1) + '. ' + m.musica;
+          var a = document.createElement('div'); a.className = 'music-artist'; a.textContent = m.cantor;
+          var links = document.createElement('div'); links.className = 'music-links';
+          [['letra', '📝 Letra'], ['cifra', '🎸 Cifra'], ['spotify', '🎵 Spotify']].forEach(function (k) {
+            if (!m[k[0]]) return;
+            var l = document.createElement('a');
+            l.href = m[k[0]]; l.target = '_blank'; l.rel = 'noopener noreferrer'; l.className = 'music-link'; l.textContent = k[1];
+            links.appendChild(l);
+          });
+          item.appendChild(t); item.appendChild(a); item.appendChild(links);
+          box.appendChild(item);
+        });
+      }).catch(function () {
+        box.textContent = '';
+        var p = document.createElement('p'); p.className = 'music-empty';
+        p.textContent = 'Não consegui carregar a lista agora. Tente de novo mais tarde.';
+        box.appendChild(p);
+      });
+    }
+    carregarPassosDeFe();
+
     var musicModal = document.getElementById('musicModal');
     var openBtn = document.getElementById('openMusic');
     var closeBtn = document.getElementById('closeMusic');
