@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#1d6b73">
+  <meta name="theme-color" content="#3f51b5">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" type="image/png" href="icons/icon-192.png">
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -12,7 +12,7 @@
   <title>Ministerio de Louvor CEVD</title>
   <!-- Tipografia Moderna -->
   <link
-    href="https://fonts.googleapis.com/css?family=Montserrat:700,400&display=swap"
+    href="https://fonts.googleapis.com/css?family=Montserrat:400,500,600,700,800&display=swap"
     rel="stylesheet"
   />
   <!-- Ícones FontAwesome -->
@@ -20,13 +20,17 @@
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
   />
+  <link rel="stylesheet" href="theme.css">
+  <script src="theme.js"></script>
   <style>
     body {
-      background: linear-gradient(135deg, #e3f0ff 0%, #faf3e3 100%);
-      font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif;
+      background: var(--bg);
+      background-image: var(--page-bg);
+      background-attachment: fixed;
+      font-family: var(--font);
       margin: 0;
       padding: 0;
-      color: #222;
+      color: var(--text);
       min-height: 100vh;
     }
 
@@ -42,9 +46,9 @@
     }
 
     .container {
-      background: #fff;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-      border-radius: 16px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      border-radius: var(--radius);
       padding: 32px 16px;
       animation: fadeIn 1.2s;
       flex: 1 1 600px;
@@ -59,81 +63,19 @@
       max-width: 120px;
       border-radius: 50%;
       box-shadow: 0 2px 8px rgba(63, 81, 181, 0.17);
-      background: #fff;
+      background: var(--surface);
       animation: fadeIn 1.2s;
     }
 
     h1 {
       text-align: center;
-      color: #3f51b5;
+      color: var(--brand-text);
       margin-bottom: 24px;
       margin-top: 0;
       font-weight: 700;
       letter-spacing: 1px;
       font-size: 2.1em;
       animation: fadeIn 1.4s;
-    }
-
-    .group {
-      margin-bottom: 30px;
-      padding: 20px 16px;
-      border-radius: 12px;
-      background: #f7f8fe;
-      box-shadow: 0 2px 8px rgba(63, 81, 181, 0.09);
-      transition: transform 0.18s, box-shadow 0.18s;
-      animation: fadeIn 1.6s;
-      position: relative;
-    }
-
-    .group:hover {
-      transform: scale(1.03);
-      box-shadow: 0 6px 22px rgba(63, 81, 181, 0.18);
-    }
-
-    .group-title {
-      font-size: 1.25em;
-      font-weight: 700;
-      color: #222;
-      margin-bottom: 6px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .group-title i {
-      color: #3f51b5;
-    }
-
-    .names {
-      margin-bottom: 8px;
-      color: #444;
-      font-size: 1em;
-      font-weight: 400;
-      letter-spacing: 0.5px;
-    }
-
-    .link {
-      display: inline-block;
-      background: #3f51b5;
-      color: #fff;
-      padding: 8px 18px;
-      border-radius: 7px;
-      text-decoration: none;
-      transition: background 0.2s, box-shadow 0.2s;
-      margin-bottom: 6px;
-      font-weight: 600;
-      font-size: 1em;
-      box-shadow: 0 1px 5px rgba(63, 81, 181, 0.1);
-      animation: fadeIn 1.8s;
-    }
-
-    .link i {
-      margin-right: 6px;
-    }
-
-    .link:hover {
-      background: #283593;
-      box-shadow: 0 4px 16px rgba(63, 81, 181, 0.2);
     }
 
     .spreadsheet {
@@ -144,15 +86,15 @@
 
     .spreadsheet a,
     .spreadsheet button {
-      background: #43a047;
+      background: var(--brand);
       padding: 10px 26px;
       border-radius: 9px;
-      color: #fff;
+      color: var(--on-brand);
       text-decoration: none;
       font-weight: bold;
       font-size: 1.05em;
       transition: background 0.2s, box-shadow 0.2s;
-      box-shadow: 0 1px 5px rgba(67, 160, 71, 0.1);
+      box-shadow: 0 1px 5px rgba(63, 81, 181, 0.15);
       display: block;
       width: 100%;
       max-width: 320px;
@@ -169,50 +111,55 @@
       margin-right: 7px;
     }
 
+    .spreadsheet a:hover,
+    .spreadsheet button:hover {
+      background: var(--brand-dark);
+      box-shadow: 0 4px 16px rgba(63, 81, 181, 0.25);
+    }
+
+    .spreadsheet .coral { background: var(--coral); }
+    .spreadsheet .coral:hover { background: var(--coral-dark); }
+
+    .spreadsheet .ghost {
+      background: var(--surface-2);
+      color: var(--brand-text);
+      border: 1px solid var(--border);
+      box-shadow: none;
+    }
+    .spreadsheet .ghost:hover { background: var(--brand-soft); }
+
     .spreadsheet a:focus-visible,
     .spreadsheet button:focus-visible,
-    .close-btn:focus-visible {
-      outline: 3px solid #1a237e;
+    .close-btn:focus-visible,
+    .music-link:focus-visible,
+    .playlist-link:focus-visible {
+      outline: 3px solid var(--brand-text);
       outline-offset: 3px;
     }
 
-    .spreadsheet a:hover,
-    .spreadsheet button:hover {
-      background: #2e7031;
-      box-shadow: 0 4px 16px rgba(67, 160, 71, 0.18);
+    .help {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85em;
+      margin: 14px auto 0;
+      max-width: 320px;
     }
 
     @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(25px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(25px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     @media (max-width: 960px) {
-      .wrapper {
-        gap: 24px;
-      }
+      .wrapper { gap: 24px; }
     }
 
     @media (max-width: 650px) {
-      .wrapper {
-        flex-direction: column;
-        align-items: center;
-        gap: 32px;
-      }
-      .container {
-        max-width: 100%;
-        flex-basis: auto;
-        min-width: auto;
-      }
+      .wrapper { flex-direction: column; align-items: center; gap: 32px; }
+      .container { max-width: 100%; flex-basis: auto; min-width: auto; }
     }
 
-    /* Modal Styles */
+    /* Janela da lista de músicas */
     .music-modal {
       display: none;
       position: fixed;
@@ -220,13 +167,13 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0,0,0,0.8);
+      background: rgba(0, 0, 0, 0.8);
       z-index: 1000;
       overflow-y: auto;
     }
 
     .modal-content {
-      background: white;
+      background: var(--surface);
       margin: 50px auto;
       padding: 0;
       border-radius: 16px;
@@ -234,12 +181,12 @@
       width: 90%;
       max-height: 80vh;
       overflow-y: auto;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
     }
 
     .modal-header {
-      background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
-      color: white;
+      background: linear-gradient(135deg, #3b4a8c 0%, #232b52 100%);
+      color: #fff;
       padding: 30px;
       border-radius: 16px 16px 0 0;
       position: sticky;
@@ -247,16 +194,12 @@
       z-index: 10;
     }
 
-    .modal-header h2 {
-      font-size: 2em;
-      margin-bottom: 10px;
-      font-weight: 700;
-    }
+    .modal-header h2 { font-size: 2em; margin-bottom: 10px; font-weight: 700; }
 
     .close-btn {
-      background: rgba(255,255,255,0.2);
+      background: rgba(255, 255, 255, 0.2);
       border: none;
-      color: white;
+      color: #fff;
       font-size: 1.5em;
       cursor: pointer;
       padding: 8px 15px;
@@ -265,10 +208,7 @@
       transition: all 0.3s ease;
       margin-top: -10px;
     }
-
-    .close-btn:hover {
-      background: rgba(255,255,255,0.3);
-    }
+    .close-btn:hover { background: rgba(255, 255, 255, 0.3); }
 
     .music-list {
       padding: 30px;
@@ -278,13 +218,12 @@
     }
 
     .music-item {
-      background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+      background: var(--surface-2);
       border-radius: 16px;
       padding: 24px;
-
-      border-left: 5px solid #ff6b6b;
+      border-left: 5px solid var(--coral);
       transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      box-shadow: var(--shadow);
       position: relative;
       overflow: hidden;
     }
@@ -296,39 +235,26 @@
       left: -100%;
       width: 100%;
       height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 107, 107, 0.1), transparent);
+      background: linear-gradient(90deg, transparent, rgba(229, 83, 45, 0.1), transparent);
       transition: left 0.6s ease;
     }
-
-    .music-item:hover::before {
-      left: 100%;
-    }
-
-    .music-item:hover {
-      transform: translateY(-8px) scale(1.02);
-      box-shadow: 0 12px 40px rgba(255, 107, 107, 0.2);
-      border-left-color: #ff5252;
-    }
+    .music-item:hover::before { left: 100%; }
+    .music-item:hover { transform: translateY(-8px) scale(1.02); box-shadow: 0 12px 40px rgba(229, 83, 45, 0.2); }
 
     .music-title {
       font-size: 1.4em;
       font-weight: 800;
-      color: #2c3e50;
+      color: var(--text);
       margin-bottom: 10px;
       letter-spacing: -0.5px;
       display: flex;
       align-items: center;
       gap: 10px;
     }
-
-    .music-title::before {
-      content: '🎵';
-      font-size: 0.8em;
-      opacity: 0.7;
-    }
+    .music-title::before { content: '🎵'; font-size: 0.8em; opacity: 0.7; }
 
     .music-artist {
-      color: #7f8c8d;
+      color: var(--muted);
       margin-bottom: 18px;
       font-style: italic;
       font-size: 1.05em;
@@ -337,22 +263,13 @@
       align-items: center;
       gap: 8px;
     }
+    .music-artist::before { content: '🎤'; font-size: 0.9em; }
 
-    .music-artist::before {
-      content: '🎤';
-      font-size: 0.9em;
-    }
-
-    .music-links {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-top: 15px;
-    }
+    .music-links { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 15px; }
 
     .music-link {
-      background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
-      color: white;
+      background: var(--brand);
+      color: var(--on-brand);
       text-decoration: none;
       padding: 10px 18px;
       border-radius: 30px;
@@ -362,35 +279,15 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      box-shadow: 0 4px 15px rgba(74, 85, 104, 0.3);
+      box-shadow: 0 4px 15px rgba(63, 81, 181, 0.3);
       position: relative;
       overflow: hidden;
     }
-
-    .music-link::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-      transition: left 0.5s ease;
-    }
-
-    .music-link:hover::before {
-      left: 100%;
-    }
-
-    .music-link:hover {
-      transform: translateY(-3px) scale(1.05);
-      box-shadow: 0 8px 25px rgba(74, 85, 104, 0.4);
-    }
-
+    .music-link:hover { background: var(--brand-dark); transform: translateY(-3px) scale(1.05); }
 
     .playlist-link {
       background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
-      color: white;
+      color: #fff;
       text-decoration: none;
       padding: 15px 30px;
       border-radius: 50px;
@@ -400,11 +297,7 @@
       box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
       transition: all 0.3s ease;
     }
-
-    .playlist-link:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
-    }
+    .playlist-link:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4); }
 
     @media (max-width: 768px) {
       .music-list { grid-template-columns: 1fr; gap: 16px; padding: 20px; }
@@ -412,43 +305,14 @@
       .music-title { font-size: 1.2em; }
       .modal-header { padding: 20px; }
       .modal-header h2 { font-size: 1.5em; }
-      .modal-content {
-        margin: 20px;
-        width: calc(100% - 40px);
-      }
-      
-      .music-links {
-        flex-direction: column;
-      }
-      
-      .music-link {
-        text-align: center;
-        justify-content: center;
-      }
+      .modal-content { margin: 20px; width: calc(100% - 40px); }
+      .music-links { flex-direction: column; }
+      .music-link { text-align: center; justify-content: center; }
     }
-    @media (prefers-color-scheme: dark) {
-      body { background: linear-gradient(135deg, #0f1626 0%, #1b1a17 100%); color: #e6e9ef; }
-      .container { background: #172033; box-shadow: 0 4px 16px rgba(0,0,0,0.5); }
-      .logo { background: #172033; }
-      h1 { color: #9fb0ff; }
-      .group { background: #1d2740; box-shadow: 0 2px 8px rgba(0,0,0,0.4); }
-      .group-title { color: #e6e9ef; }
-      .group-title i { color: #9fb0ff; }
-      .names { color: #b4bccc; }
-      .link { background: #5c6bc0; }
-      .link:hover { background: #7986cb; }
-      .spreadsheet a:focus-visible, .spreadsheet button:focus-visible, .close-btn:focus-visible { outline-color: #c5cae9; }
-      .modal-content { background: #172033; }
-      .music-item { background: linear-gradient(135deg, #1d2740 0%, #172033 100%); box-shadow: 0 4px 20px rgba(0,0,0,0.4); }
-      .music-title { color: #e6e9ef; }
-      .music-artist { color: #a5afc0; }
-    }
-
-    .ios-hint { text-align: center; color: #555; font-size: 0.85em; margin: 18px auto 0; max-width: 320px; }
-    @media (prefers-color-scheme: dark) { .ios-hint { color: #b4bccc; } }
   </style>
 </head>
 <body>
+  <button type="button" class="theme-btn theme-fab" data-theme-toggle></button>
   <div class="wrapper">
     <!-- Ministério Louvor -->
     <div class="container">
@@ -466,24 +330,21 @@
       <div class="spreadsheet">
         <a
           href="musicas/biblioteca-musicas.html"
-          style="background: #3f51b5;"
         >
           <i class="fa-solid fa-headphones"></i> Biblioteca de Músicas
         </a>
       </div>
 
       <div class="spreadsheet">
-        <button type="button" id="openMusic" aria-haspopup="dialog" style="background: #ff6b6b;">
+        <button type="button" id="openMusic" class="coral" aria-haspopup="dialog">
           <i class="fa-solid fa-music"></i> Lista música Passos de Fé
         </button>
       </div>
 
-      <div class="spreadsheet" id="installBox" hidden>
-        <button type="button" id="install" style="background: #455a64;">
-          <i class="fa-solid fa-download"></i> Instalar app
-        </button>
+      <div class="spreadsheet" id="installBox">
+        <button type="button" id="install" class="ghost"><i class="fa-solid fa-download"></i> Instalar app</button>
       </div>
-      <p class="ios-hint" id="iosHint" hidden>No iPhone: toque em Compartilhar e depois em "Adicionar à Tela de Início".</p>
+      <p class="help" id="installHelp" hidden>Para instalar: no Chrome ou Edge, abra o menu do navegador (⋮) e toque em "Instalar app" ou "Adicionar à tela inicial". No iPhone, toque em Compartilhar e depois em "Adicionar à Tela de Início".</p>
     </div>
   </div>
 
@@ -725,21 +586,15 @@
     if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(function () {});
 
     // App instalável (PWA)
-    var installBox = document.getElementById("installBox"), installBtn = document.getElementById("install"), installEvt = null;
-    window.addEventListener("beforeinstallprompt", function (e) {
-      e.preventDefault();
-      installEvt = e;
-      installBox.hidden = false;
-    });
+    var installBox = document.getElementById("installBox"), installBtn = document.getElementById("install"),
+        installHelp = document.getElementById("installHelp"), installEvt = null;
+    window.addEventListener("beforeinstallprompt", function (e) { e.preventDefault(); installEvt = e; });
     installBtn.addEventListener("click", function () {
-      if (!installEvt) return;
-      installEvt.prompt();
-      installEvt.userChoice.then(function () { installEvt = null; installBox.hidden = true; });
+      if (installEvt) { installEvt.prompt(); installEvt.userChoice.then(function () { installEvt = null; }); }
+      else installHelp.hidden = !installHelp.hidden;
     });
-    window.addEventListener("appinstalled", function () { installBox.hidden = true; });
-    var isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
-    var standalone = window.matchMedia("(display-mode: standalone)").matches || navigator.standalone;
-    if (isIos && !standalone) document.getElementById("iosHint").hidden = false;
+    window.addEventListener("appinstalled", function () { installBox.hidden = true; installHelp.hidden = true; });
+    if (window.matchMedia("(display-mode: standalone)").matches || navigator.standalone) installBox.hidden = true;
   </script>
 </body>
 </html>
