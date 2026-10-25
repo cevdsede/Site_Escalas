@@ -12,6 +12,10 @@
   <title>Ministerio de Louvor CEVD</title>
   <!-- Tipografia Moderna -->
   <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+  <link
     href="https://fonts.googleapis.com/css?family=Montserrat:400,500,600,700,800&display=swap"
     rel="stylesheet"
   />
@@ -160,159 +164,233 @@
       .container { max-width: 100%; flex-basis: auto; min-width: auto; }
     }
 
-    /* Janela da lista de músicas */
+    /* Janela do Passos de Fé: mesmo visual do app Valentes Connected (creme, azul-marinho e dourado) */
     .music-modal {
+      --ap-bg: #f7f1e6; --ap-surface: #f8f0e4; --ap-strong: #f3e8d8; --ap-muted: #ede0cb;
+      --ap-border: rgba(120, 53, 15, 0.12); --ap-text: #1f2937; --ap-text-muted: #6b7280;
+      --ap-brand: #1e3a8a; --ap-brand-text: #1e3a8a; --ap-brand-soft: rgba(30, 58, 138, 0.1);
+      --ap-accent: #eab308; --ap-shadow: 0 18px 44px rgba(39, 26, 12, 0.2);
       display: none;
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.8);
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+      -webkit-backdrop-filter: blur(4px);
+      backdrop-filter: blur(4px);
       z-index: 1000;
       overflow-y: auto;
+      font-family: 'Plus Jakarta Sans', var(--font);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) .music-modal {
+        --ap-bg: #08111f; --ap-surface: #0c1627; --ap-strong: #111f36; --ap-muted: #13233b;
+        --ap-border: rgba(255, 255, 255, 0.09); --ap-text: #f8fafc; --ap-text-muted: #94a3b8;
+        --ap-brand: #2447a8; --ap-brand-text: #7fb0ff; --ap-brand-soft: rgba(96, 165, 250, 0.14);
+        --ap-shadow: 0 28px 80px rgba(2, 6, 23, 0.6);
+      }
+    }
+    :root[data-theme="dark"] .music-modal {
+      --ap-bg: #08111f; --ap-surface: #0c1627; --ap-strong: #111f36; --ap-muted: #13233b;
+      --ap-border: rgba(255, 255, 255, 0.09); --ap-text: #f8fafc; --ap-text-muted: #94a3b8;
+      --ap-brand: #2447a8; --ap-brand-text: #7fb0ff; --ap-brand-soft: rgba(96, 165, 250, 0.14);
+      --ap-shadow: 0 28px 80px rgba(2, 6, 23, 0.6);
     }
 
     .modal-content {
-      background: var(--surface);
-      margin: 50px auto;
-      padding: 0;
-      border-radius: 16px;
-      max-width: 900px;
-      width: 90%;
-      max-height: 80vh;
+      background-color: var(--ap-bg);
+      background-image:
+        radial-gradient(circle at top left, rgba(234, 179, 8, 0.12), transparent 30%),
+        radial-gradient(circle at top right, rgba(30, 58, 138, 0.12), transparent 32%);
+      color: var(--ap-text);
+      margin: 40px auto;
+      width: 92%;
+      max-width: 940px;
+      max-height: 86vh;
       overflow-y: auto;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--ap-border);
+      border-radius: 2rem;
+      box-shadow: var(--ap-shadow);
+      animation: fadeIn 0.35s ease;
     }
 
     .modal-header {
-      background: linear-gradient(135deg, #3b4a8c 0%, #232b52 100%);
-      color: #fff;
-      padding: 30px;
-      border-radius: 16px 16px 0 0;
       position: sticky;
       top: 0;
       z-index: 10;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 14px 16px;
+      padding: 22px 26px;
+      background: var(--ap-strong);
+      border-bottom: 1px solid var(--ap-border);
+      border-radius: 2rem 2rem 0 0;
     }
-
-    .modal-header h2 { font-size: 2em; margin-bottom: 10px; font-weight: 700; }
-
-    .close-btn {
-      background: rgba(255, 255, 255, 0.2);
-      border: none;
-      color: #fff;
-      font-size: 1.5em;
-      cursor: pointer;
-      padding: 8px 15px;
-      border-radius: 50px;
-      float: right;
-      transition: all 0.3s ease;
-      margin-top: -10px;
-    }
-    .close-btn:hover { background: rgba(255, 255, 255, 0.3); }
-
-    .music-list {
-      padding: 30px;
+    .mh-icon {
+      flex: none;
+      width: 48px;
+      height: 48px;
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 20px;
+      place-items: center;
+      border-radius: 1rem;
+      background: var(--ap-brand);
+      color: #fff;
+      font-size: 20px;
+      box-shadow: 0 8px 20px rgba(30, 58, 138, 0.3);
     }
-
-    .music-item {
-      background: var(--surface-2);
-      border-radius: 16px;
-      padding: 24px;
-      border-left: 5px solid var(--coral);
-      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      box-shadow: var(--shadow);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .music-item::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(229, 83, 45, 0.1), transparent);
-      transition: left 0.6s ease;
-    }
-    .music-item:hover::before { left: 100%; }
-    .music-item:hover { transform: translateY(-8px) scale(1.02); box-shadow: 0 12px 40px rgba(229, 83, 45, 0.2); }
-
-    .music-title {
-      font-size: 1.4em;
+    .mh-text { flex: 1 1 200px; min-width: 0; }
+    .mh-title {
+      margin: 0;
+      font-size: 1.3rem;
       font-weight: 800;
-      color: var(--text);
-      margin-bottom: 10px;
-      letter-spacing: -0.5px;
+      text-transform: uppercase;
+      letter-spacing: -0.01em;
+      color: var(--ap-text);
+    }
+    .mh-sub {
+      margin: 4px 0 0;
       display: flex;
       align-items: center;
       gap: 10px;
+      flex-wrap: wrap;
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--ap-text-muted);
     }
-    .music-title::before { content: '🎵'; font-size: 0.8em; opacity: 0.7; }
-
-    .music-artist {
-      color: var(--muted);
-      margin-bottom: 18px;
-      font-style: italic;
-      font-size: 1.05em;
-      font-weight: 500;
-      display: flex;
+    .mh-count {
+      padding: 3px 11px;
+      border-radius: 999px;
+      border: 1px solid rgba(30, 58, 138, 0.22);
+      background: var(--ap-brand-soft);
+      color: var(--ap-brand-text);
+      letter-spacing: 0.1em;
+    }
+    .close-btn {
+      flex: none;
+      width: 40px;
+      height: 40px;
+      display: inline-flex;
       align-items: center;
-      gap: 8px;
+      justify-content: center;
+      border: 1px solid var(--ap-border);
+      border-radius: 0.75rem;
+      background: var(--ap-muted);
+      color: var(--ap-text-muted);
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+      transition: color 0.2s, background-color 0.2s, transform 0.2s;
     }
-    .music-artist::before { content: '🎤'; font-size: 0.9em; }
-
-    .music-links { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 15px; }
-
-    .music-link {
-      background: var(--brand);
-      color: var(--on-brand);
-      text-decoration: none;
-      padding: 10px 18px;
-      border-radius: 30px;
-      font-size: 0.9em;
-      font-weight: 600;
-      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    .close-btn:hover { color: var(--ap-brand-text); background: var(--ap-surface); }
+    .close-btn:active { transform: scale(0.96); }
+    .mh-actions { flex: 1 1 100%; display: flex; flex-wrap: wrap; gap: 10px; }
+    .playlist-link,
+    .more-link {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      box-shadow: 0 4px 15px rgba(63, 81, 181, 0.3);
-      position: relative;
-      overflow: hidden;
-    }
-    .music-link:hover { background: var(--brand-dark); transform: translateY(-3px) scale(1.05); }
-
-    .playlist-link {
-      background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
-      color: #fff;
+      padding: 10px 18px;
+      border-radius: 999px;
+      font-size: 0.68rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
       text-decoration: none;
-      padding: 15px 30px;
-      border-radius: 50px;
-      font-size: 1.1em;
-      display: inline-block;
-      font-weight: 700;
-      box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
-      transition: all 0.3s ease;
+      transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
     }
-    .playlist-link:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4); }
+    .playlist-link { background: var(--ap-accent); color: #1f2937; box-shadow: 0 6px 16px rgba(234, 179, 8, 0.35); }
+    .playlist-link:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(234, 179, 8, 0.45); }
+    .more-link { background: var(--ap-muted); color: var(--ap-text-muted); border: 1px solid var(--ap-border); }
+    .more-link:hover { background: var(--ap-surface); color: var(--ap-brand-text); }
 
-    .music-empty { grid-column: 1 / -1; text-align: center; color: var(--muted); margin: 20px 0; }
-    .modal-header .more { text-align: center; margin: 16px 0 0; font-size: 0.9em; }
-    .modal-header .more a { color: #fff; text-decoration: underline; }
+    .music-list {
+      padding: 22px 26px 28px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 14px;
+    }
+    .music-empty { grid-column: 1 / -1; text-align: center; color: var(--ap-text-muted); margin: 20px 0; }
 
-    @media (max-width: 768px) {
-      .music-list { grid-template-columns: 1fr; gap: 16px; padding: 20px; }
-      .music-item { padding: 16px; }
-      .music-title { font-size: 1.2em; }
-      .modal-header { padding: 20px; }
-      .modal-header h2 { font-size: 1.5em; }
-      .modal-content { margin: 20px; width: calc(100% - 40px); }
-      .music-links { flex-direction: column; }
-      .music-link { text-align: center; justify-content: center; }
+    .music-item {
+      background: var(--ap-surface);
+      border: 1px solid var(--ap-border);
+      border-radius: 1.25rem;
+      overflow: hidden;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .music-item:hover { transform: translateY(-3px); box-shadow: 0 14px 30px rgba(15, 23, 42, 0.14); }
+    .mi-top {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px;
+      border-bottom: 1px solid var(--ap-border);
+    }
+    .mi-icon {
+      flex: none;
+      width: 40px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+      border-radius: 0.75rem;
+      background: var(--ap-brand);
+      color: #fff;
+      font-size: 14px;
+    }
+    .mi-text { flex: 1; min-width: 0; }
+    .music-title {
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      line-height: 1.25;
+      color: var(--ap-text);
+      overflow-wrap: anywhere;
+    }
+    .music-artist { margin-top: 3px; font-size: 0.7rem; font-weight: 600; color: var(--ap-text-muted); }
+    .mi-num {
+      flex: none;
+      width: 32px;
+      height: 32px;
+      display: grid;
+      place-items: center;
+      border-radius: 0.6rem;
+      background: var(--ap-muted);
+      font-size: 0.7rem;
+      font-weight: 800;
+      color: var(--ap-text-muted);
+      font-variant-numeric: tabular-nums;
+    }
+    .music-links { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; padding: 12px 14px 14px; }
+    .music-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 0;
+      border-radius: 0.6rem;
+      background: var(--ap-strong);
+      border: 1px solid var(--ap-border);
+      font-size: 13px;
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s, color 0.2s, border-color 0.2s;
+    }
+    .music-link:hover { transform: scale(1.08); box-shadow: 0 6px 14px rgba(15, 23, 42, 0.18); color: #fff; }
+    .music-link.yt { color: #dc2626; }
+    .music-link.sp { color: #16a34a; }
+    .music-link.lt { color: #2563eb; }
+    .music-link.cf { color: #9333ea; }
+    .music-link.yt:hover { background: #dc2626; border-color: #dc2626; }
+    .music-link.sp:hover { background: #16a34a; border-color: #16a34a; }
+    .music-link.lt:hover { background: #2563eb; border-color: #2563eb; }
+    .music-link.cf:hover { background: #9333ea; border-color: #9333ea; }
+
+    @media (max-width: 640px) {
+      .modal-content { margin: 16px auto; width: calc(100% - 24px); max-height: calc(100vh - 32px); border-radius: 1.5rem; }
+      .modal-header { padding: 16px; border-radius: 1.5rem 1.5rem 0 0; }
+      .mh-icon { width: 42px; height: 42px; font-size: 17px; }
+      .mh-title { font-size: 1.1rem; }
+      .music-list { padding: 16px; grid-template-columns: 1fr; gap: 12px; }
     }
   </style>
 </head>
@@ -357,17 +435,18 @@
   <div id="musicModal" class="music-modal" role="dialog" aria-modal="true" aria-labelledby="musicModalTitle">
     <div class="modal-content">
       <div class="modal-header">
-        <button class="close-btn" id="closeMusic" type="button" aria-label="Fechar">&times;</button>
-        <h2 id="musicModalTitle">🎵 Lista música Passos de Fé</h2>
-        <p>Clique nos links para acessar letra, cifra ou ouvir no Spotify</p>
-        <div style="text-align: center; margin-top: 20px;">
-          <a href="https://music.youtube.com/playlist?list=PLXBrOMx1jKOD9VeCl7CZ34H29x4gSOY9n&si=ZlGxVbCV6Nu5wPfF" target="_blank" rel="noopener noreferrer" class="playlist-link">
-            🎧 Playlist Completa no YouTube Music
-          </a>
+        <span class="mh-icon" aria-hidden="true"><i class="fa-solid fa-music"></i></span>
+        <div class="mh-text">
+          <h2 id="musicModalTitle" class="mh-title">Passos de Fé</h2>
+          <p class="mh-sub">Lista de músicas <span class="mh-count" id="musicCount"></span></p>
         </div>
-        <p class="more"><a href="musicas/biblioteca-musicas.html?tema=Passos%20de%20F%C3%A9">Ver todas as músicas do tema Passos de Fé na Biblioteca ›</a></p>
+        <button class="close-btn" id="closeMusic" type="button" aria-label="Fechar"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+        <div class="mh-actions">
+          <a href="https://music.youtube.com/playlist?list=PLXBrOMx1jKOD9VeCl7CZ34H29x4gSOY9n&si=ZlGxVbCV6Nu5wPfF" target="_blank" rel="noopener noreferrer" class="playlist-link"><i class="fa-brands fa-youtube" aria-hidden="true"></i> Playlist no YouTube Music</a>
+          <a href="musicas/biblioteca-musicas.html?tema=Passos%20de%20F%C3%A9" class="more-link"><i class="fa-solid fa-book-open" aria-hidden="true"></i> Todas do tema na Biblioteca</a>
+        </div>
       </div>
-      
+
       <div class="music-list" id="musicList"><p class="music-empty" id="musicEmpty">Carregando a lista…</p></div>
     </div>
   </div>
@@ -414,21 +493,33 @@
       ]).then(function (res) {
         var lista = res[0].musicas || [], lib = res[1];
         box.textContent = '';
+        document.getElementById('musicCount').textContent = lista.length + ' músicas';
         lista.forEach(function (m, i) {
           var oficial = achaNaBiblioteca(m, lib) || m;
           var q = encodeURIComponent(oficial.musica + ' ' + oficial.cantor);
+          var yt = 'https://www.youtube.com/results?search_query=' + q;
           var item = document.createElement('div'); item.className = 'music-item';
-          var t = document.createElement('div'); t.className = 'music-title'; t.textContent = (i + 1) + '. ' + oficial.musica;
+          var top = document.createElement('div'); top.className = 'mi-top';
+          var icon = document.createElement('div'); icon.className = 'mi-icon';
+          icon.innerHTML = '<i class="fa-solid fa-music" aria-hidden="true"></i>';
+          var txt = document.createElement('div'); txt.className = 'mi-text';
+          var t = document.createElement('div'); t.className = 'music-title'; t.textContent = oficial.musica;
           var a = document.createElement('div'); a.className = 'music-artist'; a.textContent = oficial.cantor;
+          txt.appendChild(t); txt.appendChild(a);
+          var num = document.createElement('div'); num.className = 'mi-num'; num.textContent = i + 1;
+          top.appendChild(icon); top.appendChild(txt); top.appendChild(num);
           var links = document.createElement('div'); links.className = 'music-links';
-          [['letra', '📝 Letra', 'https://www.google.com/search?q=' + q + '%20letra%20site%3Aletras.mus.br'],
-           ['cifra', '🎸 Cifra', 'https://www.google.com/search?q=' + q + '%20cifra%20site%3Acifraclub.com.br'],
-           ['spotify', '🎵 Spotify', 'https://open.spotify.com/search/' + q]].forEach(function (k) {
+          [['yt', 'YouTube', 'fa-brands fa-youtube', yt],
+           ['sp', 'Spotify', 'fa-brands fa-spotify', m.spotify || 'https://open.spotify.com/search/' + q],
+           ['lt', 'Letra', 'fa-solid fa-microphone-lines', m.letra || 'https://www.google.com/search?q=' + q + '%20letra%20site%3Aletras.mus.br'],
+           ['cf', 'Cifra', 'fa-solid fa-guitar', m.cifra || 'https://www.google.com/search?q=' + q + '%20cifra%20site%3Acifraclub.com.br']].forEach(function (k) {
             var l = document.createElement('a');
-            l.href = m[k[0]] || k[2]; l.target = '_blank'; l.rel = 'noopener noreferrer'; l.className = 'music-link'; l.textContent = k[1];
+            l.href = k[3]; l.target = '_blank'; l.rel = 'noopener noreferrer'; l.className = 'music-link ' + k[0];
+            l.title = k[1]; l.setAttribute('aria-label', k[1] + ': ' + oficial.musica);
+            l.innerHTML = '<i class="' + k[2] + '" aria-hidden="true"></i>';
             links.appendChild(l);
           });
-          item.appendChild(t); item.appendChild(a); item.appendChild(links);
+          item.appendChild(top); item.appendChild(links);
           box.appendChild(item);
         });
       }).catch(function () {
