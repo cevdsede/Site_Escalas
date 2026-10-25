@@ -443,9 +443,32 @@
       .music-title { color: #e6e9ef; }
       .music-artist { color: #a5afc0; }
     }
+
+.site-nav { background: #fff; box-shadow: 0 2px 10px rgba(63,81,181,.12); position: sticky; top: 0; z-index: 50;  }
+.site-nav-in { max-width: 1400px; margin: 0 auto; padding: 8px 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.site-brand { display: flex; align-items: center; gap: 10px; font-weight: 700; color: #3f51b5; text-decoration: none; letter-spacing: .3px; }
+.site-brand img { border-radius: 50%; background: #fff; }
+.site-links { display: flex; gap: 4px; }
+.site-links a { padding: 8px 14px; border-radius: 999px; font-weight: 600; font-size: .95em; color: #3f51b5; text-decoration: none; }
+.site-links a:hover { background: #eef0fb; }
+.site-links a[aria-current="page"] { background: #3f51b5; color: #fff; }
+.site-brand:focus-visible, .site-links a:focus-visible { outline: 2px solid #3f51b5; outline-offset: 2px; }
+@media (max-width: 420px) { .site-brand span { display: none; } .site-links a { padding-inline: 10px; } }
+@media (prefers-color-scheme: dark) {
+      .site-nav { background: #172033; box-shadow: 0 2px 10px rgba(0,0,0,.5); }
+      .site-brand, .site-links a { color: #9fb0ff; }
+      .site-links a:hover { background: #1d2740; }
+      .site-links a[aria-current="page"] { background: #5c6bc0; color: #fff; }
+    }
   </style>
 </head>
 <body>
+  <nav class="site-nav" aria-label="Menu principal">
+    <div class="site-nav-in">
+      <a class="site-brand" href="./"><img src="logo%20louvor.png" alt="" width="34" height="34"><span>Louvor CEVD</span></a>
+      <div class="site-links"><a href="./" aria-current="page">Início</a><a href="escala/">Escala</a><a href="musicas/biblioteca-musicas.html">Músicas</a></div>
+    </div>
+  </nav>
   <div class="wrapper">
     <!-- Ministério Louvor -->
     <div class="container">
@@ -457,6 +480,15 @@
           href="escala/"
         >
           <i class="fa-solid fa-calendar-days"></i> Link da Escala
+        </a>
+      </div>
+
+      <div class="spreadsheet">
+        <a
+          href="musicas/biblioteca-musicas.html"
+          style="background: #3f51b5;"
+        >
+          <i class="fa-solid fa-headphones"></i> Biblioteca de Músicas
         </a>
       </div>
 

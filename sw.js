@@ -1,11 +1,12 @@
 // Service worker: deixa o site abrir sem internet.
 // A escala em si fica salva no aparelho pela própria página (localStorage).
-var CACHE = "escala-v1";
+var CACHE = "escala-v2";
 var SHELL = [
   "./",
   "index.html",
   "escala/",
   "escala/index.html",
+  "musicas/biblioteca-musicas.html",
   "logo%20louvor.png",
   "manifest.webmanifest",
   "icons/icon-192.png",
