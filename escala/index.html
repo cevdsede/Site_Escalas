@@ -75,6 +75,37 @@ h1 { color: var(--brand-text); font-family: var(--font-display); font-weight: 70
 .who { font-weight: 500; overflow-wrap: anywhere; }
 .who.min { font-weight: 600; color: var(--accent); }
 .who span.me { background: var(--accent-soft); color: var(--accent); border-radius: 4px; padding: 0 5px; margin-inline: -5px; box-shadow: 0 0 0 1px var(--accent) inset; }
+.rep-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.add-rep { font: inherit; font-size: 13px; font-weight: 600; color: var(--brand-text); background: var(--brand-soft); border: 1px solid var(--border); border-radius: 999px; padding: 2px 12px; cursor: pointer; }
+.add-rep:hover { border-color: var(--brand-text); }
+.add-rep:focus-visible { outline: 2px solid var(--brand-text); outline-offset: 2px; }
+.rep-list { display: flex; flex-direction: column; }
+.rep-item { display: grid; grid-template-columns: 76px minmax(0, 1fr) auto; gap: 10px; align-items: baseline; padding: 5px 0; border-top: 1px solid var(--border); font-size: 14px; }
+.rep-item:first-child { border-top: 0; }
+.rep-item .tom { font-weight: 600; color: var(--muted); font-variant-numeric: tabular-nums; font-size: 13px; }
+.rep-item .mus { color: var(--text); font-weight: 500; text-decoration: none; overflow-wrap: anywhere; }
+.rep-item .mus:hover { color: var(--brand-text); text-decoration: underline; }
+.rep-item .who-rep { color: var(--muted); font-size: 13px; text-align: right; }
+.rep-empty { color: var(--muted); font-size: 14px; }
+@media (max-width: 480px) { .rep-item { grid-template-columns: 64px minmax(0, 1fr); } .rep-item .who-rep { display: none; } }
+dialog#repDialog { border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); color: var(--text); padding: 0; width: min(520px, calc(100vw - 24px)); max-height: calc(100vh - 24px); }
+dialog#repDialog::backdrop { background: rgba(0, 0, 0, .55); }
+.rep-form { display: grid; gap: 12px; padding: 18px; }
+.rep-form h2 { margin: 0; font-size: 20px; font-family: var(--font-display); color: var(--brand-text); }
+.rep-sub { margin: -6px 0 0; color: var(--muted); font-size: 14px; }
+.rep-form label { display: grid; gap: 5px; font-size: 13px; font-weight: 600; color: var(--muted); }
+.rep-form input, .rep-form select { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font: inherit; font-weight: 400; }
+.rep-form select[size] { padding: 4px; }
+.rep-form option:disabled { color: var(--muted); }
+.rep-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.rep-row label[hidden] { display: none; }
+.rep-msg { font-size: 13px; min-height: 1.2em; }
+.rep-msg.err { color: #dc2626; }
+.rep-msg.ok { color: #059669; }
+.rep-actions { display: flex; gap: 8px; justify-content: flex-end; }
+.pill.primary { background: var(--brand); border-color: var(--brand); color: var(--on-brand); }
+.pill:disabled { opacity: .6; cursor: default; }
+@media (max-width: 480px) { .rep-row { grid-template-columns: 1fr; } }
 .foot-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 .rep { grid-column: 2; display: flex; flex-direction: column; gap: 4px; margin-top: 4px; }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -97,7 +128,7 @@ body { margin: 0; }
   <nav class="site-nav rounded" aria-label="Menu principal">
     <div class="site-nav-in">
       <a class="site-brand" href="../"><img src="../logo%20louvor.png" alt="" width="34" height="34"><span>Louvor CEVD</span></a>
-      <div class="site-links"><a href="../">Início</a><a href="./" aria-current="page">Escala</a><a href="../musicas/biblioteca-musicas.html">Músicas</a></div>
+      <div class="site-links"><a href="../">Início</a><a href="./" aria-current="page">Escala</a><a href="../musicas/biblioteca-musicas.html">Músicas</a><a href="../musicas/repertorio.html">Repertório</a></div>
       <button type="button" class="theme-btn" data-theme-toggle></button>
     </div>
   </nav>
@@ -116,6 +147,33 @@ body { margin: 0; }
     <div class="summary" id="summary" aria-live="polite"></div>
   </div>
   <main id="weeks" class="wrap" style="gap:28px"></main>
+  <dialog id="repDialog" aria-labelledby="repTitle">
+  <form id="repForm" class="rep-form">
+    <h2 id="repTitle">Adicionar música</h2>
+    <p class="rep-sub" id="repSub"></p>
+    <label>Quem vai cantar
+      <select id="fMembro" required></select>
+    </label>
+    <label>Música
+      <input id="fBusca" type="search" placeholder="Digite para filtrar…" autocomplete="off">
+      <select id="fMusica" size="6" required></select>
+    </label>
+    <div class="rep-row">
+      <label>Tom
+        <select id="fTom" required></select>
+      </label>
+      <label id="fPinLabel" hidden>PIN
+        <input id="fPin" type="password" autocomplete="off">
+      </label>
+    </div>
+    <div class="rep-msg" id="fMsg" role="status"></div>
+    <div class="rep-actions">
+      <button type="button" class="pill" id="fClose">Fechar</button>
+      <button type="submit" class="pill primary" id="fSave">Adicionar</button>
+    </div>
+  </form>
+</dialog>
+
   <footer>
     <div id="status">Carregando…</div>
     <div class="foot-actions">
@@ -130,14 +188,15 @@ body { margin: 0; }
 var SHEET_ID = "1K47eF2raU_RB69ziWpV7P7NS5cyWfRhlsofXt9MWOz8";
 var MONTHS = ["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];
 var DOW = ["dom.","seg.","ter.","qua.","qui.","sex.","sáb."];
-var ROLES = [["Ministro","min"],["Back","back"],["Teclado","tec"],["Guitarra","gui"],["Baixo","bai"],["Bateria","bat"],["Violão","vio"]];
+var ROLES = [["Ministro","min"],["Back","back"],["Teclado","tec"],["Guitarra","gui"],["Baixo","bai"],["Bateria","bat"],["Violão","vio"],["Ministro e vocal","voc"]];
+var API_URL = "https://ipdrbhkzluuwjulkhjkd.supabase.co/functions/v1/repertorio-publico";
 
 function list(s) { return s ? s.split(",").map(function (x) { return x.trim(); }).filter(Boolean) : []; }
 function parse(line, year) {
   var p = line.split("|").map(function (s) { return s.trim(); });
   var dm = p[0].split("/");
   var date = new Date(year, +dm[1] - 1, +dm[0], +p[1].slice(0, 2), +p[1].slice(3, 5));
-  return { date: date, day: dm[0], month: MONTHS[+dm[1] - 1], dow: DOW[date.getDay()], time: p[1], culto: p[2],
+  return { date: date, iso: year + "-" + pad(+dm[1]) + "-" + pad(+dm[0]), voc: [], api: null, day: dm[0], month: MONTHS[+dm[1] - 1], dow: DOW[date.getDay()], time: p[1], culto: p[2],
     min: list(p[3]), back: list(p[4]), vio: list(p[5]), tec: list(p[6]), gui: list(p[7]), bai: list(p[8]), bat: list(p[9]), ens: p[10] || "", rep: (p[12] || "").split(";").map(function (x) { return x.trim(); }).filter(Boolean) };
 }
 // groups: array of arrays of "|" lines. Assigns years in order, rolling over at December -> January.
@@ -206,7 +265,10 @@ function groupsFromCsv(text) {
   return groups.filter(function (g) { return g.length; });
 }
 
-var data = [];
+var data = [];          // escala completa (planilha + cultos que só existem no app)
+var sheetData = [];     // semanas lidas da planilha
+var api = null;         // dados do app de repertório: cultos, músicas, tons, repertórios
+var repByCulto = {}, cultoByKey = {};
 var loaded = false, failed = false;
 var selected = null, view = "all";
 try {
@@ -214,6 +276,42 @@ try {
   view = localStorage.getItem("escala.visao") === "week" ? "week" : "all";
 } catch (e) {}
 function save(k, v) { try { if (v == null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) {} }
+
+function firstName(n) { return String(n || "").trim().split(/\s+/)[0]; }
+function indexApi() {
+  cultoByKey = {}; repByCulto = {};
+  if (!api) return;
+  api.cultos.forEach(function (c) { cultoByKey[c.data + " " + c.horario] = c; });
+  api.repertorios.forEach(function (r) { if (r.culto && r.culto.id) repByCulto[r.culto.id] = r.itens || []; });
+}
+// Junta a planilha com os cultos do app. Culto que só está no app aparece com os ministros e vocais escalados.
+function rebuildData() {
+  indexApi();
+  var have = {};
+  sheetData.forEach(function (w) { w.forEach(function (s) {
+    have[s.iso + " " + s.time] = 1;
+    s.api = cultoByKey[s.iso + " " + s.time] || null;
+    // linha da planilha ainda sem equipe: mostra os ministros e vocais escalados no app
+    var comEquipe = ROLES.some(function (r) { return r[1] !== "voc" && s[r[1]].length; });
+    s.voc = (s.api && !comEquipe) ? s.api.cantores.map(function (x) { return firstName(x.nome); }) : [];
+  }); });
+  var extra = [];
+  if (api) api.cultos.forEach(function (c) {
+    if (have[c.data + " " + c.horario]) return;
+    var p = c.data.split("-"), d = new Date(+p[0], +p[1] - 1, +p[2], +c.horario.slice(0, 2), +c.horario.slice(3, 5));
+    extra.push({ date: d, iso: c.data, day: p[2], month: MONTHS[+p[1] - 1], dow: DOW[d.getDay()], time: c.horario,
+      culto: String(c.nome || "").trim(), min: [], back: [], vio: [], tec: [], gui: [], bai: [], bat: [],
+      voc: c.cantores.map(function (x) { return firstName(x.nome); }), ens: "", rep: [], api: c });
+  });
+  extra.sort(function (a, b) { return a.date - b.date; });
+  var weeks = [];
+  extra.forEach(function (s) {
+    var w = weeks[weeks.length - 1];
+    if (w && s.date - w[w.length - 1].date < 3 * 86400e3) w.push(s); else weeks.push([s]);
+  });
+  data = sheetData.concat(weeks).sort(function (a, b) { return a[0].date - b[0].date; });
+}
+function repItems(s) { return s.api ? (repByCulto[s.api.id] || []) : []; }
 
 function key(d) { return d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate(); }
 function todayKey() { return key(new Date()); }
@@ -235,11 +333,13 @@ function pad(n) { return (n < 10 ? "0" : "") + n; }
 function icsStamp(d) { return d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + "T" + pad(d.getHours()) + pad(d.getMinutes()) + "00"; }
 function icsHref(s) {
   var end = new Date(s.date.getTime() + 2 * 3600e3);
+  var items = repItems(s);
+  var songs = items.length ? items.map(function (i) { return i.musica + (i.tom ? " (" + i.tom + ")" : ""); }) : s.rep;
   var team = ROLES.filter(function (r) { return s[r[1]].length; }).map(function (r) { return r[0] + ": " + s[r[1]].join(", "); }).join("\\n");
   var lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Escala Louvor//PT", "BEGIN:VEVENT",
     "UID:" + icsStamp(s.date) + "@escala-louvor", "DTSTAMP:" + icsStamp(new Date()),
     "DTSTART:" + icsStamp(s.date), "DTEND:" + icsStamp(end),
-    "SUMMARY:" + (s.culto || "Culto") + " (Louvor)", "DESCRIPTION:" + team + (s.rep.length ? "\\nRepertório: " + s.rep.join(", ") : ""), "END:VEVENT", "END:VCALENDAR"];
+    "SUMMARY:" + (s.culto || "Culto") + " (Louvor)", "DESCRIPTION:" + team + (songs.length ? "\\nRepertório: " + songs.join(", ") : ""), "END:VEVENT", "END:VCALENDAR"];
   return "data:text/calendar;charset=utf-8," + encodeURIComponent(lines.join("\r\n"));
 }
 function calLink(s) {
@@ -353,17 +453,42 @@ function render() {
         team.appendChild(role);
       });
       card.appendChild(team);
-      if (s.rep.length) {
+      var items = repItems(s);
+      if (items.length || s.rep.length || s.api) {
         var rep = el("div", "rep");
-        rep.appendChild(el("span", "role-name", "Repertório"));
-        var chips = el("div", "chips");
-        s.rep.forEach(function (m) {
-          var a = el("a", "chip", m);
-          a.href = "../musicas/biblioteca-musicas.html?q=" + encodeURIComponent(m);
-          a.title = "Abrir na biblioteca de músicas";
-          chips.appendChild(a);
-        });
-        rep.appendChild(chips);
+        var rh = el("div", "rep-head");
+        rh.appendChild(el("span", "role-name", "Repertório"));
+        if (s.api) {
+          var add = el("button", "add-rep", "+ Música");
+          add.type = "button";
+          add.addEventListener("click", (function (svc) { return function () { openRep(svc); }; })(s));
+          rh.appendChild(add);
+        }
+        rep.appendChild(rh);
+        if (items.length) {
+          var ul = el("div", "rep-list");
+          items.forEach(function (i) {
+            var row = el("div", "rep-item");
+            row.appendChild(el("span", "tom", i.tom || "—"));
+            var a = el("a", "mus", i.musica);
+            a.href = "../musicas/biblioteca-musicas.html?q=" + encodeURIComponent(i.musica);
+            a.title = "Abrir na biblioteca de músicas";
+            row.appendChild(a);
+            row.appendChild(el("span", "who-rep", i.ministro));
+            ul.appendChild(row);
+          });
+          rep.appendChild(ul);
+        } else if (s.rep.length) {
+          var chips = el("div", "chips");
+          s.rep.forEach(function (m) {
+            var c = el("a", "chip", m);
+            c.href = "../musicas/biblioteca-musicas.html?q=" + encodeURIComponent(m);
+            chips.appendChild(c);
+          });
+          rep.appendChild(chips);
+        } else {
+          rep.appendChild(el("div", "rep-empty", "Nenhuma música ainda."));
+        }
         card.appendChild(rep);
       }
       sec.appendChild(card);
@@ -415,14 +540,29 @@ render();
 // Live sync: reads the published spreadsheet (CSV) and refreshes every minute.
 var statusEl = document.getElementById("status");
 function setStatus(msg) { statusEl.textContent = msg; }
+// Cultos, músicas e repertórios do app (atualiza junto com a planilha)
+function loadApi() {
+  return fetch(API_URL, { cache: "no-store" }).then(function (r) {
+    if (!r.ok) throw new Error("http " + r.status);
+    return r.json();
+  }).then(function (j) {
+    if (!j || !j.cultos) throw new Error("formato");
+    api = j;
+    save("escala.api", JSON.stringify(j));
+    loaded = true; failed = false;
+    rebuildData(); renderPills(); render();
+  }).catch(function () {});
+}
+
 function load() {
+  loadApi();
   fetch(CSV_URL, { cache: "no-store" }).then(function (r) {
     if (!r.ok) throw new Error("http " + r.status);
     return r.text();
   }).then(function (text) {
     var groups = groupsFromCsv(text);
     if (!groups.length) throw new Error("empty");
-    data = build(groups);
+    sheetData = build(groups); rebuildData();
     loaded = true; failed = false;
     save("escala.csv", text);
     save("escala.csvAt", String(Date.now()));
@@ -434,6 +574,92 @@ function load() {
     else setStatus("Sem conexão com a planilha. Mostrando a escala salva" + savedLabel() + ".");
   });
 }
+// ---------- Adicionar música ao repertório de um culto ----------
+var curSvc = null;
+var repDialog = document.getElementById("repDialog");
+function normTxt(t) { return String(t || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase(); }
+function fMsg(text, kind) { var m = document.getElementById("fMsg"); m.textContent = text; m.className = "rep-msg " + (kind || ""); }
+function fillRepSongs() {
+  var q = normTxt(document.getElementById("fBusca").value);
+  var already = {};
+  repItems(curSvc).forEach(function (i) { already[normTxt(i.musica) + "|" + normTxt(i.cantor)] = 1; });
+  var box = document.getElementById("fMusica"), curVal = box.value;
+  box.textContent = "";
+  api.musicas.filter(function (m) { return !q || normTxt(m.musica).indexOf(q) >= 0 || normTxt(m.cantor).indexOf(q) >= 0; })
+    .forEach(function (m) {
+      var o = document.createElement("option");
+      o.value = m.id;
+      var dup = already[normTxt(m.musica) + "|" + normTxt(m.cantor)];
+      o.textContent = m.musica + (m.cantor ? " — " + m.cantor : "") + (dup ? "  (já no repertório)" : "");
+      o.disabled = !!dup;
+      box.appendChild(o);
+    });
+  if (curVal) box.value = curVal;
+}
+function openRep(svc) {
+  if (!api || !svc.api) return;
+  curSvc = svc;
+  document.getElementById("repTitle").textContent = "Repertório · " + (svc.culto || "Culto");
+  document.getElementById("repSub").textContent = svc.dow + " " + svc.day + "/" + pad(svc.date.getMonth() + 1) + " · " + svc.time;
+  var mem = document.getElementById("fMembro");
+  mem.textContent = "";
+  var first = document.createElement("option"); first.value = ""; first.textContent = svc.api.cantores.length ? "Selecione…" : "Ninguém escalado como ministro ou vocal"; mem.appendChild(first);
+  svc.api.cantores.forEach(function (c) { var o = document.createElement("option"); o.value = c.id; o.textContent = c.nome; mem.appendChild(o); });
+  if (svc.api.cantores.length === 1) mem.value = svc.api.cantores[0].id;
+  var tom = document.getElementById("fTom");
+  tom.textContent = "";
+  var t0 = document.createElement("option"); t0.value = ""; t0.textContent = "Selecione…"; tom.appendChild(t0);
+  api.tons.forEach(function (t) { var o = document.createElement("option"); o.value = t.id; o.textContent = t.nome; tom.appendChild(o); });
+  document.getElementById("fBusca").value = "";
+  document.getElementById("fPinLabel").hidden = !api.pin_obrigatorio;
+  document.getElementById("fPin").required = !!api.pin_obrigatorio;
+  try { document.getElementById("fPin").value = sessionStorage.getItem("escala.pin") || ""; } catch (e) {}
+  fMsg("");
+  fillRepSongs();
+  if (repDialog.showModal) repDialog.showModal(); else repDialog.setAttribute("open", "");
+}
+document.getElementById("fBusca").addEventListener("input", fillRepSongs);
+document.getElementById("fClose").addEventListener("click", function () { repDialog.close(); });
+document.getElementById("repForm").addEventListener("submit", function (e) {
+  e.preventDefault();
+  if (!curSvc) return;
+  var musica = document.getElementById("fMusica").value;
+  if (!musica) { fMsg("Escolha uma música da lista.", "err"); return; }
+  var save = document.getElementById("fSave");
+  save.disabled = true;
+  fMsg("Salvando…");
+  var pin = document.getElementById("fPin").value;
+  fetch(API_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      id_culto: curSvc.api.id,
+      id_membros: document.getElementById("fMembro").value,
+      id_musicas: musica,
+      id_tons: Number(document.getElementById("fTom").value),
+      pin: pin
+    })
+  }).then(function (r) {
+    return r.json().catch(function () { return {}; }).then(function (j) {
+      if (!r.ok) throw new Error(j.error || "Erro ao salvar.");
+    });
+  }).then(function () {
+    try { if (pin) sessionStorage.setItem("escala.pin", pin); } catch (e) {}
+    fMsg("Música adicionada ao repertório!", "ok");
+    document.getElementById("fBusca").value = "";
+    document.getElementById("fMusica").value = "";
+    document.getElementById("fTom").value = "";
+    return loadApi().then(function () { if (curSvc) { var k = curSvc.iso + " " + curSvc.time; curSvc = findSvc(k) || curSvc; fillRepSongs(); } });
+  }).catch(function (err) {
+    fMsg(err && err.message && err.message !== "Failed to fetch" ? err.message : "Sem conexão. Tente de novo.", "err");
+  }).then(function () { save.disabled = false; });
+});
+function findSvc(k) {
+  var found = null;
+  data.forEach(function (w) { w.forEach(function (s) { if (s.iso + " " + s.time === k) found = s; }); });
+  return found;
+}
+
 // Compartilhar o link da escala (menu do celular; no computador copia o link)
 document.getElementById("share").addEventListener("click", function () {
   var info = { title: "Escala Louvor", text: "Escala do Ministério de Louvor", url: location.href.split("#")[0].split("?")[0] };
@@ -455,9 +681,14 @@ try {
   var cachedCsv = localStorage.getItem("escala.csv");
   if (cachedCsv) {
     var cachedGroups = groupsFromCsv(cachedCsv);
-    if (cachedGroups.length) { data = build(cachedGroups); loaded = true; renderPills(); render(); }
+    if (cachedGroups.length) { sheetData = build(cachedGroups); rebuildData(); loaded = true; }
   }
 } catch (e) {}
+try {
+  var cachedApi = JSON.parse(localStorage.getItem("escala.api") || "null");
+  if (cachedApi && cachedApi.cultos) { api = cachedApi; rebuildData(); loaded = true; }
+} catch (e) {}
+if (loaded) { renderPills(); render(); }
 setStatus(loaded ? "Mostrando a escala salva" + savedLabel() + ". Atualizando…" : "Conectando à planilha…");
 load();
 setInterval(load, 60000);

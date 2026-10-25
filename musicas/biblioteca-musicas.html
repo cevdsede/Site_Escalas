@@ -52,6 +52,7 @@
   .song:hover { transform: translateY(-3px); box-shadow: 0 8px 22px rgba(63, 81, 181, 0.18); }
   .song .title { font-weight: 650; font-size: 15px; }
   .song .artist { color: var(--muted); font-size: 13px; }
+  .song .meta { color: var(--brand-text); font-size: 12px; font-weight: 600; margin-top: 2px; }
   .tags { display: flex; gap: 6px; flex-wrap: wrap; }
   .tag { font-size: 11px; padding: 2px 8px; border-radius: 999px; background: var(--surface-2); color: var(--muted); }
   .tag.style-celebracao { color: var(--warn); }
@@ -77,7 +78,7 @@
   <nav class="site-nav rounded" aria-label="Menu principal">
     <div class="site-nav-in">
       <a class="site-brand" href="../"><img src="../logo%20louvor.png" alt="" width="34" height="34"><span>Louvor CEVD</span></a>
-      <div class="site-links"><a href="../">Início</a><a href="../escala/">Escala</a><a href="./biblioteca-musicas.html" aria-current="page">Músicas</a></div>
+      <div class="site-links"><a href="../">Início</a><a href="../escala/">Escala</a><a href="./biblioteca-musicas.html" aria-current="page">Músicas</a><a href="./repertorio.html">Repertório</a></div>
       <button type="button" class="theme-btn" data-theme-toggle></button>
     </div>
   </nav>
@@ -104,6 +105,7 @@
     <select id="sortBy">
       <option value="az">A–Z</option>
       <option value="new">Adicionadas recentemente</option>
+      <option value="top">Mais tocadas</option>
     </select>
   </div>
   <div class="count" id="songCount"></div>
@@ -160,6 +162,39 @@
       d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
   };
   let savedAt = 0;
+
+  // Quantas vezes cada música foi cantada e o último tom: vem do histórico do repertório (app).
+  const REP_URL = 'https://ipdrbhkzluuwjulkhjkd.supabase.co/functions/v1/repertorio-publico';
+  const PLAYS_KEY = 'bm-plays';
+  let playMap = {};
+  const playKey = (title, singer) => norm(title).replace(/\s+/g, ' ').trim() + '|' + norm(singer).replace(/\s+/g, ' ').trim();
+  function buildPlays(hist) {
+    const m = {};
+    (hist || []).forEach((h) => { // o histórico vem do mais recente para o mais antigo
+      const k = playKey(h.musica, h.cantor);
+      if (!m[k]) m[k] = { count: 0, tone: h.tom || '' };
+      m[k].count += 1;
+    });
+    return m;
+  }
+  function mergePlays() {
+    songs.forEach((s) => {
+      const p = playMap[playKey(s.title, s.singer)];
+      s.plays = p ? p.count : 0;
+      s.tone = p ? p.tone : '';
+    });
+  }
+  async function loadPlays() {
+    try {
+      const res = await fetch(REP_URL, { cache: 'no-store' });
+      const json = await res.json();
+      if (!res.ok || !Array.isArray(json.historico)) return;
+      playMap = buildPlays(json.historico);
+      try { localStorage.setItem(PLAYS_KEY, JSON.stringify(playMap)); } catch {}
+      mergePlays();
+      renderSongs();
+    } catch (err) { console.error(err); }
+  }
   let urlTema = new URLSearchParams(location.search).get('tema') || ''; // vem do link do Passos de Fé
 
   function applyData(data) {
@@ -177,8 +212,11 @@
       style: m.estilo || '',
       theme: m.tema || 'Sem tema',
       created: m.criada_em,
+      plays: m.vezes_tocada || 0,
+      tone: m.ultimo_tom || '',
     }));
 
+    mergePlays();
     $('updated').textContent = 'Atualizado em ' + new Date(data.atualizado_em).toLocaleString('pt-BR');
     fillFilters();
     if (urlTema) { $('themeFilter').value = urlTema; urlTema = ''; }
@@ -209,7 +247,7 @@
       }
     }
   }
-  $('refreshBtn').onclick = () => loadData();
+  $('refreshBtn').onclick = () => { loadData(); loadPlays(); };
 
   // ---------- Render ----------
   function fillFilters() {
@@ -234,9 +272,13 @@
       (!theme || s.theme === theme) &&
       (!style || s.style === style));
 
-    list.sort($('sortBy').value === 'new'
-      ? (a, b) => String(b.created || '').localeCompare(String(a.created || ''))
-      : (a, b) => a.title.localeCompare(b.title, 'pt-BR'));
+    const byName = (a, b) => a.title.localeCompare(b.title, 'pt-BR');
+    const sorters = {
+      new: (a, b) => String(b.created || '').localeCompare(String(a.created || '')),
+      top: (a, b) => b.plays - a.plays || byName(a, b),
+      az: byName,
+    };
+    list.sort(sorters[$('sortBy').value] || byName);
 
     $('songCount').textContent = `${list.length} de ${songs.length} músicas`;
     $('songGrid').innerHTML = list.length === 0
@@ -246,6 +288,7 @@
           <div>
             <div class="title">${esc(s.title)}</div>
             <div class="artist">${esc(s.singer || 'Cantor não informado')}</div>
+            ${s.plays ? `<div class="meta">Tocada ${s.plays}× · último tom ${esc(s.tone || '—')}</div>` : ''}
           </div>
           <div class="tags">
             <span class="tag">${esc(s.theme)}</span>
@@ -294,6 +337,7 @@
 
   // Abre já filtrado quando vem de um link da escala (?q=nome da música)
   $('search').value = new URLSearchParams(location.search).get('q') || '';
+  try { playMap = JSON.parse(localStorage.getItem(PLAYS_KEY) || '{}') || {}; } catch {}
   try {
     const saved = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
     if (saved && saved.data && Array.isArray(saved.data.musicas)) {
@@ -303,6 +347,7 @@
     }
   } catch {}
   loadData();
+  loadPlays();
 
 </script>
 </body>

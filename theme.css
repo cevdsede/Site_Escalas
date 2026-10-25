@@ -88,7 +88,8 @@
 .site-links a:hover { background: var(--brand-soft); }
 .site-links a[aria-current="page"] { background: var(--brand); color: var(--on-brand); }
 .site-brand:focus-visible, .site-links a:focus-visible { outline: 2px solid var(--brand-text); outline-offset: 2px; }
-@media (max-width: 420px) { .site-brand span { display: none; } .site-links a { padding-inline: 10px; } }
+@media (max-width: 560px) { .site-brand span { display: none; } .site-nav-in { padding: 8px 10px; gap: 6px; } .site-links { gap: 0; } .site-links a { padding: 8px 9px; font-size: .88em; } }
+@media (max-width: 380px) { .site-links a { padding: 8px 6px; font-size: .8em; } }
 
 /* Aviso de versão nova */
 .update-bar { position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 2000; max-width: 480px; margin: 0 auto; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; box-shadow: var(--shadow); font-size: 14px; }

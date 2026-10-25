@@ -49,7 +49,9 @@
   function setupWorker() {
     if (!("serviceWorker" in navigator)) return;
     var reloaded = false;
+    var hadController = !!navigator.serviceWorker.controller; // primeira instalação não precisa recarregar
     navigator.serviceWorker.addEventListener("controllerchange", function () {
+      if (!hadController) { hadController = true; return; }
       if (reloaded) return;
       reloaded = true;
       location.reload();

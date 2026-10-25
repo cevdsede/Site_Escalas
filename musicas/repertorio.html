@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Repertório</title>
+<meta name="description" content="Repertório do louvor por culto e histórico das músicas cantadas.">
+<meta name="theme-color" content="#3f51b5">
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../icons/apple-touch-icon.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400,500,600,700,800&display=swap">
+<link rel="stylesheet" href="../theme.css">
+<script src="../theme.js"></script>
+<script src="../site.js" defer></script>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); background-image: var(--page-bg); background-attachment: fixed; min-height: 100vh; color: var(--text); font: 15px/1.5 var(--font); }
+  button, input, select { font: inherit; color: inherit; }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 20px 16px 60px; }
+  header.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 14px 0 18px; flex-wrap: wrap; }
+  h1 { font-size: 26px; margin: 0; letter-spacing: .5px; font-weight: 700; color: var(--brand-text); }
+  .sub { color: var(--muted); font-size: 13px; }
+  .btn { border: 1px solid var(--border); background: var(--surface); border-radius: 10px; padding: 8px 14px; cursor: pointer; font-weight: 600; transition: background .2s; }
+  .btn:hover { background: var(--surface-2); }
+  .btn:focus-visible, .tab:focus-visible, input:focus-visible, select:focus-visible, .link:focus-visible { outline: 2px solid var(--brand-text); outline-offset: 2px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
+
+  .tabs { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+  .tab { border: 1px solid var(--border); background: var(--surface); border-radius: 999px; padding: 7px 16px; cursor: pointer; color: var(--muted); font-weight: 600; }
+  .tab[aria-selected="true"] { background: var(--brand); color: var(--on-brand); border-color: var(--brand); }
+
+  .tip { margin: 0 0 14px; padding: 12px 16px; font-size: 14px; color: var(--muted); }
+  .tip a { color: var(--brand-text); font-weight: 600; }
+
+  .filters { display: grid; grid-template-columns: 1fr auto; gap: 10px; margin-bottom: 14px; }
+  .filters input, .filters select { padding: 9px 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); min-width: 0; }
+  .count { color: var(--muted); font-size: 13px; margin-bottom: 10px; }
+
+  .group { margin-bottom: 12px; overflow: hidden; }
+  .group-head { padding: 12px 16px; display: flex; justify-content: space-between; gap: 10px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+  .group-head strong { color: var(--brand-text); }
+  .group-head .when { color: var(--muted); font-size: 13px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  td { padding: 9px 16px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tr:last-child td { border-bottom: 0; }
+  td.tone { width: 92px; font-weight: 600; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  td.who { color: var(--muted); text-align: right; white-space: nowrap; }
+  td.date { color: var(--muted); width: 100px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  td a { color: var(--text); text-decoration: none; font-weight: 500; }
+  td a:hover { color: var(--brand-text); text-decoration: underline; }
+
+  .empty, .loading { text-align: center; color: var(--muted); padding: 50px 0; }
+  .empty a { color: var(--brand-text); font-weight: 600; }
+  [hidden] { display: none !important; }
+
+  @media (max-width: 640px) {
+    td.who { display: none; }
+    td.date { width: 80px; }
+    .filters { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <nav class="site-nav rounded" aria-label="Menu principal">
+    <div class="site-nav-in">
+      <a class="site-brand" href="../"><img src="../logo%20louvor.png" alt="" width="34" height="34"><span>Louvor CEVD</span></a>
+      <div class="site-links"><a href="../">Início</a><a href="../escala/">Escala</a><a href="./biblioteca-musicas.html">Músicas</a><a href="./repertorio.html" aria-current="page">Repertório</a></div>
+      <button type="button" class="theme-btn" data-theme-toggle></button>
+    </div>
+  </nav>
+
+  <header class="top">
+    <div>
+      <h1>Repertório</h1>
+      <div class="sub" id="updated"></div>
+    </div>
+    <button class="btn" id="refreshBtn" title="Recarregar dados">Atualizar</button>
+  </header>
+
+  <p class="card tip">Para montar o repertório de um culto, abra a <a href="../escala/">Escala</a> e toque em <strong>+ Música</strong> no culto desejado.</p>
+
+  <nav class="tabs" role="tablist" aria-label="Seções">
+    <button class="tab" role="tab" aria-selected="true" data-tab="reps">Repertórios</button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="hist">Histórico</button>
+  </nav>
+
+  <div class="loading" id="loading">Carregando…</div>
+
+  <section id="tab-reps" hidden>
+    <div class="filters">
+      <input id="repSearch" type="search" placeholder="Buscar música, culto ou ministro…">
+    </div>
+    <div class="count" id="repCount"></div>
+    <div id="repList"></div>
+  </section>
+
+  <section id="tab-hist" hidden>
+    <div class="filters">
+      <input id="histSearch" type="search" placeholder="Buscar música ou ministro…">
+      <select id="histGroup">
+        <option value="data">Por data</option>
+        <option value="ministro">Por ministro</option>
+        <option value="musica">Por música</option>
+      </select>
+    </div>
+    <div class="count" id="histCount"></div>
+    <div id="histList"></div>
+  </section>
+</main>
+
+<script>
+  // Dados do app (função pública do Supabase, sem login). O cadastro de músicas no repertório fica na Escala.
+  const API_URL = 'https://ipdrbhkzluuwjulkhjkd.supabase.co/functions/v1/repertorio-publico';
+  const CACHE_KEY = 'rep-data';
+
+  const $ = (id) => document.getElementById(id);
+  let data = { repertorios: [], historico: [] };
+  let activeTab = 'reps';
+  let loaded = false;
+
+  // ---------- Helpers ----------
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const norm = (s) => String(s ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+  const fmtDate = (d) => d ? new Date(d.length === 10 ? d + 'T12:00:00' : d).toLocaleDateString('pt-BR') : '—';
+  const libLink = (name) => `<a href="./biblioteca-musicas.html?q=${encodeURIComponent(name)}" title="Abrir na biblioteca de músicas">${esc(name)}</a>`;
+  const savedLabel = (t) => {
+    if (!t) return '';
+    const d = new Date(t);
+    return ' em ' + d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) + ' às ' +
+      d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  };
+  let savedAt = 0;
+
+  // ---------- Abas ----------
+  const showTab = (tab) => {
+    activeTab = tab;
+    document.querySelectorAll('.tab').forEach((t) => t.setAttribute('aria-selected', t.dataset.tab === tab));
+    ['reps', 'hist'].forEach((t) => { $('tab-' + t).hidden = t !== tab || !$('loading').hidden; });
+  };
+  document.querySelectorAll('.tab').forEach((t) => t.onclick = () => showTab(t.dataset.tab));
+
+  // ---------- Dados (a última leitura fica salva no aparelho) ----------
+  function applyData(json) {
+    data = json;
+    $('updated').textContent = 'Atualizado em ' + new Date(json.atualizado_em).toLocaleString('pt-BR');
+    renderReps();
+    renderHist();
+    $('loading').hidden = true;
+    loaded = true;
+    showTab(activeTab);
+  }
+
+  async function loadData() {
+    if (!loaded) { $('loading').hidden = false; $('loading').textContent = 'Carregando…'; showTab(activeTab); }
+    try {
+      const res = await fetch(API_URL, { cache: 'no-store' });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || `HTTP ${res.status}`);
+      applyData(json);
+      savedAt = Date.now();
+      try { localStorage.setItem(CACHE_KEY, JSON.stringify({ savedAt, json })); } catch {}
+    } catch (err) {
+      console.error(err);
+      if (loaded) {
+        $('updated').textContent = 'Sem conexão. Mostrando os dados salvos' + savedLabel(savedAt) + '.';
+      } else {
+        $('loading').hidden = false;
+        $('loading').textContent = 'Não foi possível carregar o repertório. Tente "Atualizar".';
+      }
+    }
+  }
+  $('refreshBtn').onclick = () => loadData();
+
+  // ---------- Repertórios ----------
+  function renderReps() {
+    const q = norm($('repSearch').value);
+    const groups = data.repertorios
+      .map((r) => ({
+        ...r,
+        itens: r.itens.filter((i) => !q || norm(r.culto.nome).includes(q) ||
+          norm(i.musica).includes(q) || norm(i.cantor).includes(q) || norm(i.ministro).includes(q)),
+      }))
+      .filter((r) => r.itens.length > 0);
+
+    $('repCount').textContent = `${groups.length} culto(s) com repertório`;
+    $('repList').innerHTML = groups.length === 0
+      ? '<div class="empty">Nenhum repertório cadastrado ainda.<br>Abra a <a href="../escala/">Escala</a> e use <strong>+ Música</strong> em um culto.</div>'
+      : groups.map((r) => `
+        <div class="card group">
+          <div class="group-head">
+            <strong>${esc(r.culto.nome.trim())}</strong>
+            <span class="when">${fmtDate(r.culto.data)}${r.culto.horario ? ' · ' + esc(r.culto.horario) : ''} · ${r.itens.length} música(s)</span>
+          </div>
+          <table>${r.itens.map((i) => `
+            <tr>
+              <td class="tone">${esc(i.tom || '—')}</td>
+              <td>${libLink(i.musica)}<div class="sub">${esc(i.cantor)}</div></td>
+              <td class="who">${esc(i.ministro)}</td>
+            </tr>`).join('')}
+          </table>
+        </div>`).join('');
+  }
+  $('repSearch').addEventListener('input', renderReps);
+
+  // ---------- Histórico ----------
+  function renderHist() {
+    const q = norm($('histSearch').value);
+    const mode = $('histGroup').value;
+    const list = data.historico.filter((h) => !q ||
+      norm(h.musica).includes(q) || norm(h.cantor).includes(q) || norm(h.ministro).includes(q));
+
+    $('histCount').textContent = `${list.length} música(s) cantada(s)`;
+    if (list.length === 0) { $('histList').innerHTML = '<div class="empty">Nenhuma música no histórico.</div>'; return; }
+
+    if (mode === 'data') {
+      $('histList').innerHTML = `<div class="card group"><table>${list.map((h) => `
+        <tr>
+          <td class="date">${fmtDate(h.data)}</td>
+          <td>${libLink(h.musica)}<div class="sub">${esc(h.cantor)}</div></td>
+          <td class="tone">${esc(h.tom || '—')}</td>
+          <td class="who">${esc(h.ministro)}</td>
+        </tr>`).join('')}</table></div>`;
+      return;
+    }
+
+    const key = mode === 'ministro' ? (h) => h.ministro : (h) => `${h.musica}\u0000${h.cantor}`;
+    const groups = new Map();
+    list.forEach((h) => {
+      const k = key(h);
+      if (!groups.has(k)) groups.set(k, []);
+      groups.get(k).push(h);
+    });
+    const sorted = [...groups.entries()].sort((a, b) => b[1].length - a[1].length || a[0].localeCompare(b[0], 'pt-BR'));
+
+    $('histList').innerHTML = sorted.map(([k, items]) => {
+      const title = mode === 'ministro'
+        ? esc(k)
+        : `${esc(items[0].musica)} <span class="sub">${esc(items[0].cantor)}</span>`;
+      return `
+        <div class="card group">
+          <div class="group-head">
+            <strong>${title}</strong>
+            <span class="when">${items.length}× cantada(s)</span>
+          </div>
+          <table>${items.map((h) => `
+            <tr>
+              <td class="date">${fmtDate(h.data)}</td>
+              <td>${mode === 'ministro' ? `${libLink(h.musica)}<div class="sub">${esc(h.cantor)}</div>` : esc(h.ministro)}</td>
+              <td class="tone">${esc(h.tom || '—')}</td>
+            </tr>`).join('')}
+          </table>
+        </div>`;
+    }).join('');
+  }
+  $('histSearch').addEventListener('input', renderHist);
+  $('histGroup').addEventListener('input', renderHist);
+
+  try {
+    const saved = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
+    if (saved && saved.json && Array.isArray(saved.json.repertorios)) {
+      savedAt = saved.savedAt || 0;
+      applyData(saved.json);
+      $('updated').textContent = 'Dados salvos' + savedLabel(savedAt) + '. Atualizando…';
+    }
+  } catch {}
+  loadData();
+</script>
+</body>
+</html>

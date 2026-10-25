@@ -57,6 +57,19 @@
       ]
     },
     {
+      "name": "Repertório",
+      "short_name": "Repertório",
+      "description": "Repertórios por culto e histórico",
+      "url": "./musicas/repertorio.html",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
       "name": "Início",
       "short_name": "Início",
       "description": "Página inicial do ministério",
