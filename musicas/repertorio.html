@@ -46,7 +46,19 @@
   td.tone { width: 92px; font-weight: 600; white-space: nowrap; font-variant-numeric: tabular-nums; }
   td.who { color: var(--muted); text-align: right; white-space: nowrap; }
   td.date { color: var(--muted); width: 100px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  td.act { width: 44px; text-align: right; }
+  .del { border: 0; background: transparent; color: var(--muted); cursor: pointer; padding: 4px 8px; border-radius: 8px; font-size: 18px; line-height: 1; }
+  .del:hover { color: #dc2626; background: var(--surface-2); }
+  .del:focus-visible { outline: 2px solid var(--brand-text); outline-offset: 2px; }
   td a { color: var(--text); text-decoration: none; font-weight: 500; }
+  details.group > summary { list-style: none; cursor: pointer; border-bottom: 0; align-items: center; }
+  details.group > summary::-webkit-details-marker { display: none; }
+  details.group > summary::before { content: "\25B8"; color: var(--muted); margin-right: 8px; transition: transform .15s; display: inline-block; }
+  details.group[open] > summary::before { transform: rotate(90deg); }
+  details.group[open] > summary { border-bottom: 1px solid var(--border); }
+  details.group > summary:focus-visible { outline: 2px solid var(--brand-text); outline-offset: -2px; }
+  details.group > summary .name { flex: 1 1 auto; font-weight: 700; color: var(--brand-text); }
+  .hist-tools { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
   td a:hover { color: var(--brand-text); text-decoration: underline; }
 
   .empty, .loading { text-align: center; color: var(--muted); padding: 50px 0; }
@@ -99,10 +111,14 @@
     <div class="filters">
       <input id="histSearch" type="search" placeholder="Buscar música ou ministro…">
       <select id="histGroup">
-        <option value="data">Por data</option>
-        <option value="ministro">Por ministro</option>
+        <option value="ministro" selected>Por ministro</option>
         <option value="musica">Por música</option>
+        <option value="data">Por data</option>
       </select>
+    </div>
+    <div class="hist-tools" id="histTools">
+      <button type="button" class="btn" id="histOpenAll">Expandir todos</button>
+      <button type="button" class="btn" id="histCloseAll">Recolher todos</button>
     </div>
     <div class="count" id="histCount"></div>
     <div id="histList"></div>
@@ -197,10 +213,16 @@
               <td class="tone">${esc(i.tom || '—')}</td>
               <td>${libLink(i.musica)}<div class="sub">${esc(i.cantor)}</div></td>
               <td class="who">${esc(i.ministro)}</td>
+              <td class="act">${i.id ? `<button class="del" type="button" title="Excluir do repertório" aria-label="Excluir ${esc(i.musica)} do repertório" data-id="${esc(i.id)}" data-nome="${esc(i.musica)}">&times;</button>` : ''}</td>
             </tr>`).join('')}
           </table>
         </div>`).join('');
   }
+  $('repList').addEventListener('click', (e) => {
+    const btn = e.target.closest('.del');
+    if (!btn || !window.SiteRep) return;
+    window.SiteRep.excluir({ id: btn.dataset.id, nome: btn.dataset.nome, apiUrl: API_URL, pinRequired: Boolean(data.pin_obrigatorio), onDone: loadData });
+  });
   $('repSearch').addEventListener('input', renderReps);
 
   // ---------- Histórico ----------
@@ -211,6 +233,7 @@
       norm(h.musica).includes(q) || norm(h.cantor).includes(q) || norm(h.ministro).includes(q));
 
     $('histCount').textContent = `${list.length} música(s) cantada(s)`;
+    $('histTools').hidden = mode === 'data';
     if (list.length === 0) { $('histList').innerHTML = '<div class="empty">Nenhuma música no histórico.</div>'; return; }
 
     if (mode === 'data') {
@@ -233,16 +256,18 @@
     });
     const sorted = [...groups.entries()].sort((a, b) => b[1].length - a[1].length || a[0].localeCompare(b[0], 'pt-BR'));
 
+    // Cada ministro (ou música) vira um bloco recolhido; abre sozinho quando há busca.
+    const open = q ? ' open' : '';
     $('histList').innerHTML = sorted.map(([k, items]) => {
       const title = mode === 'ministro'
         ? esc(k)
         : `${esc(items[0].musica)} <span class="sub">${esc(items[0].cantor)}</span>`;
       return `
-        <div class="card group">
-          <div class="group-head">
-            <strong>${title}</strong>
+        <details class="card group"${open}>
+          <summary class="group-head">
+            <span class="name">${title}</span>
             <span class="when">${items.length}× cantada(s)</span>
-          </div>
+          </summary>
           <table>${items.map((h) => `
             <tr>
               <td class="date">${fmtDate(h.data)}</td>
@@ -250,9 +275,11 @@
               <td class="tone">${esc(h.tom || '—')}</td>
             </tr>`).join('')}
           </table>
-        </div>`;
+        </details>`;
     }).join('');
   }
+  $('histOpenAll').onclick = () => document.querySelectorAll('#histList details').forEach((d) => { d.open = true; });
+  $('histCloseAll').onclick = () => document.querySelectorAll('#histList details').forEach((d) => { d.open = false; });
   $('histSearch').addEventListener('input', renderHist);
   $('histGroup').addEventListener('input', renderHist);
 

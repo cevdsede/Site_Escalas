@@ -88,7 +88,7 @@
 .site-links a:hover { background: var(--brand-soft); }
 .site-links a[aria-current="page"] { background: var(--brand); color: var(--on-brand); }
 .site-brand:focus-visible, .site-links a:focus-visible { outline: 2px solid var(--brand-text); outline-offset: 2px; }
-@media (max-width: 560px) { .site-brand span { display: none; } .site-nav-in { padding: 8px 10px; gap: 6px; } .site-links { gap: 0; } .site-links a { padding: 8px 9px; font-size: .88em; } }
+@media (max-width: 700px) { .site-brand span { display: none; } .site-nav-in { padding: 8px 10px; gap: 6px; } .site-links { gap: 0; } .site-links a { padding: 8px 9px; font-size: .88em; } }
 @media (max-width: 380px) { .site-links a { padding: 8px 6px; font-size: .8em; } }
 
 /* Aviso de versão nova */
@@ -97,3 +97,19 @@
 .update-bar button { font: inherit; font-weight: 600; border: 0; border-radius: 8px; padding: 8px 14px; background: var(--brand); color: var(--on-brand); cursor: pointer; }
 .update-bar button.ghost { background: var(--surface-2); color: var(--brand-text); border: 1px solid var(--border); }
 .update-bar button:focus-visible { outline: 2px solid var(--brand-text); outline-offset: 2px; }
+
+/* Diálogo de confirmação (excluir do repertório) */
+dialog.dlg { border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); color: var(--text); padding: 0; width: min(420px, calc(100vw - 24px)); }
+dialog.dlg::backdrop { background: rgba(0, 0, 0, .55); }
+.dlg-form { display: grid; gap: 12px; padding: 18px; font-family: var(--font); }
+.dlg-form h2 { margin: 0; font-size: 20px; color: var(--brand-text); }
+.dlg-form p { margin: 0; overflow-wrap: anywhere; }
+.dlg-form label { display: grid; gap: 5px; font-size: 13px; font-weight: 600; color: var(--muted); }
+.dlg-form input { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font: inherit; font-weight: 400; }
+.dlg-msg { font-size: 13px; min-height: 1.2em; color: var(--muted); }
+.dlg-msg.err { color: #dc2626; }
+.dlg-actions { display: flex; gap: 8px; justify-content: flex-end; }
+.dlg-btn { font: inherit; font-weight: 600; border: 1px solid var(--border); background: var(--surface-2); color: var(--text); border-radius: 10px; padding: 8px 16px; cursor: pointer; }
+.dlg-btn.danger { background: #dc2626; border-color: #dc2626; color: #fff; }
+.dlg-btn:disabled { opacity: .6; cursor: default; }
+.dlg-btn:focus-visible, .dlg-form input:focus-visible { outline: 2px solid var(--brand-text); outline-offset: 2px; }

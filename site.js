@@ -71,6 +71,71 @@
     }).catch(function () {});
   }
 
+  // ---------- Excluir item do repertório (diálogo com PIN) ----------
+  // Uso: SiteRep.excluir({ id, nome, apiUrl, pinRequired, onDone })
+  window.SiteRep = {
+    excluir: function (o) {
+      var old = document.getElementById("delDialog");
+      if (old) old.remove();
+      var dlg = document.createElement("dialog");
+      dlg.id = "delDialog";
+      dlg.className = "dlg";
+      dlg.setAttribute("aria-labelledby", "delTitle");
+      var form = document.createElement("form");
+      form.className = "dlg-form";
+
+      var h = document.createElement("h2"); h.id = "delTitle"; h.textContent = "Excluir do repertório";
+      var p = document.createElement("p"); p.textContent = "Excluir \u201C" + o.nome + "\u201D do repertório deste culto?";
+      form.appendChild(h); form.appendChild(p);
+
+      var pin = null;
+      if (o.pinRequired) {
+        var label = document.createElement("label"); label.textContent = "PIN";
+        pin = document.createElement("input");
+        pin.type = "password"; pin.autocomplete = "off"; pin.required = true;
+        try { pin.value = sessionStorage.getItem("escala.pin") || ""; } catch (e) {}
+        label.appendChild(pin);
+        form.appendChild(label);
+      }
+      var msg = document.createElement("div"); msg.className = "dlg-msg"; msg.setAttribute("role", "status");
+      var actions = document.createElement("div"); actions.className = "dlg-actions";
+      var cancel = document.createElement("button"); cancel.type = "button"; cancel.className = "dlg-btn"; cancel.textContent = "Cancelar";
+      var ok = document.createElement("button"); ok.type = "submit"; ok.className = "dlg-btn danger"; ok.textContent = "Excluir";
+      actions.appendChild(cancel); actions.appendChild(ok);
+      form.appendChild(msg); form.appendChild(actions);
+      dlg.appendChild(form);
+      document.body.appendChild(dlg);
+
+      cancel.addEventListener("click", function () { dlg.close(); dlg.remove(); });
+      dlg.addEventListener("close", function () { dlg.remove(); });
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        ok.disabled = true; msg.textContent = "Excluindo\u2026"; msg.className = "dlg-msg";
+        var pinValue = pin ? pin.value : "";
+        fetch(o.apiUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ acao: "excluir", id: o.id, pin: pinValue })
+        }).then(function (r) {
+          return r.json().catch(function () { return {}; }).then(function (j) {
+            if (!r.ok) throw new Error(j.error || "Erro ao excluir.");
+          });
+        }).then(function () {
+          try { if (pinValue) sessionStorage.setItem("escala.pin", pinValue); } catch (e) {}
+          dlg.close();
+          dlg.remove();
+          if (o.onDone) o.onDone();
+        }).catch(function (err) {
+          msg.textContent = err && err.message && err.message !== "Failed to fetch" ? err.message : "Sem conexão. Tente de novo.";
+          msg.className = "dlg-msg err";
+          ok.disabled = false;
+        });
+      });
+      dlg.showModal();
+      if (pin) pin.focus(); else cancel.focus();
+    }
+  };
+
   setupInstall();
   setupWorker();
 })();

@@ -80,14 +80,17 @@ h1 { color: var(--brand-text); font-family: var(--font-display); font-weight: 70
 .add-rep:hover { border-color: var(--brand-text); }
 .add-rep:focus-visible { outline: 2px solid var(--brand-text); outline-offset: 2px; }
 .rep-list { display: flex; flex-direction: column; }
-.rep-item { display: grid; grid-template-columns: 76px minmax(0, 1fr) auto; gap: 10px; align-items: baseline; padding: 5px 0; border-top: 1px solid var(--border); font-size: 14px; }
+.rep-item { display: grid; grid-template-columns: 76px minmax(0, 1fr) auto auto; gap: 10px; align-items: baseline; padding: 5px 0; border-top: 1px solid var(--border); font-size: 14px; }
 .rep-item:first-child { border-top: 0; }
 .rep-item .tom { font-weight: 600; color: var(--muted); font-variant-numeric: tabular-nums; font-size: 13px; }
 .rep-item .mus { color: var(--text); font-weight: 500; text-decoration: none; overflow-wrap: anywhere; }
 .rep-item .mus:hover { color: var(--brand-text); text-decoration: underline; }
 .rep-item .who-rep { color: var(--muted); font-size: 13px; text-align: right; }
+.del-rep { border: 0; background: transparent; color: var(--muted); cursor: pointer; padding: 0 8px; border-radius: 8px; font-size: 18px; line-height: 1; }
+.del-rep:hover { color: #dc2626; background: var(--surface-2); }
+.del-rep:focus-visible { outline: 2px solid var(--brand-text); outline-offset: 2px; }
 .rep-empty { color: var(--muted); font-size: 14px; }
-@media (max-width: 480px) { .rep-item { grid-template-columns: 64px minmax(0, 1fr); } .rep-item .who-rep { display: none; } }
+@media (max-width: 480px) { .rep-item { grid-template-columns: 64px minmax(0, 1fr) auto; } .rep-item .who-rep { display: none; } }
 dialog#repDialog { border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); color: var(--text); padding: 0; width: min(520px, calc(100vw - 24px)); max-height: calc(100vh - 24px); }
 dialog#repDialog::backdrop { background: rgba(0, 0, 0, .55); }
 .rep-form { display: grid; gap: 12px; padding: 18px; }
@@ -178,9 +181,7 @@ body { margin: 0; }
     <div id="status">Carregando…</div>
     <div class="foot-actions">
       <button type="button" class="pill" id="share">Compartilhar</button>
-      <button type="button" class="pill" id="install">Instalar app</button>
     </div>
-    <div id="installHelp" hidden>Para instalar: no Chrome ou Edge, abra o menu do navegador (⋮) e toque em "Instalar app" ou "Adicionar à tela inicial". No iPhone, toque em Compartilhar e depois em "Adicionar à Tela de Início".</div>
   </footer>
 </div>
 
@@ -475,6 +476,16 @@ function render() {
             a.title = "Abrir na biblioteca de músicas";
             row.appendChild(a);
             row.appendChild(el("span", "who-rep", i.ministro));
+            if (i.id) {
+              var del = el("button", "del-rep", "\u00d7");
+              del.type = "button";
+              del.title = "Excluir do repertório";
+              del.setAttribute("aria-label", "Excluir " + i.musica + " do repertório");
+              del.addEventListener("click", (function (item) { return function () {
+                if (window.SiteRep) window.SiteRep.excluir({ id: item.id, nome: item.musica, apiUrl: API_URL, pinRequired: !!(api && api.pin_obrigatorio), onDone: loadApi });
+              }; })(i));
+              row.appendChild(del);
+            }
             ul.appendChild(row);
           });
           rep.appendChild(ul);
