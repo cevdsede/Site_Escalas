@@ -64,6 +64,8 @@ h1 { color: var(--brand-text); font-family: var(--font-display); font-weight: 70
 .none-sub { font-size: 14px; }
 .summary { color: var(--accent); font-weight: 600; min-height: 1.4em; }
 .week { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr)); gap: 12px; align-items: start; }
+.past-title { margin: 8px 0 0; font-size: 14px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; }
+.svc.past { filter: grayscale(.35); }
 .week-title { grid-column: 1 / -1; font-family: var(--font-display); font-weight: 500; font-size: 14px; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; margin: 0; padding-bottom: 6px; border-bottom: 1px solid var(--line); }
 .svc { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 4px 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
 .svc.today { border-color: var(--today); background: linear-gradient(0deg, var(--today-soft), var(--today-soft)), var(--surface); }
@@ -361,17 +363,24 @@ function calLink(s) {
 }
 
 // Hide finished weeks and services nobody is scheduled for.
+var pastWeeks = [];
 function visibleWeeks() {
-  var t = todayKey();
-  var weeks = data.map(function (w) {
-    if (w.every(function (s) { return key(s.date) < t; })) return [];
-    return w.filter(function (s) { return !isEmpty(s) && (!selected || hasPerson(s, selected)); });
-  }).filter(function (w) { return w.length; });
-  return view === "week" ? weeks.slice(0, 1) : weeks;
+  var t = todayKey(), up = [], past = [];
+  data.forEach(function (w) {
+    var list = w.filter(function (s) { return !isEmpty(s) && (!selected || hasPerson(s, selected)); });
+    if (!list.length) return;
+    if (w.every(function (s) { return key(s.date) < t; })) { if (selected) past.push(list); }  // semanas passadas só aparecem ao filtrar uma pessoa
+    else up.push(list);
+  });
+  pastWeeks = past.reverse(); // mais recentes primeiro
+  return view === "week" ? up.slice(0, 1) : up;
 }
+// Só quem está na escala da planilha (CSV). Nomes que vêm apenas do app não entram na lista.
 function allNames() {
   var set = {};
-  data.forEach(function (w) { w.forEach(function (s) { ROLES.forEach(function (r) { s[r[1]].forEach(function (n) { set[n] = 1; }); }); }); });
+  (sheetData.length ? sheetData : data).forEach(function (w) { w.forEach(function (s) {
+    ROLES.forEach(function (r) { if (r[1] !== "voc") s[r[1]].forEach(function (n) { set[n] = 1; }); });
+  }); });
   return Object.keys(set).filter(function (n) { return n !== "Convidado"; }).sort(function (a, b) { return a.localeCompare(b, "pt"); });
 }
 
@@ -415,18 +424,18 @@ function fillEmpty(box) {
 function render() {
   var root = document.getElementById("weeks");
   root.textContent = "";
-  var weeks = visibleWeeks(), count = 0, nextSvc = null;
+  var weeks = visibleWeeks(), count = 0, nextSvc = null, pastMode = false;
   weeks.forEach(function (w) { w.forEach(function (s) {
     var k = key(s.date);
     if (!nextSvc && (k > todayKey() || (k === todayKey() && s.date.getTime() + 2 * 3600e3 >= Date.now()))) nextSvc = s;
   }); });
   renderNext(nextSvc);
-  weeks.forEach(function (list) {
+  function drawWeek(list) {
     var sec = el("section", "week");
     var a = list[0], b = list[list.length - 1];
     sec.appendChild(el("h2", "week-title", a.day + " " + a.month + " – " + b.day + " " + b.month));
     list.forEach(function (s) {
-      count++;
+      if (!pastMode) count++;
       var k = key(s.date);
       var card = el("article", "svc" + (k === todayKey() ? " today" : "") + (k < todayKey() ? " past" : ""));
       var d = el("div", "date");
@@ -514,7 +523,8 @@ function render() {
       sec.appendChild(card);
     });
     root.appendChild(sec);
-  });
+  }
+  weeks.forEach(drawWeek);
   if (!count) {
     var box = el("div", "none");
     if (!loaded && !failed) box.textContent = "Carregando a escala…";
@@ -527,7 +537,16 @@ function render() {
     } else fillEmpty(box);
     root.appendChild(box);
   }
-  document.getElementById("summary").textContent = selected ? selected + ": " + count + (count === 1 ? " escala" : " escalas") : "";
+  var pastN = 0;
+  if (selected && view === "all" && pastWeeks.length) {
+    root.appendChild(el("h2", "past-title", "Escalas anteriores de " + selected));
+    pastMode = true;
+    pastWeeks.forEach(function (w) { pastN += w.length; drawWeek(w); });
+    pastMode = false;
+  }
+  document.getElementById("summary").textContent = selected
+    ? selected + ": " + count + (count === 1 ? " escala" : " escalas") + (pastN ? " · " + pastN + (pastN === 1 ? " anterior" : " anteriores") : "")
+    : "";
 }
 
 function makePill(container, label, active, onClick) {
