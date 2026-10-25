@@ -1,6 +1,6 @@
 // Service worker: deixa o site abrir sem internet.
 // A escala em si fica salva no aparelho pela própria página (localStorage).
-var CACHE = "escala-v2";
+var CACHE = "escala-v3";
 var SHELL = [
   "./",
   "index.html",
