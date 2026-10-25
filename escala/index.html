@@ -49,6 +49,9 @@ h1 { color: var(--brand-text); font-family: var(--font-display); font-weight: 70
 .cal:hover { background: var(--accent); color: var(--surface); }
 .badge.warn { color: var(--today); }
 .none p { margin: 0 0 12px; }
+.none p:last-child { margin-bottom: 0; }
+.none-title { font-weight: 600; color: var(--text); }
+.none-sub { font-size: 14px; }
 .summary { color: var(--accent); font-weight: 600; min-height: 1.4em; }
 .week { display: flex; flex-direction: column; gap: 10px; }
 .week-title { font-family: var(--font-display); font-weight: 500; font-size: 14px; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; margin: 0; padding-bottom: 6px; border-bottom: 1px solid var(--line); }
@@ -128,11 +131,25 @@ function parse(line, year) {
     min: list(p[3]), back: list(p[4]), vio: list(p[5]), tec: list(p[6]), gui: list(p[7]), bai: list(p[8]), bat: list(p[9]), ens: p[10] || "" };
 }
 // groups: array of arrays of "|" lines. Assigns years in order, rolling over at December -> January.
+// O ano não vem na planilha: usa o dia da semana (qui., sex.…) da primeira linha para descobrir qual ano bate.
+function firstYear(line, now) {
+  var y = now.getFullYear();
+  if (!line) return y;
+  var dm = line[0].split("/"), idx = DOW.indexOf((line[11] || "").toLowerCase());
+  var best = null;
+  [y - 1, y, y + 1].forEach(function (c) {
+    var d = new Date(c, +dm[1] - 1, +dm[0]);
+    if (idx >= 0 && d.getDay() !== idx) return;
+    if (best === null || Math.abs(d - now) < Math.abs(new Date(best, +dm[1] - 1, +dm[0]) - now)) best = c;
+  });
+  if (best !== null) return best;
+  return +dm[1] - 1 > now.getMonth() + 6 ? y - 1 : y;
+}
 function build(groups) {
-  var now = new Date(), first = null;
-  groups.some(function (g) { if (g.length) { first = +g[0].split("|")[0].split("/")[1]; return true; } });
-  var year = now.getFullYear();
-  if (first && first - 1 > now.getMonth() + 6) year -= 1;
+  var now = new Date(), firstLine = null;
+  groups.some(function (g) { if (g.length) { firstLine = g[0].split("|"); return true; } });
+  var first = firstLine ? +firstLine[0].split("/")[1] : null;
+  var year = firstYear(firstLine, now);
   var prev = first || 1;
   return groups.map(function (g) {
     return g.map(function (line) {
@@ -167,7 +184,7 @@ function groupsFromCsv(text) {
     if (/^\d{1,2}\/\d{1,2}$/.test(c[0])) {
       var min = [c[4], c[5]].filter(Boolean).join(",");
       var back = [c[6], c[7], c[8]].filter(Boolean).join(",");
-      groups[groups.length - 1].push([c[0], c[2], c[3], min, back, c[9], c[10], c[11], c[12], c[13], c[14] || ""].join("|"));
+      groups[groups.length - 1].push([c[0], c[2], c[3], min, back, c[9], c[10], c[11], c[12], c[13], c[14] || "", c[1]].join("|"));
     } else if (c.slice(0, 15).every(function (x) { return !x; })) {
       if (groups[groups.length - 1].length) groups.push([]);
     }
@@ -251,6 +268,26 @@ function renderNext(nextSvc) {
   if (sub.length) box.appendChild(el("div", "next-sub", sub.join(" · ")));
 }
 
+// Mensagem quando não há culto escalado daqui para frente.
+function lastScheduled(name) {
+  var last = null;
+  data.forEach(function (w) { w.forEach(function (s) {
+    if (!isEmpty(s) && (!name || hasPerson(s, name))) last = s;
+  }); });
+  return last;
+}
+function fillEmpty(box) {
+  var who = selected ? "para " + selected : "";
+  box.appendChild(el("p", "none-title", selected ? "Nenhuma escala próxima " + who + "." : "Ainda não há escala para as próximas semanas."));
+  var last = lastScheduled(selected);
+  if (last) {
+    var txt = "Última escala " + (selected ? "de " + selected : "preenchida") + ": " + last.dow + " " + last.day + "/" + pad(last.date.getMonth() + 1) + "/" + last.date.getFullYear() + " · " + (last.culto || "Sexta-feira");
+    if (!selected && last.min.length) txt += " (ministro: " + last.min.join(", ") + ")";
+    box.appendChild(el("p", "none-sub", txt));
+  }
+  box.appendChild(el("p", "none-sub", "Assim que a planilha for preenchida, a escala aparece aqui sozinha."));
+}
+
 function render() {
   var root = document.getElementById("weeks");
   root.textContent = "";
@@ -315,7 +352,7 @@ function render() {
       retry.type = "button";
       retry.addEventListener("click", function () { failed = false; render(); load(); });
       box.appendChild(retry);
-    } else box.textContent = selected ? "Nenhuma escala próxima para " + selected + "." : "Nenhuma escala preenchida daqui para frente.";
+    } else fillEmpty(box);
     root.appendChild(box);
   }
   document.getElementById("summary").textContent = selected ? selected + ": " + count + (count === 1 ? " escala" : " escalas") : "";
