@@ -373,23 +373,59 @@
   </div>
 
   <script>
-    // Lista do Passos de Fé: vem de passos-de-fe.json (edite o arquivo para mudar as músicas)
-    function carregarPassosDeFe() {
-      var box = document.getElementById('musicList');
-      fetch('passos-de-fe.json').then(function (r) {
+    // Lista do Passos de Fé: a ordem vem de passos-de-fe.json e cada música é buscada na Biblioteca de Músicas
+    // (nome e cantor oficiais). Os links de letra e cifra do arquivo continuam valendo.
+    var BIB_URL = 'https://ipdrbhkzluuwjulkhjkd.supabase.co/functions/v1/biblioteca-musicas';
+    function nrm(t) { return String(t || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim(); }
+    function dist(a, b) {
+      var prev = [], i, j;
+      for (j = 0; j <= b.length; j++) prev[j] = j;
+      for (i = 1; i <= a.length; i++) {
+        var cur = [i];
+        for (j = 1; j <= b.length; j++) cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a.charAt(i - 1) === b.charAt(j - 1) ? 0 : 1));
+        prev = cur;
+      }
+      return prev[b.length];
+    }
+    function mesmoCantor(a, b) {
+      a = nrm(a); b = nrm(b);
+      return a === b || a.indexOf(b) >= 0 || b.indexOf(a) >= 0 || dist(a, b) <= 2;
+    }
+    function achaNaBiblioteca(item, lib) {
+      var t = nrm(item.musica);
+      return lib.filter(function (l) { return nrm(l.musica) === t && mesmoCantor(l.cantor, item.cantor); })[0] || null;
+    }
+    function lerBiblioteca() {
+      return fetch(BIB_URL, { cache: 'no-store' }).then(function (r) {
         if (!r.ok) throw new Error('http ' + r.status);
         return r.json();
-      }).then(function (d) {
+      }).then(function (j) {
+        try { localStorage.setItem('passos-lib', JSON.stringify(j.musicas)); } catch (e) {}
+        return j.musicas;
+      }).catch(function () {
+        try { return JSON.parse(localStorage.getItem('passos-lib') || 'null') || []; } catch (e) { return []; }
+      });
+    }
+    function carregarPassosDeFe() {
+      var box = document.getElementById('musicList');
+      Promise.all([
+        fetch('passos-de-fe.json').then(function (r) { if (!r.ok) throw new Error('http ' + r.status); return r.json(); }),
+        lerBiblioteca()
+      ]).then(function (res) {
+        var lista = res[0].musicas || [], lib = res[1];
         box.textContent = '';
-        (d.musicas || []).forEach(function (m, i) {
+        lista.forEach(function (m, i) {
+          var oficial = achaNaBiblioteca(m, lib) || m;
+          var q = encodeURIComponent(oficial.musica + ' ' + oficial.cantor);
           var item = document.createElement('div'); item.className = 'music-item';
-          var t = document.createElement('div'); t.className = 'music-title'; t.textContent = (i + 1) + '. ' + m.musica;
-          var a = document.createElement('div'); a.className = 'music-artist'; a.textContent = m.cantor;
+          var t = document.createElement('div'); t.className = 'music-title'; t.textContent = (i + 1) + '. ' + oficial.musica;
+          var a = document.createElement('div'); a.className = 'music-artist'; a.textContent = oficial.cantor;
           var links = document.createElement('div'); links.className = 'music-links';
-          [['letra', '📝 Letra'], ['cifra', '🎸 Cifra'], ['spotify', '🎵 Spotify']].forEach(function (k) {
-            if (!m[k[0]]) return;
+          [['letra', '📝 Letra', 'https://www.google.com/search?q=' + q + '%20letra%20site%3Aletras.mus.br'],
+           ['cifra', '🎸 Cifra', 'https://www.google.com/search?q=' + q + '%20cifra%20site%3Acifraclub.com.br'],
+           ['spotify', '🎵 Spotify', 'https://open.spotify.com/search/' + q]].forEach(function (k) {
             var l = document.createElement('a');
-            l.href = m[k[0]]; l.target = '_blank'; l.rel = 'noopener noreferrer'; l.className = 'music-link'; l.textContent = k[1];
+            l.href = m[k[0]] || k[2]; l.target = '_blank'; l.rel = 'noopener noreferrer'; l.className = 'music-link'; l.textContent = k[1];
             links.appendChild(l);
           });
           item.appendChild(t); item.appendChild(a); item.appendChild(links);
