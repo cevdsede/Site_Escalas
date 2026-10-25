@@ -9,7 +9,7 @@ Não tem etapa de build: são arquivos HTML, CSS e JavaScript puros.
 | Página | Arquivo | O que faz |
 | :-- | :-- | :-- |
 | Início | `index.html` | Botões para a Escala, a Biblioteca e a lista do Passos de Fé (janela em tela cheia), mais o botão **Instalar app**. |
-| Escala | `escala/index.html` | Próximos cultos com a equipe (ministro, backs e instrumentos), filtro por pessoa, "Próximo culto", agendar no calendário, compartilhar e o **repertório de cada culto** (adicionar e excluir músicas). |
+| Escala | `escala/index.html` | Próximos cultos com a equipe (ministro, backs e instrumentos), filtro por pessoa, "Próximo culto", agendar no calendário (um culto ou **todas as escalas de uma pessoa**), **exportar a escala em imagem** (completa ou só de uma pessoa), compartilhar e o **repertório de cada culto** (adicionar e excluir músicas). |
 | Músicas | `musicas/biblioteca-musicas.html` | Biblioteca com busca, filtros por tema e estilo, ordenação por "mais tocadas", links de letra, cifra, Spotify e YouTube, e cadastro de música nova. |
 | Repertório | `musicas/repertorio.html` | Repertórios por culto e histórico das músicas cantadas, recolhido por ministro. |
 

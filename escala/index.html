@@ -120,6 +120,7 @@ dialog#repDialog::backdrop { background: rgba(0, 0, 0, .55); }
 .pill.primary { background: var(--brand); border-color: var(--brand); color: var(--on-brand); }
 .pill:disabled { opacity: .6; cursor: default; }
 @media (max-width: 480px) { .rep-row { grid-template-columns: 1fr; } }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .foot-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 .rep { grid-column: 2; display: flex; flex-direction: column; gap: 4px; margin-top: 4px; }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -159,6 +160,7 @@ body { margin: 0; }
     <span class="filter-label">Filtrar por pessoa</span>
     <div class="pills" id="pills"></div>
     <div class="summary" id="summary" aria-live="polite"></div>
+    <div class="actions" id="actions"></div>
   </div>
   <main id="weeks" class="wrap" style="gap:28px"></main>
   <dialog id="repDialog" aria-labelledby="repTitle">
@@ -356,16 +358,30 @@ function doubled(s) {
 }
 function pad(n) { return (n < 10 ? "0" : "") + n; }
 function icsStamp(d) { return d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + "T" + pad(d.getHours()) + pad(d.getMinutes()) + "00"; }
-function icsHref(s) {
-  var end = new Date(s.date.getTime() + 2 * 3600e3);
+// Texto da descrição (equipe e repertório) de um culto
+function icsDescricao(s) {
   var items = repItems(s);
   var songs = items.length ? items.map(function (i) { return i.musica + (i.tom ? " (" + i.tom + ")" : ""); }) : s.rep;
   var team = ROLES.filter(function (r) { return s[r[1]].length; }).map(function (r) { return r[0] + ": " + s[r[1]].join(", "); }).join("\\n");
-  var lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Escala Louvor//PT", "BEGIN:VEVENT",
-    "UID:" + icsStamp(s.date) + "@escala-louvor", "DTSTAMP:" + icsStamp(new Date()),
-    "DTSTART:" + icsStamp(s.date), "DTEND:" + icsStamp(end),
-    "SUMMARY:" + (s.culto || "Culto") + " (Louvor)", "DESCRIPTION:" + team + (songs.length ? "\\nRepertório: " + songs.join(", ") : ""), "END:VEVENT", "END:VCALENDAR"];
-  return "data:text/calendar;charset=utf-8," + encodeURIComponent(lines.join("\r\n"));
+  return team + (songs.length ? "\\nRepertório: " + songs.join(", ") : "");
+}
+// Um VEVENT. Com uma pessoa filtrada, o título leva a função dela.
+function icsEvento(s) {
+  var end = new Date(s.date.getTime() + 2 * 3600e3);
+  var funcao = selected ? rolesOf(s, selected).join(" e ") : "";
+  return ["BEGIN:VEVENT", "UID:" + icsStamp(s.date) + (selected ? "-" + normTxt(selected).replace(/[^a-z0-9]/g, "") : "") + "@escala-louvor",
+    "DTSTAMP:" + icsStamp(new Date()), "DTSTART:" + icsStamp(s.date), "DTEND:" + icsStamp(end),
+    "SUMMARY:" + (s.culto || "Culto") + " (Louvor" + (funcao ? " - " + funcao : "") + ")",
+    "DESCRIPTION:" + icsDescricao(s), "END:VEVENT"];
+}
+function icsDocumento(lista) {
+  var lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Escala Louvor//PT"];
+  lista.forEach(function (s) { lines = lines.concat(icsEvento(s)); });
+  lines.push("END:VCALENDAR");
+  return lines.join("\r\n");
+}
+function icsHref(s) {
+  return "data:text/calendar;charset=utf-8," + encodeURIComponent(icsDocumento([s]));
 }
 function calLink(s) {
   var a = el("a", "cal", "Agendar");
@@ -560,6 +576,7 @@ function render() {
   document.getElementById("summary").textContent = selected
     ? selected + ": " + count + (count === 1 ? " escala" : " escalas") + (pastN ? " · " + pastN + (pastN === 1 ? " anterior" : " anteriores") : "")
     : "";
+  renderActions();
 }
 
 function makePill(container, label, active, onClick) {
@@ -710,6 +727,227 @@ function findSvc(k) {
   var found = null;
   data.forEach(function (w) { w.forEach(function (s) { if (s.iso + " " + s.time === k) found = s; }); });
   return found;
+}
+
+// ---------- Exportar escala (imagem) e agendar todas as escalas ----------
+// Cultos que ainda vão acontecer (hoje em diante), respeitando o filtro de pessoa e ignorando "Esta semana".
+function upcomingWeeks() {
+  var t = todayKey(), out = [];
+  data.forEach(function (w) {
+    var list = w.filter(function (s) { return key(s.date) >= t && !isEmpty(s) && (!selected || hasPerson(s, selected)); });
+    if (list.length) out.push(list);
+  });
+  return out;
+}
+function upcomingFlat() { return upcomingWeeks().reduce(function (a, w) { return a.concat(w); }, []); }
+
+function renderActions() {
+  var box = document.getElementById("actions");
+  box.textContent = "";
+  var n = upcomingFlat().length;
+  var exp = el("button", "pill primary", selected ? "Exportar escala de " + selected + " (imagem)" : "Exportar escala (imagem)");
+  exp.type = "button";
+  exp.disabled = !n;
+  exp.title = n ? "Gera uma imagem com as escalas futuras" : "Não há escalas futuras para exportar";
+  exp.addEventListener("click", exportarImagem);
+  box.appendChild(exp);
+  if (selected) {
+    var ag = el("button", "pill", "Agendar todas as escalas de " + selected + (n ? " (" + n + ")" : ""));
+    ag.type = "button";
+    ag.disabled = !n;
+    ag.title = "Adiciona todos os cultos futuros dessa pessoa ao calendário";
+    ag.addEventListener("click", agendarTodas);
+    box.appendChild(ag);
+  }
+}
+
+function baixar(blob, nome) {
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement("a");
+  a.href = url; a.download = nome;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+}
+function slug(t) { return normTxt(t).replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""); }
+function hojeISO() { var d = new Date(); return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); }
+
+function agendarTodas() {
+  var lista = upcomingFlat();
+  if (!lista.length) return;
+  var blob = new Blob([icsDocumento(lista)], { type: "text/calendar;charset=utf-8" });
+  baixar(blob, "escala-" + slug(selected || "louvor") + "-" + hojeISO() + ".ics");
+  setStatus(lista.length + (lista.length === 1 ? " culto" : " cultos") + " de " + selected + " prontos para o calendário. Abra o arquivo baixado para adicionar.");
+}
+
+function exportarImagem() {
+  var weeks = upcomingWeeks();
+  if (!weeks.length) return;
+  var logo = new Image();
+  var go = function () { desenharEscala(weeks, logo.complete && logo.naturalWidth ? logo : null); };
+  logo.onload = go; logo.onerror = go;
+  logo.src = "../logo%20louvor.png";
+}
+
+function desenharEscala(weeks, logo) {
+  var W = 1080, PAD = 48, CW = W - PAD * 2;
+  var F = "Montserrat, 'Segoe UI', system-ui, sans-serif";
+  var COR = { bg: "#eaf0fb", card: "#ffffff", texto: "#1f2533", muted: "#5f6b85", brand: "#3f51b5", soft: "#e8ebfa", linha: "#dfe3f0", hoje: "#b4570a" };
+  var cv = document.createElement("canvas"), ctx = cv.getContext("2d");
+  var porPessoa = !!selected;
+
+  function fonte(peso, tam) { return peso + " " + tam + "px " + F; }
+  function quebra(texto, larg, f) { // quebra de linha por palavras
+    ctx.font = f;
+    var palavras = String(texto).split(/\s+/), linhas = [], atual = "";
+    palavras.forEach(function (p) {
+      var teste = atual ? atual + " " + p : p;
+      if (ctx.measureText(teste).width > larg && atual) { linhas.push(atual); atual = p; } else atual = teste;
+    });
+    if (atual) linhas.push(atual);
+    return linhas;
+  }
+  // Blocos "ROTULO valor" que fluem em linhas
+  function fluxo(segs, x, y, larg, desenhar) {
+    var cx = x, cy = y, lh = 30;
+    segs.forEach(function (sg) {
+      ctx.font = fonte(700, 13);
+      var wl = ctx.measureText(sg.l.toUpperCase()).width + 8;
+      ctx.font = fonte(500, 19);
+      var wv = ctx.measureText(sg.v).width;
+      if (cx > x && cx + wl + wv > x + larg) { cx = x; cy += lh; }
+      if (desenhar) {
+        ctx.fillStyle = COR.muted; ctx.font = fonte(700, 13); ctx.textBaseline = "alphabetic";
+        ctx.fillText(sg.l.toUpperCase(), cx, cy);
+        ctx.fillStyle = sg.destaque ? COR.brand : COR.texto; ctx.font = fonte(sg.destaque ? 700 : 500, 19);
+        ctx.fillText(sg.v, cx + wl, cy);
+      }
+      cx += wl + wv + 28;
+    });
+    return cy - y + lh;
+  }
+  function segmentos(sv) {
+    var segs = [];
+    ROLES.forEach(function (r) {
+      var nomes = sv[r[1]];
+      if (!nomes.length) return;
+      segs.push({ l: r[0], v: nomes.join(", "), destaque: porPessoa && nomes.indexOf(selected) >= 0 });
+    });
+    return segs;
+  }
+  function musicas(sv) {
+    var it = repItems(sv);
+    var l = it.length ? it.map(function (i) { return i.musica + (i.tom ? " (" + i.tom + ")" : ""); }) : sv.rep;
+    return l.length ? "Repertório: " + l.join(" · ") : "";
+  }
+
+  // 1ª passada: medir
+  var TOPO = 190, itens = [], altura = TOPO;
+  weeks.forEach(function (w) {
+    itens.push({ tipo: "semana", w: w, h: 56 });
+    altura += 56;
+    w.forEach(function (sv) {
+      var segs = segmentos(sv), rep = musicas(sv);
+      var hRoles = porPessoa ? 30 + (function () {
+        var outros = segs.filter(function (x) { return !x.destaque; });
+        return outros.length ? fluxo(outros, 0, 0, CW - 150, false) : 0;
+      })() : fluxo(segs, 0, 0, CW - 150, false);
+      var repL = rep ? quebra(rep, CW - 150, fonte(500, 16)) : [];
+      var h = 22 + 34 + hRoles + (repL.length ? 8 + repL.length * 24 : 0) + 18;
+      itens.push({ tipo: "culto", sv: sv, segs: segs, repL: repL, h: Math.max(h, 110) });
+      altura += Math.max(h, 110) + 14;
+    });
+    altura += 6;
+  });
+  altura += 70;
+
+  var escala = Math.min(2, Math.sqrt(14e6 / (W * altura)));
+  cv.width = Math.round(W * escala); cv.height = Math.round(altura * escala);
+  ctx.scale(escala, escala);
+
+  // fundo
+  var g = ctx.createLinearGradient(0, 0, W, altura);
+  g.addColorStop(0, COR.bg); g.addColorStop(1, "#faf3e3");
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, altura);
+
+  // cabeçalho
+  if (logo) {
+    ctx.save(); ctx.beginPath(); ctx.arc(PAD + 44, 76, 44, 0, Math.PI * 2); ctx.clip();
+    ctx.drawImage(logo, PAD, 32, 88, 88); ctx.restore();
+  }
+  var tx = PAD + (logo ? 112 : 0);
+  ctx.textBaseline = "alphabetic";
+  ctx.fillStyle = COR.brand; ctx.font = fonte(800, 44); ctx.fillText("Escala Louvor", tx, 72);
+  ctx.fillStyle = COR.texto; ctx.font = fonte(600, 22);
+  ctx.fillText(porPessoa ? "Escala de " + selected : "Escala completa", tx, 106);
+  ctx.fillStyle = COR.muted; ctx.font = fonte(500, 17);
+  var total = weeks.reduce(function (a, w) { return a + w.length; }, 0);
+  ctx.fillText("Próximos cultos · " + total + (total === 1 ? " culto" : " cultos") + " · gerada em " + new Date().toLocaleDateString("pt-BR"), tx, 134);
+
+  // lista
+  var y = TOPO;
+  itens.forEach(function (it) {
+    if (it.tipo === "semana") {
+      var a = it.w[0], b = it.w[it.w.length - 1];
+      ctx.fillStyle = COR.muted; ctx.font = fonte(700, 16);
+      var tit = (a.day + " " + a.month + " – " + b.day + " " + b.month).toUpperCase();
+      ctx.fillText(tit, PAD, y + 34);
+      ctx.fillStyle = COR.linha; ctx.fillRect(PAD, y + 46, CW, 2);
+      y += it.h;
+      return;
+    }
+    var sv = it.sv, h = it.h, hoje = key(sv.date) === todayKey();
+    // cartão
+    ctx.fillStyle = COR.card; ctx.strokeStyle = hoje ? COR.hoje : COR.linha; ctx.lineWidth = hoje ? 2 : 1.5;
+    ctx.beginPath(); (ctx.roundRect ? ctx.roundRect(PAD, y, CW, h, 18) : ctx.rect(PAD, y, CW, h)); ctx.fill(); ctx.stroke();
+    // data
+    ctx.textAlign = "center";
+    ctx.fillStyle = COR.texto; ctx.font = fonte(800, 40); ctx.fillText(sv.day, PAD + 62, y + 56);
+    ctx.fillStyle = COR.muted; ctx.font = fonte(700, 15); ctx.fillText(sv.month.toUpperCase() + " · " + sv.dow.replace(".", "").toUpperCase(), PAD + 62, y + 82);
+    ctx.textAlign = "left";
+    // título
+    var x0 = PAD + 130, yy = y + 40;
+    ctx.fillStyle = COR.texto; ctx.font = fonte(700, 24);
+    var nome = sv.culto || "Sexta-feira";
+    ctx.fillText(nome, x0, yy);
+    var wn = ctx.measureText(nome).width;
+    ctx.fillStyle = COR.muted; ctx.font = fonte(500, 20); ctx.fillText(sv.time, x0 + wn + 14, yy);
+    var wt = ctx.measureText(sv.time).width; // mede antes de trocar a fonte
+    if (hoje) { ctx.fillStyle = COR.hoje; ctx.font = fonte(800, 14); ctx.fillText("HOJE", x0 + wn + 14 + wt + 14, yy); }
+    yy += 20;
+    if (porPessoa) {
+      var minhas = rolesOf(sv, selected).join(" e ");
+      ctx.fillStyle = COR.brand; ctx.font = fonte(800, 21); ctx.fillText("Sua função: " + minhas, x0, yy + 24);
+      yy += 30;
+      var outros = it.segs.filter(function (x) { return !x.destaque; });
+      if (outros.length) yy += fluxo(outros, x0, yy + 24, CW - 150, true);
+    } else {
+      yy += fluxo(it.segs, x0, yy + 24, CW - 150, true);
+    }
+    if (it.repL.length) {
+      ctx.fillStyle = COR.brand; ctx.font = fonte(500, 16);
+      it.repL.forEach(function (l, i) { ctx.fillText(l, x0, yy + 22 + i * 24); });
+    }
+    y += h + 14;
+  });
+
+  // rodapé
+  ctx.fillStyle = COR.muted; ctx.font = fonte(500, 15); ctx.textAlign = "center";
+  ctx.fillText("Ministério de Louvor · CEVD", W / 2, altura - 30);
+  ctx.textAlign = "left";
+
+  var nomeArq = "escala-" + slug(selected || "completa") + "-" + hojeISO() + ".png";
+  cv.toBlob(function (blob) {
+    if (!blob) { setStatus("Não consegui gerar a imagem."); return; }
+    var arquivo = null;
+    try { arquivo = new File([blob], nomeArq, { type: "image/png" }); } catch (e) {}
+    var celular = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
+    if (celular && arquivo && navigator.canShare && navigator.canShare({ files: [arquivo] })) {
+      navigator.share({ files: [arquivo], title: "Escala Louvor" }).catch(function () {});
+    } else {
+      baixar(blob, nomeArq);
+      setStatus("Imagem " + nomeArq + " baixada.");
+    }
+  }, "image/png");
 }
 
 // Compartilhar o link da escala (menu do celular; no computador copia o link)
