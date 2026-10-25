@@ -201,11 +201,13 @@
         radial-gradient(circle at top left, rgba(234, 179, 8, 0.12), transparent 30%),
         radial-gradient(circle at top right, rgba(30, 58, 138, 0.12), transparent 32%);
       color: var(--ap-text);
-      margin: 40px auto;
-      width: 92%;
-      max-width: 940px;
-      max-height: 86vh;
+      margin: 16px auto;
+      width: calc(100% - 32px);
+      max-width: none;
+      height: calc(100vh - 32px);
+      height: calc(100dvh - 32px);
       overflow-y: auto;
+      overscroll-behavior: contain;
       border: 1px solid var(--ap-border);
       border-radius: 2rem;
       box-shadow: var(--ap-shadow);
@@ -307,7 +309,7 @@
     .music-list {
       padding: 22px 26px 28px;
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
       gap: 14px;
     }
     .music-empty { grid-column: 1 / -1; text-align: center; color: var(--ap-text-muted); margin: 20px 0; }
@@ -385,12 +387,31 @@
     .music-link.lt:hover { background: #2563eb; border-color: #2563eb; }
     .music-link.cf:hover { background: #9333ea; border-color: #9333ea; }
 
+    /* Desktop: a janela usa a tela toda; o cabeçalho vira uma linha só e a lista ganha mais colunas */
+    @media (min-width: 900px) {
+      .modal-header { flex-wrap: nowrap; padding: 22px 32px; }
+      .mh-text { order: 1; }
+      .mh-actions { order: 2; flex: none; }
+      .close-btn { order: 3; }
+      .music-list { padding: 28px 32px 36px; gap: 16px; }
+    }
+    @media (min-width: 1400px) {
+      .mh-title { font-size: 1.6rem; }
+      .music-title { font-size: 0.85rem; }
+      .music-artist { font-size: 0.76rem; }
+      .music-list { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
+    }
+
+    /* Celular: folha em tela cheia, uma coluna, botões fáceis de tocar e respeitando a área segura */
     @media (max-width: 640px) {
-      .modal-content { margin: 16px auto; width: calc(100% - 24px); max-height: calc(100vh - 32px); border-radius: 1.5rem; }
-      .modal-header { padding: 16px; border-radius: 1.5rem 1.5rem 0 0; }
+      .modal-content { margin: 0; width: 100%; height: 100vh; height: 100dvh; border: 0; border-radius: 0; }
+      .modal-header { padding: max(14px, env(safe-area-inset-top)) 14px 14px; border-radius: 0; gap: 12px; }
       .mh-icon { width: 42px; height: 42px; font-size: 17px; }
       .mh-title { font-size: 1.1rem; }
-      .music-list { padding: 16px; grid-template-columns: 1fr; gap: 12px; }
+      .mh-actions { gap: 8px; }
+      .playlist-link, .more-link { flex: 1 1 100%; justify-content: center; padding: 12px 16px; }
+      .music-list { padding: 14px 14px max(24px, env(safe-area-inset-bottom)); grid-template-columns: 1fr; gap: 12px; }
+      .music-link { padding: 13px 0; font-size: 15px; }
     }
   </style>
 </head>
