@@ -151,39 +151,60 @@
   };
 
   // ---------- Dados ----------
+  // A última lista fica salva no aparelho: abre na hora e funciona sem internet.
+  const CACHE_KEY = 'bm-data';
+  const savedLabel = (t) => {
+    if (!t) return '';
+    const d = new Date(t);
+    return ' em ' + d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) + ' às ' +
+      d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  };
+  let savedAt = 0;
+
+  function applyData(data) {
+    pinRequired = Boolean(data.pin_obrigatorio);
+    $('fPin').hidden = !pinRequired;
+    $('fPin').required = pinRequired;
+    const curTheme = $('fTheme').value;
+    $('fTheme').innerHTML = '<option value="">Tema...</option>' +
+      (data.temas || []).map((t) => `<option>${esc(t)}</option>`).join('');
+    $('fTheme').value = curTheme;
+
+    songs = data.musicas.map((m) => ({
+      title: m.musica || 'Sem título',
+      singer: m.cantor || '',
+      style: m.estilo || '',
+      theme: m.tema || 'Sem tema',
+      created: m.criada_em,
+    }));
+
+    $('updated').textContent = 'Atualizado em ' + new Date(data.atualizado_em).toLocaleString('pt-BR');
+    fillFilters();
+    $('stTotal').textContent = songs.length.toLocaleString('pt-BR');
+    $('stTemas').textContent = new Set(songs.map((s) => s.theme)).size.toLocaleString('pt-BR');
+    renderSongs();
+    $('loading').hidden = true;
+  }
+
   async function loadData() {
-    $('loading').hidden = false;
+    $('loading').hidden = songs.length > 0;
     $('loading').textContent = 'Carregando…';
     try {
       const res = await fetch(API_URL, { cache: 'no-store' });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
-
-      pinRequired = Boolean(data.pin_obrigatorio);
-      $('fPin').hidden = !pinRequired;
-      $('fPin').required = pinRequired;
-      const curTheme = $('fTheme').value;
-      $('fTheme').innerHTML = '<option value="">Tema...</option>' +
-        (data.temas || []).map((t) => `<option>${esc(t)}</option>`).join('');
-      $('fTheme').value = curTheme;
-
-      songs = data.musicas.map((m) => ({
-        title: m.musica || 'Sem título',
-        singer: m.cantor || '',
-        style: m.estilo || '',
-        theme: m.tema || 'Sem tema',
-        created: m.criada_em,
-      }));
-
-      $('updated').textContent = 'Atualizado em ' + new Date(data.atualizado_em).toLocaleString('pt-BR');
-      fillFilters();
-      $('stTotal').textContent = songs.length.toLocaleString('pt-BR');
-      $('stTemas').textContent = new Set(songs.map((s) => s.theme)).size.toLocaleString('pt-BR');
-      renderSongs();
-      $('loading').hidden = true;
+      applyData(data);
+      savedAt = Date.now();
+      try { localStorage.setItem(CACHE_KEY, JSON.stringify({ savedAt, data })); } catch {}
     } catch (err) {
       console.error(err);
-      $('loading').textContent = 'Não foi possível carregar as músicas. Tente "Atualizar".';
+      if (songs.length) {
+        $('updated').textContent = 'Sem conexão. Mostrando a lista salva' + savedLabel(savedAt) + '.';
+        $('loading').hidden = true;
+      } else {
+        $('loading').hidden = false;
+        $('loading').textContent = 'Não foi possível carregar as músicas. Tente "Atualizar".';
+      }
     }
   }
   $('refreshBtn').onclick = () => loadData();
@@ -271,6 +292,14 @@
 
   // Abre já filtrado quando vem de um link da escala (?q=nome da música)
   $('search').value = new URLSearchParams(location.search).get('q') || '';
+  try {
+    const saved = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
+    if (saved && saved.data && Array.isArray(saved.data.musicas)) {
+      savedAt = saved.savedAt || 0;
+      applyData(saved.data);
+      $('updated').textContent = 'Lista salva' + savedLabel(savedAt) + '. Atualizando…';
+    }
+  } catch {}
   loadData();
 
 </script>
