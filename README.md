@@ -74,4 +74,6 @@ Abra `http://localhost:8766`. O service worker só funciona em `localhost` ou em
 
 ## Visual
 
+Cada função da escala tem um ícone próprio (microfone com coroa para o ministro, microfone para o back, teclado, sax, guitarra, baixo, violão e bateria). Eles são SVG desenhados no próprio `escala/index.html` (`ICONES`) e aparecem nos cartões e na imagem exportada.
+
 Tokens de cor, fontes e componentes compartilhados ficam em `theme.css`. A janela do Passos de Fé usa o visual do app Valentes Connected (creme, azul-marinho e dourado, fonte Plus Jakarta Sans).

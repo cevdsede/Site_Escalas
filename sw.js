@@ -2,7 +2,7 @@
 // Com internet, as páginas vêm sempre da rede (versão mais nova); sem internet, vêm do cache.
 // A escala e a lista de músicas ficam salvas no aparelho pelas próprias páginas (localStorage).
 // Mude o número de CACHE a cada publicação para os aparelhos mostrarem o aviso de versão nova.
-var CACHE = "escala-v16";
+var CACHE = "escala-v17";
 var SHELL = [
   "./",
   "index.html",

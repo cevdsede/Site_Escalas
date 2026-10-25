@@ -121,6 +121,8 @@ dialog#repDialog::backdrop { background: rgba(0, 0, 0, .55); }
 .pill:disabled { opacity: .6; cursor: default; }
 @media (max-width: 480px) { .rep-row { grid-template-columns: 1fr; } }
 .actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.role-name svg { width: 15px; height: 15px; flex: none; color: var(--accent); }
+.team .role-name { display: inline-flex; align-items: center; gap: 5px; }
 .foot-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 .rep { grid-column: 2; display: flex; flex-direction: column; gap: 4px; margin-top: 4px; }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -204,6 +206,26 @@ var MONTHS = ["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov",
 var DOW = ["dom.","seg.","ter.","qua.","qui.","sex.","sáb."];
 var ROLES = [["Ministro","min"],["Back","back"],["Teclado","tec"],["Guitarra","gui"],["Baixo","bai"],["Bateria","bat"],["Violão","vio"],["Sax","sax"],["Ministro e vocal","voc"]];
 var API_URL = "https://ipdrbhkzluuwjulkhjkd.supabase.co/functions/v1/repertorio-publico";
+
+// Ícones das funções (SVG próprio, usam a cor do texto). A coroa do ministro é dourada.
+var MIC = '<rect x="9" y="6.5" width="6" height="9" rx="3"/><path d="M6 11.5v1a6 6 0 0 0 12 0v-1M12 18.5v2.5M9 21h6"/>';
+var COROA = '<path d="M8 5.6l.9-3.2 3.1 2 3.1-2 .9 3.2z" stroke="#eab308" fill="#eab308" fill-opacity=".35"/>';
+var ICONES = {
+  min: '<g transform="translate(1.8 3.6) scale(.85)">' + MIC + '</g><path d="M7.6 6.2L6.6 1.6l3.3 2.4L12 1l2.1 3 3.3-2.4-1 4.6z" stroke="#eab308" fill="#eab308" fill-opacity=".35"/>',
+  back: MIC,
+  voc: MIC,
+  tec: '<rect x="2.5" y="7" width="19" height="11" rx="2"/><path d="M7.3 13v5M12 13v5M16.7 13v5"/><path d="M7.3 7v6M12 7v6M16.7 7v6" stroke-width="2.8"/>',
+  sax: '<path d="M8.5 3l3.5 2.5V15a4 4 0 0 0 4 4h.5a3.5 3.5 0 0 0 3.5-3.5V12M18.5 12h3"/><circle cx="12" cy="8.5" r=".9"/><circle cx="12" cy="11.5" r=".9"/><circle cx="12" cy="14.5" r=".9"/>',
+  gui: '<g transform="translate(12 12) rotate(45) scale(.8) translate(-12 -12)"><rect x="10.4" y="0.8" width="3.2" height="3.6" rx=".8"/><path d="M11 4.4v8M13 4.4v8"/><rect x="6.6" y="11.2" width="10.8" height="11.4" rx="5.2"/><path d="M9.6 16h4.8M9.6 19h4.8"/></g>',
+  bai: '<g transform="translate(12 12) rotate(45) scale(.8) translate(-12 -12)"><rect x="10.4" y="0.3" width="3.2" height="3.6" rx=".8"/><path d="M11 3.9v10M13 3.9v10"/><rect x="7.4" y="12.6" width="9.2" height="10" rx="4.4"/><path d="M10 17h4M10 19.8h4"/></g>',
+  vio: '<g transform="translate(12 12) rotate(45) scale(.8) translate(-12 -12)"><rect x="10.4" y="0.8" width="3.2" height="3.4" rx=".8"/><path d="M11 4.2v6.6M13 4.2v6.6"/><path d="M12 9.2c-2.2 0-3.6 1.2-3.6 2.8 0 1.1.8 1.7 1.2 2.3-1.8.7-3.2 2.1-3.2 4 0 2.6 2.4 4.2 5.6 4.2s5.6-1.6 5.6-4.2c0-1.9-1.4-3.3-3.2-4 .4-.6 1.2-1.2 1.2-2.3 0-1.6-1.4-2.8-3.6-2.8z"/><circle cx="12" cy="17" r="1.3"/></g>',
+  bat: '<ellipse cx="12" cy="10.5" rx="7.5" ry="2.8"/><path d="M4.5 10.5v6c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8v-6M7 3.5l4 5.5M17 3.5l-4 5.5"/>'
+};
+function iconeSvg(k, cor, tam) {
+  var t = tam || 16;
+  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="' + t + '" height="' + t + '" fill="none" stroke="' + (cor || "currentColor") +
+    '" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' + (ICONES[k] || "") + '</svg>';
+}
 
 function list(s) { return s ? s.split(",").map(function (x) { return x.trim(); }).filter(Boolean) : []; }
 function parse(line, year) {
@@ -491,7 +513,10 @@ function render() {
         var arr = s[r[1]];
         if (!arr.length) return;
         var role = el("div", "role");
-        role.appendChild(el("span", "role-name", r[0]));
+        var rn = el("span", "role-name");
+        rn.innerHTML = iconeSvg(r[1]);
+        rn.appendChild(document.createTextNode(r[0]));
+        role.appendChild(rn);
         var who = el("span", "who" + (r[1] === "min" ? " min" : ""));
         arr.forEach(function (n, i) {
           if (i) who.appendChild(document.createTextNode(", "));
@@ -783,12 +808,23 @@ function exportarImagem() {
   var weeks = upcomingWeeks();
   if (!weeks.length) return;
   var logo = new Image();
-  var go = function () { desenharEscala(weeks, logo.complete && logo.naturalWidth ? logo : null); };
-  logo.onload = go; logo.onerror = go;
-  logo.src = "../logo%20louvor.png";
+  var imgs = {};
+  // carrega os ícones das funções como imagens para desenhar no canvas
+  var carregaIcones = Promise.all(ROLES.map(function (r) {
+    return new Promise(function (ok) {
+      var im = new Image();
+      im.onload = function () { imgs[r[1]] = im; ok(); };
+      im.onerror = ok;
+      im.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(iconeSvg(r[1], "#3f51b5", 48));
+    });
+  }));
+  var carregaLogo = new Promise(function (ok) { logo.onload = ok; logo.onerror = ok; logo.src = "../logo%20louvor.png"; });
+  Promise.all([carregaIcones, carregaLogo]).then(function () {
+    desenharEscala(weeks, logo.complete && logo.naturalWidth ? logo : null, imgs);
+  });
 }
 
-function desenharEscala(weeks, logo) {
+function desenharEscala(weeks, logo, imgs) {
   var W = 1080, PAD = 48, CW = W - PAD * 2;
   var F = "Montserrat, 'Segoe UI', system-ui, sans-serif";
   var COR = { bg: "#eaf0fb", card: "#ffffff", texto: "#1f2533", muted: "#5f6b85", brand: "#3f51b5", soft: "#e8ebfa", linha: "#dfe3f0", hoje: "#b4570a" };
@@ -811,13 +847,15 @@ function desenharEscala(weeks, logo) {
     var cx = x, cy = y, lh = 30;
     segs.forEach(function (sg) {
       ctx.font = fonte(700, 13);
-      var wl = ctx.measureText(sg.l.toUpperCase()).width + 8;
+      var wi = imgs && imgs[sg.k] ? 24 : 0; // espaço do ícone
+      var wl = wi + ctx.measureText(sg.l.toUpperCase()).width + 8;
       ctx.font = fonte(500, 19);
       var wv = ctx.measureText(sg.v).width;
       if (cx > x && cx + wl + wv > x + larg) { cx = x; cy += lh; }
       if (desenhar) {
+        if (wi) ctx.drawImage(imgs[sg.k], cx, cy - 16, 20, 20);
         ctx.fillStyle = COR.muted; ctx.font = fonte(700, 13); ctx.textBaseline = "alphabetic";
-        ctx.fillText(sg.l.toUpperCase(), cx, cy);
+        ctx.fillText(sg.l.toUpperCase(), cx + wi, cy);
         ctx.fillStyle = sg.destaque ? COR.brand : COR.texto; ctx.font = fonte(sg.destaque ? 700 : 500, 19);
         ctx.fillText(sg.v, cx + wl, cy);
       }
@@ -830,7 +868,7 @@ function desenharEscala(weeks, logo) {
     ROLES.forEach(function (r) {
       var nomes = sv[r[1]];
       if (!nomes.length) return;
-      segs.push({ l: r[0], v: nomes.join(", "), destaque: porPessoa && nomes.indexOf(selected) >= 0 });
+      segs.push({ k: r[1], l: r[0], v: nomes.join(", "), destaque: porPessoa && nomes.indexOf(selected) >= 0 });
     });
     return segs;
   }
