@@ -13,6 +13,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400,500,600,700,800&display=swap">
 <link rel="stylesheet" href="../theme.css">
 <script src="../theme.js"></script>
+<script src="../site.js" defer></script>
 <style>
 /* Layout: cabeçalho + filtro por pessoa, depois semanas empilhadas; cada culto é uma linha com data à esquerda e equipe à direita */
 :root {
@@ -449,16 +450,6 @@ setStatus(loaded ? "Mostrando a escala salva" + savedLabel() + ". Atualizando…
 load();
 setInterval(load, 60000);
 document.addEventListener("visibilitychange", function () { if (!document.hidden) load(); });
-// App instalável (PWA) e funcionamento sem internet.
-if ("serviceWorker" in navigator) navigator.serviceWorker.register("../sw.js").catch(function () {});
-var installBtn = document.getElementById("install"), installHelp = document.getElementById("installHelp"), installEvt = null;
-window.addEventListener("beforeinstallprompt", function (e) { e.preventDefault(); installEvt = e; });
-installBtn.addEventListener("click", function () {
-  if (installEvt) { installEvt.prompt(); installEvt.userChoice.then(function () { installEvt = null; }); }
-  else installHelp.hidden = !installHelp.hidden;
-});
-window.addEventListener("appinstalled", function () { installBtn.hidden = true; installHelp.hidden = true; });
-if (window.matchMedia("(display-mode: standalone)").matches || navigator.standalone) installBtn.hidden = true;
 </script>
 </body>
 </html>

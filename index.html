@@ -22,6 +22,7 @@
   />
   <link rel="stylesheet" href="theme.css">
   <script src="theme.js"></script>
+  <script src="site.js" defer></script>
   <style>
     body {
       background: var(--bg);
@@ -582,19 +583,6 @@
         else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
       }
     });
-
-    if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(function () {});
-
-    // App instalável (PWA)
-    var installBox = document.getElementById("installBox"), installBtn = document.getElementById("install"),
-        installHelp = document.getElementById("installHelp"), installEvt = null;
-    window.addEventListener("beforeinstallprompt", function (e) { e.preventDefault(); installEvt = e; });
-    installBtn.addEventListener("click", function () {
-      if (installEvt) { installEvt.prompt(); installEvt.userChoice.then(function () { installEvt = null; }); }
-      else installHelp.hidden = !installHelp.hidden;
-    });
-    window.addEventListener("appinstalled", function () { installBox.hidden = true; installHelp.hidden = true; });
-    if (window.matchMedia("(display-mode: standalone)").matches || navigator.standalone) installBox.hidden = true;
   </script>
 </body>
 </html>

@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400,500,600,700,800&display=swap">
 <link rel="stylesheet" href="../theme.css">
 <script src="../theme.js"></script>
+<script src="../site.js" defer></script>
 <meta name="description" content="Biblioteca de músicas do ministério com dados reais: busca por música, cantor, tema e estilo.">
 <style>
   * { box-sizing: border-box; }
@@ -272,7 +273,6 @@
   $('search').value = new URLSearchParams(location.search).get('q') || '';
   loadData();
 
-  if ("serviceWorker" in navigator) navigator.serviceWorker.register("../sw.js").catch(() => {});
 </script>
 </body>
 </html>
