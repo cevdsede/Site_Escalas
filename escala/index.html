@@ -296,32 +296,15 @@ function indexApi() {
   api.cultos.forEach(function (c) { cultoByKey[c.data + " " + c.horario] = c; });
   api.repertorios.forEach(function (r) { if (r.culto && r.culto.id) repByCulto[r.culto.id] = r.itens || []; });
 }
-// Junta a planilha com os cultos do app. Culto que só está no app aparece com os ministros e vocais escalados.
+// A escala (quem toca em cada culto) vem só da planilha. O app entra apenas com o repertório:
+// cada culto da planilha é ligado ao culto do app pela data e pelo horário.
 function rebuildData() {
   indexApi();
-  var have = {};
   sheetData.forEach(function (w) { w.forEach(function (s) {
-    have[s.iso + " " + s.time] = 1;
     s.api = cultoByKey[s.iso + " " + s.time] || null;
-    // linha da planilha ainda sem equipe: mostra os ministros e vocais escalados no app
-    var comEquipe = ROLES.some(function (r) { return r[1] !== "voc" && s[r[1]].length; });
-    s.voc = (s.api && !comEquipe) ? s.api.cantores.map(function (x) { return firstName(x.nome); }) : [];
+    s.voc = [];
   }); });
-  var extra = [];
-  if (api) api.cultos.forEach(function (c) {
-    if (have[c.data + " " + c.horario]) return;
-    var p = c.data.split("-"), d = new Date(+p[0], +p[1] - 1, +p[2], +c.horario.slice(0, 2), +c.horario.slice(3, 5));
-    extra.push({ date: d, iso: c.data, day: p[2], month: MONTHS[+p[1] - 1], dow: DOW[d.getDay()], time: c.horario,
-      culto: String(c.nome || "").trim(), min: [], back: [], vio: [], tec: [], gui: [], bai: [], bat: [],
-      voc: c.cantores.map(function (x) { return firstName(x.nome); }), ens: "", rep: [], api: c });
-  });
-  extra.sort(function (a, b) { return a.date - b.date; });
-  var weeks = [];
-  extra.forEach(function (s) {
-    var w = weeks[weeks.length - 1];
-    if (w && s.date - w[w.length - 1].date < 3 * 86400e3) w.push(s); else weeks.push([s]);
-  });
-  data = sheetData.concat(weeks).sort(function (a, b) { return a[0].date - b[0].date; });
+  data = sheetData.slice();
 }
 function repItems(s) { return s.api ? (repByCulto[s.api.id] || []) : []; }
 

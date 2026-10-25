@@ -18,11 +18,11 @@ Não tem etapa de build: são arquivos HTML, CSS e JavaScript puros.
 | Dado | Fonte |
 | :-- | :-- |
 | Equipe completa do culto (ministro, backs, teclado, guitarra, baixo, bateria, violão) e ensaio | **Planilha do Google** publicada na web em CSV (`CSV_URL` em `escala/index.html`) |
-| Cultos, ministros e vocais escalados, músicas, tons, repertórios e histórico | **Supabase**, função `repertorio-publico` |
+| Repertório de cada culto, músicas, tons e histórico (e a lista de ministros e vocais usada no formulário de repertório) | **Supabase**, função `repertorio-publico` |
 | Biblioteca de músicas e cadastro de música nova | **Supabase**, função `biblioteca-musicas` |
 | Lista do Passos de Fé (ordem e links) | `passos-de-fe.json`, com nome e cantor conferidos na Biblioteca |
 
-Na **Escala**, a planilha e o Supabase são juntados pela data e pelo horário do culto. Se o culto existe nos dois, vale a equipe da planilha. Se só existe no Supabase, aparece com os ministros e vocais escalados. As duas fontes são relidas a cada minuto.
+Na **Escala**, quem toca em cada culto vem **só da planilha**: se o culto não está na planilha, ele não aparece. O Supabase entra apenas com o repertório, ligado ao culto da planilha pela data e pelo horário (o botão **+ Música** só aparece quando existe um culto igual no app). As duas fontes são relidas a cada minuto.
 
 Adicionar ou excluir música do repertório exige o **PIN** do ministério. A conferência do PIN e o limite de tentativas ficam nas funções do Supabase, não neste site. **Nenhuma chave ou PIN está neste repositório.**
 
