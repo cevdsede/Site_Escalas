@@ -74,6 +74,11 @@ h1 { color: var(--brand-text); font-family: var(--font-display); font-weight: 70
 .who { font-weight: 500; overflow-wrap: anywhere; }
 .who.min { font-weight: 600; color: var(--accent); }
 .who span.me { background: var(--accent-soft); color: var(--accent); border-radius: 4px; padding: 0 5px; margin-inline: -5px; box-shadow: 0 0 0 1px var(--accent) inset; }
+.rep { grid-column: 2; display: flex; flex-direction: column; gap: 4px; margin-top: 4px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-size: 13px; font-weight: 500; color: var(--brand-text); background: var(--brand-soft); border: 1px solid var(--border); border-radius: 999px; padding: 2px 10px; text-decoration: none; }
+.chip:hover { border-color: var(--brand-text); }
+.chip:focus-visible { outline: 2px solid var(--brand-text); outline-offset: 2px; }
 .tbd { color: var(--empty); font-style: italic; font-size: 14px; }
 .none { color: var(--muted); padding: 24px; text-align: center; border: 1px dashed var(--line); border-radius: 10px; }
 footer { color: var(--muted); font-size: 13px; display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
@@ -128,7 +133,7 @@ function parse(line, year) {
   var dm = p[0].split("/");
   var date = new Date(year, +dm[1] - 1, +dm[0], +p[1].slice(0, 2), +p[1].slice(3, 5));
   return { date: date, day: dm[0], month: MONTHS[+dm[1] - 1], dow: DOW[date.getDay()], time: p[1], culto: p[2],
-    min: list(p[3]), back: list(p[4]), vio: list(p[5]), tec: list(p[6]), gui: list(p[7]), bai: list(p[8]), bat: list(p[9]), ens: p[10] || "" };
+    min: list(p[3]), back: list(p[4]), vio: list(p[5]), tec: list(p[6]), gui: list(p[7]), bai: list(p[8]), bat: list(p[9]), ens: p[10] || "", rep: (p[12] || "").split(";").map(function (x) { return x.trim(); }).filter(Boolean) };
 }
 // groups: array of arrays of "|" lines. Assigns years in order, rolling over at December -> January.
 // O ano não vem na planilha: usa o dia da semana (qui., sex.…) da primeira linha para descobrir qual ano bate.
@@ -177,14 +182,18 @@ function csvRows(text) {
 }
 // Columns: Data, dia, hora, Culto, Ministro x2, Back x3, Violão, Teclado, Guitarra, Baixo, Bateria, Ensaio
 function groupsFromCsv(text) {
-  var groups = [[]];
+  var groups = [[]], repCol = -1;
   csvRows(text).forEach(function (r) {
     var c = r.map(function (s) { return s.trim(); });
     while (c.length < 15) c.push("");
+    if (c[0].toLowerCase() === "data") {
+      // coluna opcional com as músicas do culto, separadas por ponto e vírgula
+      c.forEach(function (h, i) { if (repCol < 0 && /^(repert|m[uú]sicas)/i.test(h)) repCol = i; });
+    }
     if (/^\d{1,2}\/\d{1,2}$/.test(c[0])) {
       var min = [c[4], c[5]].filter(Boolean).join(",");
       var back = [c[6], c[7], c[8]].filter(Boolean).join(",");
-      groups[groups.length - 1].push([c[0], c[2], c[3], min, back, c[9], c[10], c[11], c[12], c[13], c[14] || "", c[1]].join("|"));
+      groups[groups.length - 1].push([c[0], c[2], c[3], min, back, c[9], c[10], c[11], c[12], c[13], c[14] || "", c[1], repCol >= 0 ? (c[repCol] || "").replace(/\|/g, " ") : ""].join("|"));
     } else if (c.slice(0, 15).every(function (x) { return !x; })) {
       if (groups[groups.length - 1].length) groups.push([]);
     }
@@ -205,7 +214,7 @@ function key(d) { return d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.
 function todayKey() { return key(new Date()); }
 function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
 function hasPerson(s, n) { return ROLES.some(function (r) { return s[r[1]].indexOf(n) >= 0; }); }
-function isEmpty(s) { return !ROLES.some(function (r) { return s[r[1]].length; }); }
+function isEmpty(s) { return !s.rep.length && !ROLES.some(function (r) { return s[r[1]].length; }); }
 function rolesOf(s, n) { return ROLES.filter(function (r) { return s[r[1]].indexOf(n) >= 0; }).map(function (r) { return r[0]; }); }
 // Same person listed in more than one role in the same service (guests excluded).
 function doubled(s) {
@@ -225,7 +234,7 @@ function icsHref(s) {
   var lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Escala Louvor//PT", "BEGIN:VEVENT",
     "UID:" + icsStamp(s.date) + "@escala-louvor", "DTSTAMP:" + icsStamp(new Date()),
     "DTSTART:" + icsStamp(s.date), "DTEND:" + icsStamp(end),
-    "SUMMARY:" + (s.culto || "Culto") + " (Louvor)", "DESCRIPTION:" + team, "END:VEVENT", "END:VCALENDAR"];
+    "SUMMARY:" + (s.culto || "Culto") + " (Louvor)", "DESCRIPTION:" + team + (s.rep.length ? "\\nRepertório: " + s.rep.join(", ") : ""), "END:VEVENT", "END:VCALENDAR"];
   return "data:text/calendar;charset=utf-8," + encodeURIComponent(lines.join("\r\n"));
 }
 function calLink(s) {
@@ -339,6 +348,19 @@ function render() {
         team.appendChild(role);
       });
       card.appendChild(team);
+      if (s.rep.length) {
+        var rep = el("div", "rep");
+        rep.appendChild(el("span", "role-name", "Repertório"));
+        var chips = el("div", "chips");
+        s.rep.forEach(function (m) {
+          var a = el("a", "chip", m);
+          a.href = "../musicas/biblioteca-musicas.html?q=" + encodeURIComponent(m);
+          a.title = "Abrir na biblioteca de músicas";
+          chips.appendChild(a);
+        });
+        rep.appendChild(chips);
+        card.appendChild(rep);
+      }
       sec.appendChild(card);
     });
     root.appendChild(sec);
