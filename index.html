@@ -159,6 +159,16 @@
       .wrapper { gap: 24px; }
     }
 
+    /* Desktop: o cartão cresce e os botões ficam em duas colunas */
+    @media (min-width: 900px) {
+      .container { flex: 1 1 auto; max-width: 1040px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 32px; padding: 44px 40px; }
+      .container > .logo, .container > h1, .container > .help { grid-column: 1 / -1; }
+      .container .logo { max-width: 140px; margin-bottom: 0; }
+      .container h1 { margin-bottom: 8px; font-size: 2.4em; }
+      .container > .spreadsheet { margin-top: 0; }
+      .spreadsheet a, .spreadsheet button { max-width: none; }
+    }
+
     @media (max-width: 650px) {
       .wrapper { flex-direction: column; align-items: center; gap: 32px; }
       .container { max-width: 100%; flex-basis: auto; min-width: auto; }

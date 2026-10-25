@@ -16,7 +16,7 @@
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--bg); background-image: var(--page-bg); background-attachment: fixed; min-height: 100vh; color: var(--text); font: 15px/1.5 var(--font); }
   button, input, select { font: inherit; color: inherit; }
-  .wrap { max-width: 1000px; margin: 0 auto; padding: 20px 16px 60px; }
+  .wrap { max-width: none; margin: 0 auto; padding: 20px clamp(16px, 3vw, 40px) 60px; }
   header.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 14px 0 18px; flex-wrap: wrap; }
   h1 { font-size: 26px; margin: 0; letter-spacing: .5px; font-weight: 700; color: var(--brand-text); }
   .sub { color: var(--muted); font-size: 13px; }
@@ -37,6 +37,9 @@
   .count { color: var(--muted); font-size: 13px; margin-bottom: 10px; }
 
   .group { margin-bottom: 12px; overflow: hidden; }
+  #repList, #histList { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 480px), 1fr)); gap: 12px; align-items: start; }
+  #repList .group, #histList .group { margin-bottom: 0; }
+  #repList > .empty, #histList > .empty, #histList > .group:only-child { grid-column: 1 / -1; }
   .group-head { padding: 12px 16px; display: flex; justify-content: space-between; gap: 10px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
   .group-head strong { color: var(--brand-text); }
   .group-head .when { color: var(--muted); font-size: 13px; }

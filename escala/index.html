@@ -25,8 +25,9 @@
   --font-body: var(--font);
 }
 * { box-sizing: border-box; }
-body { background: var(--bg); background-image: var(--page-bg); background-attachment: fixed; color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.45; padding-inline: 16px; padding-block: 28px 56px; }
-.wrap { max-width: 880px; margin-inline: auto; display: flex; flex-direction: column; gap: 28px; }
+body { background: var(--bg); background-image: var(--page-bg); background-attachment: fixed; color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.45; padding-inline: clamp(16px, 3vw, 40px); padding-block: 28px 56px; }
+.wrap { max-width: none; width: 100%; margin-inline: auto; display: flex; flex-direction: column; gap: 28px; }
+main#weeks { width: 100%; max-width: none; margin: 0; }
 header { display: flex; flex-direction: column; gap: 6px; }
 h1 { color: var(--brand-text); font-family: var(--font-display); font-weight: 700; font-size: clamp(30px, 6vw, 44px); line-height: 1.05; margin: 0; letter-spacing: -0.02em; text-wrap: balance; }
 .sub { color: var(--muted); margin: 0; }
@@ -42,6 +43,14 @@ h1 { color: var(--brand-text); font-family: var(--font-display); font-weight: 70
 .back:focus-visible, .cal:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .next-box { background: var(--accent-soft); border: 1px solid var(--accent); border-radius: 10px; padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; }
 .next-box[hidden] { display: none; }
+@media (min-width: 1000px) {
+  .next-box { display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto; align-items: center; column-gap: 28px; padding: 14px 22px; }
+  .next-top { display: contents; }
+  .next-label { order: 1; }
+  .next-main { order: 2; }
+  .next-sub { order: 3; }
+  .next-top .cal { order: 4; }
+}
 .next-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .next-label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--accent); }
 .next-main { font-family: var(--font-display); font-weight: 700; font-size: 20px; }
@@ -54,8 +63,8 @@ h1 { color: var(--brand-text); font-family: var(--font-display); font-weight: 70
 .none-title { font-weight: 600; color: var(--text); }
 .none-sub { font-size: 14px; }
 .summary { color: var(--accent); font-weight: 600; min-height: 1.4em; }
-.week { display: flex; flex-direction: column; gap: 10px; }
-.week-title { font-family: var(--font-display); font-weight: 500; font-size: 14px; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; margin: 0; padding-bottom: 6px; border-bottom: 1px solid var(--line); }
+.week { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr)); gap: 12px; align-items: start; }
+.week-title { grid-column: 1 / -1; font-family: var(--font-display); font-weight: 500; font-size: 14px; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; margin: 0; padding-bottom: 6px; border-bottom: 1px solid var(--line); }
 .svc { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 4px 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
 .svc.today { border-color: var(--today); background: linear-gradient(0deg, var(--today-soft), var(--today-soft)), var(--surface); }
 .svc.past { opacity: .62; }
