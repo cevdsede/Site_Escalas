@@ -200,7 +200,7 @@ body { margin: 0; }
 var SHEET_ID = "1K47eF2raU_RB69ziWpV7P7NS5cyWfRhlsofXt9MWOz8";
 var MONTHS = ["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];
 var DOW = ["dom.","seg.","ter.","qua.","qui.","sex.","sáb."];
-var ROLES = [["Ministro","min"],["Back","back"],["Teclado","tec"],["Guitarra","gui"],["Baixo","bai"],["Bateria","bat"],["Violão","vio"],["Ministro e vocal","voc"]];
+var ROLES = [["Ministro","min"],["Back","back"],["Teclado","tec"],["Guitarra","gui"],["Baixo","bai"],["Bateria","bat"],["Violão","vio"],["Sax","sax"],["Ministro e vocal","voc"]];
 var API_URL = "https://ipdrbhkzluuwjulkhjkd.supabase.co/functions/v1/repertorio-publico";
 
 function list(s) { return s ? s.split(",").map(function (x) { return x.trim(); }).filter(Boolean) : []; }
@@ -208,7 +208,7 @@ function parse(line, year) {
   var p = line.split("|").map(function (s) { return s.trim(); });
   var dm = p[0].split("/");
   var date = new Date(year, +dm[1] - 1, +dm[0], +p[1].slice(0, 2), +p[1].slice(3, 5));
-  return { date: date, iso: year + "-" + pad(+dm[1]) + "-" + pad(+dm[0]), voc: [], api: null, day: dm[0], month: MONTHS[+dm[1] - 1], dow: DOW[date.getDay()], time: p[1], culto: p[2],
+  return { date: date, iso: year + "-" + pad(+dm[1]) + "-" + pad(+dm[0]), voc: [], sax: [], api: null, day: dm[0], month: MONTHS[+dm[1] - 1], dow: DOW[date.getDay()], time: p[1], culto: p[2],
     min: list(p[3]), back: list(p[4]), vio: list(p[5]), tec: list(p[6]), gui: list(p[7]), bai: list(p[8]), bat: list(p[9]), ens: p[10] || "", rep: (p[12] || "").split(";").map(function (x) { return x.trim(); }).filter(Boolean) };
 }
 // groups: array of arrays of "|" lines. Assigns years in order, rolling over at December -> January.
@@ -296,15 +296,45 @@ function indexApi() {
   api.cultos.forEach(function (c) { cultoByKey[c.data + " " + c.horario] = c; });
   api.repertorios.forEach(function (r) { if (r.culto && r.culto.id) repByCulto[r.culto.id] = r.itens || []; });
 }
-// A escala (quem toca em cada culto) vem só da planilha. O app entra apenas com o repertório:
-// cada culto da planilha é ligado ao culto do app pela data e pelo horário.
+// Função do app -> linha da escala (mesmas linhas da planilha).
+var FUNC_KEY = { "ministro": "min", "vocal": "back", "violão": "vio", "violao": "vio", "teclado": "tec", "guitarra": "gui", "baixo": "bai", "bateria": "bat", "sax": "sax" };
+function fillFromApi(s, c) {
+  (c.equipe || []).forEach(function (e) {
+    var k = FUNC_KEY[String(e.funcao || "").trim().toLowerCase()];
+    var nome = firstName(e.nome);
+    if (k && nome && s[k].indexOf(nome) < 0) s[k].push(nome);
+  });
+}
+// Junta a planilha com o app, pela data e pelo horário do culto:
+// - culto da planilha com equipe: vale a planilha;
+// - culto da planilha sem equipe: usa a equipe escalada no app;
+// - culto que só existe no app: aparece com a equipe do app, organizada nas mesmas funções da planilha.
 function rebuildData() {
   indexApi();
+  var have = {};
   sheetData.forEach(function (w) { w.forEach(function (s) {
+    have[s.iso + " " + s.time] = 1;
     s.api = cultoByKey[s.iso + " " + s.time] || null;
     s.voc = [];
+    var comEquipe = ROLES.some(function (r) { return s[r[1]].length; });
+    if (s.api && !comEquipe) fillFromApi(s, s.api);
   }); });
-  data = sheetData.slice();
+  var extra = [];
+  if (api) api.cultos.forEach(function (c) {
+    if (have[c.data + " " + c.horario] || !(c.equipe || []).length) return;
+    var p = c.data.split("-"), d = new Date(+p[0], +p[1] - 1, +p[2], +c.horario.slice(0, 2), +c.horario.slice(3, 5));
+    var svc = { date: d, iso: c.data, day: p[2], month: MONTHS[+p[1] - 1], dow: DOW[d.getDay()], time: c.horario,
+      culto: String(c.nome || "").trim(), min: [], back: [], vio: [], tec: [], gui: [], bai: [], bat: [], sax: [], voc: [], ens: "", rep: [], api: c };
+    fillFromApi(svc, c);
+    extra.push(svc);
+  });
+  extra.sort(function (a, b) { return a.date - b.date; });
+  var weeks = [];
+  extra.forEach(function (s) {
+    var w = weeks[weeks.length - 1];
+    if (w && s.date - w[w.length - 1].date < 3 * 86400e3) w.push(s); else weeks.push([s]);
+  });
+  data = sheetData.concat(weeks).sort(function (a, b) { return a[0].date - b[0].date; });
 }
 function repItems(s) { return s.api ? (repByCulto[s.api.id] || []) : []; }
 
