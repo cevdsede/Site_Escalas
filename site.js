@@ -20,7 +20,7 @@
   }
 
   // ---------- Aviso de versão nova ----------
-  function showUpdate(worker) {
+  function showUpdate(reg) {
     if (document.getElementById("updateBar")) return;
     var bar = document.createElement("div");
     bar.id = "updateBar";
@@ -31,7 +31,12 @@
     var go = document.createElement("button");
     go.type = "button";
     go.textContent = "Atualizar";
-    go.addEventListener("click", function () { go.disabled = true; worker.postMessage({ type: "SKIP_WAITING" }); });
+    go.addEventListener("click", function () {
+      var w = reg.waiting; // sempre a versão em espera mais recente
+      if (!w) { location.reload(); return; }
+      go.disabled = true;
+      w.postMessage({ type: "SKIP_WAITING" });
+    });
     var later = document.createElement("button");
     later.type = "button";
     later.className = "ghost";
@@ -50,12 +55,12 @@
       location.reload();
     });
     navigator.serviceWorker.register(new URL("sw.js", base)).then(function (reg) {
-      if (reg.waiting && navigator.serviceWorker.controller) showUpdate(reg.waiting);
+      if (reg.waiting && navigator.serviceWorker.controller) showUpdate(reg);
       reg.addEventListener("updatefound", function () {
         var w = reg.installing;
         if (!w) return;
         w.addEventListener("statechange", function () {
-          if (w.state === "installed" && navigator.serviceWorker.controller) showUpdate(w);
+          if (w.state === "installed" && navigator.serviceWorker.controller) showUpdate(reg);
         });
       });
       // procura versão nova ao voltar para a página e de tempos em tempos

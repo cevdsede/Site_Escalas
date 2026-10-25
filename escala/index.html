@@ -75,6 +75,7 @@ h1 { color: var(--brand-text); font-family: var(--font-display); font-weight: 70
 .who { font-weight: 500; overflow-wrap: anywhere; }
 .who.min { font-weight: 600; color: var(--accent); }
 .who span.me { background: var(--accent-soft); color: var(--accent); border-radius: 4px; padding: 0 5px; margin-inline: -5px; box-shadow: 0 0 0 1px var(--accent) inset; }
+.foot-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 .rep { grid-column: 2; display: flex; flex-direction: column; gap: 4px; margin-top: 4px; }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; }
 .chip { font-size: 13px; font-weight: 500; color: var(--brand-text); background: var(--brand-soft); border: 1px solid var(--border); border-radius: 999px; padding: 2px 10px; text-decoration: none; }
@@ -117,7 +118,10 @@ body { margin: 0; }
   <main id="weeks" class="wrap" style="gap:28px"></main>
   <footer>
     <div id="status">Carregando…</div>
-    <button type="button" class="pill" id="install">Instalar app</button>
+    <div class="foot-actions">
+      <button type="button" class="pill" id="share">Compartilhar</button>
+      <button type="button" class="pill" id="install">Instalar app</button>
+    </div>
     <div id="installHelp" hidden>Para instalar: no Chrome ou Edge, abra o menu do navegador (⋮) e toque em "Instalar app" ou "Adicionar à tela inicial". No iPhone, toque em Compartilhar e depois em "Adicionar à Tela de Início".</div>
   </footer>
 </div>
@@ -430,6 +434,14 @@ function load() {
     else setStatus("Sem conexão com a planilha. Mostrando a escala salva" + savedLabel() + ".");
   });
 }
+// Compartilhar o link da escala (menu do celular; no computador copia o link)
+document.getElementById("share").addEventListener("click", function () {
+  var info = { title: "Escala Louvor", text: "Escala do Ministério de Louvor", url: location.href.split("#")[0].split("?")[0] };
+  if (navigator.share) { navigator.share(info).catch(function () {}); }
+  else if (navigator.clipboard) {
+    navigator.clipboard.writeText(info.url).then(function () { setStatus("Link da escala copiado."); }, function () { setStatus("Não consegui copiar o link."); });
+  } else { setStatus("Link: " + info.url); }
+});
 function savedLabel() {
   try {
     var t = +localStorage.getItem("escala.csvAt");

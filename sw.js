@@ -56,7 +56,8 @@ self.addEventListener("fetch", function (e) {
   if (!sameOrigin && CDN.indexOf(url.hostname) < 0) return; // planilha e banco de músicas sempre vão direto à rede
 
   e.respondWith(caches.open(CACHE).then(function (cache) {
-    var net = fetch(req).then(function (res) {
+    // arquivos do site: sempre confere com o servidor (o cache do navegador do GitHub Pages dura 10 minutos)
+    var net = (sameOrigin ? fetch(req, { cache: "no-cache" }) : fetch(req)).then(function (res) {
       if (res && (res.ok || res.type === "opaque")) cache.put(req, res.clone());
       return res;
     });
