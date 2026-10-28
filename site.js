@@ -136,6 +136,80 @@
     }
   };
 
+  // ---------- Definir ou trocar o tom de uma música do repertório ----------
+  // Uso: SiteRep.editarTom({ id, nome, tomAtual (id ou null), tons, apiUrl, pinRequired, onDone })
+  window.SiteRep.editarTom = function (o) {
+    var old = document.getElementById("tomDialog");
+    if (old) old.remove();
+    var dlg = document.createElement("dialog");
+    dlg.id = "tomDialog";
+    dlg.className = "dlg";
+    dlg.setAttribute("aria-labelledby", "tomTitle");
+    var form = document.createElement("form");
+    form.className = "dlg-form";
+
+    var h = document.createElement("h2"); h.id = "tomTitle"; h.textContent = "Tom da música";
+    var p = document.createElement("p"); p.textContent = o.nome;
+    form.appendChild(h); form.appendChild(p);
+
+    var lt = document.createElement("label"); lt.textContent = "Tom";
+    var sel = document.createElement("select");
+    sel.className = "dlg-select";
+    var vazio = document.createElement("option"); vazio.value = ""; vazio.textContent = "Sem tom (definir depois)"; sel.appendChild(vazio);
+    (o.tons || []).forEach(function (t) {
+      var op = document.createElement("option"); op.value = t.id; op.textContent = t.nome; sel.appendChild(op);
+    });
+    sel.value = o.tomAtual == null ? "" : String(o.tomAtual);
+    lt.appendChild(sel);
+    form.appendChild(lt);
+
+    var pin = null;
+    if (o.pinRequired) {
+      var lp = document.createElement("label"); lp.textContent = "PIN";
+      pin = document.createElement("input");
+      pin.type = "password"; pin.autocomplete = "off"; pin.required = true;
+      try { pin.value = sessionStorage.getItem("escala.pin") || ""; } catch (e) {}
+      lp.appendChild(pin);
+      form.appendChild(lp);
+    }
+    var msg = document.createElement("div"); msg.className = "dlg-msg"; msg.setAttribute("role", "status");
+    var actions = document.createElement("div"); actions.className = "dlg-actions";
+    var cancel = document.createElement("button"); cancel.type = "button"; cancel.className = "dlg-btn"; cancel.textContent = "Cancelar";
+    var ok = document.createElement("button"); ok.type = "submit"; ok.className = "dlg-btn primary"; ok.textContent = "Salvar";
+    actions.appendChild(cancel); actions.appendChild(ok);
+    form.appendChild(msg); form.appendChild(actions);
+    dlg.appendChild(form);
+    document.body.appendChild(dlg);
+
+    cancel.addEventListener("click", function () { dlg.close(); dlg.remove(); });
+    dlg.addEventListener("close", function () { dlg.remove(); });
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      ok.disabled = true; msg.textContent = "Salvando…"; msg.className = "dlg-msg";
+      var pinValue = pin ? pin.value : "";
+      fetch(o.apiUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ acao: "editar", id: o.id, id_tons: sel.value === "" ? null : Number(sel.value), pin: pinValue })
+      }).then(function (r) {
+        return r.json().catch(function () { return {}; }).then(function (j) {
+          if (!r.ok) throw new Error(j.error || "Erro ao salvar o tom.");
+        });
+      }).then(function () {
+        try { if (pinValue) sessionStorage.setItem("escala.pin", pinValue); } catch (e) {}
+        dlg.close();
+        dlg.remove();
+        if (o.onDone) o.onDone();
+      }).catch(function (err) {
+        msg.textContent = err && err.message && err.message !== "Failed to fetch" ? err.message : "Sem conexão. Tente de novo.";
+        msg.className = "dlg-msg err";
+        ok.disabled = false;
+      });
+    });
+    dlg.showModal();
+    sel.focus();
+  };
+
   setupInstall();
   setupWorker();
 })();

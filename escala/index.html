@@ -100,6 +100,10 @@ h1 { color: var(--brand-text); font-family: var(--font-display); font-weight: 70
 .del-rep { border: 0; background: transparent; color: var(--muted); cursor: pointer; padding: 0 8px; border-radius: 8px; font-size: 18px; line-height: 1; }
 .del-rep:hover { color: #dc2626; background: var(--surface-2); }
 .del-rep:focus-visible { outline: 2px solid var(--brand-text); outline-offset: 2px; }
+.tom-btn { font: inherit; font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--muted); background: none; border: 1px dashed transparent; border-radius: 8px; padding: 1px 6px; margin-left: -6px; cursor: pointer; text-align: left; white-space: nowrap; }
+.tom-btn:hover { color: var(--brand-text); border-color: var(--border); }
+.tom-btn.vazio { color: var(--brand-text); border-color: var(--border); }
+.tom-btn:focus-visible { outline: 2px solid var(--brand-text); outline-offset: 2px; }
 .rep-empty { color: var(--muted); font-size: 14px; }
 @media (max-width: 480px) { .rep-item { grid-template-columns: 64px minmax(0, 1fr) auto; } .rep-item .who-rep { display: none; } }
 dialog#repDialog { border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); color: var(--text); padding: 0; width: min(520px, calc(100vw - 24px)); max-height: calc(100vh - 24px); }
@@ -177,8 +181,8 @@ body { margin: 0; }
       <select id="fMusica" size="6" required></select>
     </label>
     <div class="rep-row">
-      <label>Tom
-        <select id="fTom" required></select>
+      <label>Tom (opcional)
+        <select id="fTom"></select>
       </label>
       <label id="fPinLabel" hidden>PIN
         <input id="fPin" type="password" autocomplete="off">
@@ -542,7 +546,14 @@ function render() {
           var ul = el("div", "rep-list");
           items.forEach(function (i) {
             var row = el("div", "rep-item");
-            row.appendChild(el("span", "tom", i.tom || "—"));
+            if (i.id) {
+              var tb = el("button", "tom-btn" + (i.tom ? "" : " vazio"), i.tom || "+ tom");
+              tb.type = "button";
+              tb.title = i.tom ? "Editar o tom" : "Definir o tom";
+              tb.setAttribute("aria-label", (i.tom ? "Editar o tom de " : "Definir o tom de ") + i.musica);
+              tb.addEventListener("click", (function (item) { return function () { editarTomItem(item); }; })(i));
+              row.appendChild(tb);
+            } else row.appendChild(el("span", "tom", i.tom || "—"));
             var a = el("a", "mus", i.musica);
             a.href = "../musicas/biblioteca-musicas.html?q=" + encodeURIComponent(i.musica);
             a.title = "Abrir na biblioteca de músicas";
@@ -702,7 +713,7 @@ function openRep(svc) {
   if (svc.api.cantores.length === 1) mem.value = svc.api.cantores[0].id;
   var tom = document.getElementById("fTom");
   tom.textContent = "";
-  var t0 = document.createElement("option"); t0.value = ""; t0.textContent = "Selecione…"; tom.appendChild(t0);
+  var t0 = document.createElement("option"); t0.value = ""; t0.textContent = "Definir depois"; tom.appendChild(t0);
   api.tons.forEach(function (t) { var o = document.createElement("option"); o.value = t.id; o.textContent = t.nome; tom.appendChild(o); });
   document.getElementById("fBusca").value = "";
   document.getElementById("fPinLabel").hidden = !api.pin_obrigatorio;
@@ -730,7 +741,7 @@ document.getElementById("repForm").addEventListener("submit", function (e) {
       id_culto: curSvc.api.id,
       id_membros: document.getElementById("fMembro").value,
       id_musicas: musica,
-      id_tons: Number(document.getElementById("fTom").value),
+      id_tons: document.getElementById("fTom").value === "" ? null : Number(document.getElementById("fTom").value),
       pin: pin
     })
   }).then(function (r) {
@@ -752,6 +763,17 @@ function findSvc(k) {
   var found = null;
   data.forEach(function (w) { w.forEach(function (s) { if (s.iso + " " + s.time === k) found = s; }); });
   return found;
+}
+
+// Define ou troca o tom de uma música já no repertório (o tom é opcional ao adicionar).
+function editarTomItem(item) {
+  if (!window.SiteRep || !window.SiteRep.editarTom || !api) return;
+  var atual = item.id_tom;
+  if (atual == null && item.tom) {
+    var achado = (api.tons || []).filter(function (t) { return t.nome === item.tom; })[0];
+    atual = achado ? achado.id : null;
+  }
+  window.SiteRep.editarTom({ id: item.id, nome: item.musica, tomAtual: atual, tons: api.tons || [], apiUrl: API_URL, pinRequired: !!api.pin_obrigatorio, onDone: loadApi });
 }
 
 // ---------- Exportar escala (imagem) e agendar todas as escalas ----------

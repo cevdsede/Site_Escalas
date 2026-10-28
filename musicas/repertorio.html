@@ -50,6 +50,10 @@
   td.who { color: var(--muted); text-align: right; white-space: nowrap; }
   td.date { color: var(--muted); width: 100px; white-space: nowrap; font-variant-numeric: tabular-nums; }
   td.act { width: 44px; text-align: right; }
+  .tom-btn { font: inherit; font-size: 13px; font-weight: 600; color: var(--muted); background: none; border: 1px dashed transparent; border-radius: 8px; padding: 1px 6px; margin-left: -6px; cursor: pointer; white-space: nowrap; }
+  .tom-btn:hover { color: var(--brand-text); border-color: var(--border); }
+  .tom-btn.vazio { color: var(--brand-text); border-color: var(--border); }
+  .tom-btn:focus-visible { outline: 2px solid var(--brand-text); outline-offset: 2px; }
   .del { border: 0; background: transparent; color: var(--muted); cursor: pointer; padding: 4px 8px; border-radius: 8px; font-size: 18px; line-height: 1; }
   .del:hover { color: #dc2626; background: var(--surface-2); }
   .del:focus-visible { outline: 2px solid var(--brand-text); outline-offset: 2px; }
@@ -213,7 +217,7 @@
           </div>
           <table>${r.itens.map((i) => `
             <tr>
-              <td class="tone">${esc(i.tom || '—')}</td>
+              <td class="tone">${i.id ? `<button class="tom-btn${i.tom ? '' : ' vazio'}" type="button" title="${i.tom ? 'Editar o tom' : 'Definir o tom'}" data-id="${esc(i.id)}" data-nome="${esc(i.musica)}" data-tom="${esc(i.id_tom ?? '')}" data-tomnome="${esc(i.tom)}">${esc(i.tom || '+ tom')}</button>` : esc(i.tom || '—')}</td>
               <td>${libLink(i.musica)}<div class="sub">${esc(i.cantor)}</div></td>
               <td class="who">${esc(i.ministro)}</td>
               <td class="act">${i.id ? `<button class="del" type="button" title="Excluir do repertório" aria-label="Excluir ${esc(i.musica)} do repertório" data-id="${esc(i.id)}" data-nome="${esc(i.musica)}">&times;</button>` : ''}</td>
@@ -222,6 +226,16 @@
         </div>`).join('');
   }
   $('repList').addEventListener('click', (e) => {
+    const tb = e.target.closest('.tom-btn');
+    if (tb && window.SiteRep && window.SiteRep.editarTom) {
+      let atual = tb.dataset.tom === '' ? null : Number(tb.dataset.tom);
+      if (atual === null && tb.dataset.tomnome) {
+        const achado = (data.tons || []).find((t) => t.nome === tb.dataset.tomnome);
+        atual = achado ? achado.id : null;
+      }
+      window.SiteRep.editarTom({ id: tb.dataset.id, nome: tb.dataset.nome, tomAtual: atual, tons: data.tons || [], apiUrl: API_URL, pinRequired: Boolean(data.pin_obrigatorio), onDone: loadData });
+      return;
+    }
     const btn = e.target.closest('.del');
     if (!btn || !window.SiteRep) return;
     window.SiteRep.excluir({ id: btn.dataset.id, nome: btn.dataset.nome, apiUrl: API_URL, pinRequired: Boolean(data.pin_obrigatorio), onDone: loadData });

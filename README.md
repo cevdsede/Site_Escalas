@@ -24,7 +24,7 @@ Não tem etapa de build: são arquivos HTML, CSS e JavaScript puros.
 
 Na **Escala**, a planilha e o app são juntados pela data e pelo horário do culto: se o culto tem equipe na planilha, vale a planilha; se a linha está sem equipe, ou o culto só existe no app, aparece a equipe escalada no app, organizada nas mesmas funções (ministro, back, teclado, guitarra, baixo, bateria, violão e sax). O repertório sempre vem do app, e o botão **+ Música** só aparece quando existe um culto igual no app. A lista de pessoas do filtro usa só os nomes da planilha. As duas fontes são relidas a cada minuto.
 
-Adicionar ou excluir música do repertório exige o **PIN** do ministério. A conferência do PIN e o limite de tentativas ficam nas funções do Supabase, não neste site. **Nenhuma chave ou PIN está neste repositório.**
+Adicionar, editar o tom ou excluir música do repertório exige o **PIN** do ministério. O **tom é opcional** ao adicionar: dá para definir depois tocando no tom (ou em "+ tom") ao lado da música. A conferência do PIN e o limite de tentativas ficam nas funções do Supabase, não neste site. **Nenhuma chave ou PIN está neste repositório.**
 
 ## Funcionamento offline e atualizações
 
