@@ -1,0 +1,1582 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gerador de Escala do Louvor</title>
+<meta name="robots" content="noindex,nofollow">
+<meta name="robots" content="noindex">
+<style>
+/* Layout: barra do período no topo, abas (Membros, Indisponibilidades, Gerar, Exportar) e conteúdo em largura total */
+@import url("https://fonts.googleapis.com/css?family=Montserrat:400,500,600,700,800&display=swap");
+:root {
+  --font: "Montserrat", "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+  --bg: #e3f0ff; --page-bg: linear-gradient(135deg, #e3f0ff 0%, #faf3e3 100%);
+  --surface: #ffffff; --surface-2: #f1f3fb; --border: #dfe3f0; --text: #1f2533; --muted: #5f6b85;
+  --brand: #3f51b5; --brand-dark: #283593; --brand-text: #3f51b5; --brand-soft: #e8ebfa; --on-brand: #ffffff;
+  --coral: #e5532d; --coral-dark: #c4421f;
+  --ok: #15803d; --warn: #b45309; --bad: #dc2626; --bad-soft: #fde8e8; --warn-soft: #fdf0d8; --ok-soft: #e1f5e8;
+  --radius: 16px; --shadow: 0 4px 16px rgba(0, 0, 0, .10);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1626; --page-bg: linear-gradient(135deg, #0f1626 0%, #1b1a17 100%);
+    --surface: #172033; --surface-2: #1d2740; --border: #2a3552; --text: #e6e9ef; --muted: #a5afc0;
+    --brand: #5361bd; --brand-dark: #6b79d1; --brand-text: #9fb0ff; --brand-soft: #1f2b52; --coral-dark: #ff6b3d;
+    --ok: #4ade80; --warn: #fbbf24; --bad: #f87171; --bad-soft: #3b1d22; --warn-soft: #3a2f14; --ok-soft: #14301f;
+    --shadow: 0 4px 16px rgba(0, 0, 0, .5); color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1626; --page-bg: linear-gradient(135deg, #0f1626 0%, #1b1a17 100%);
+  --surface: #172033; --surface-2: #1d2740; --border: #2a3552; --text: #e6e9ef; --muted: #a5afc0;
+  --brand: #5361bd; --brand-dark: #6b79d1; --brand-text: #9fb0ff; --brand-soft: #1f2b52; --coral-dark: #ff6b3d;
+  --ok: #4ade80; --warn: #fbbf24; --bad: #f87171; --bad-soft: #3b1d22; --warn-soft: #3a2f14; --ok-soft: #14301f;
+  --shadow: 0 4px 16px rgba(0, 0, 0, .5); color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); background-image: var(--page-bg); background-attachment: fixed; color: var(--text); font: 14px/1.45 var(--font); min-height: 100vh; }
+button, input, select, textarea { font: inherit; color: inherit; }
+h1 { font-size: clamp(26px, 4.5vw, 38px); line-height: 1.05; margin: 0; color: var(--brand-text); font-weight: 700; letter-spacing: -.02em; }
+h2 { font-size: 18px; margin: 0 0 10px; color: var(--brand-text); font-weight: 700; }
+h3 { font-size: 14px; margin: 14px 0 8px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
+.wrap { max-width: 1800px; margin: 0 auto; padding: 16px clamp(12px, 2.5vw, 32px) 60px; }
+header.top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.sub { color: var(--muted); font-size: 13px; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; }
+.row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.grow { flex: 1 1 auto; }
+.btn { border: 1px solid var(--border); background: var(--surface); border-radius: 999px; padding: 8px 16px; cursor: pointer; font-weight: 600; }
+.btn:hover { background: var(--surface-2); }
+.btn.primary { background: var(--brand); border-color: var(--brand); color: var(--on-brand); }
+.btn.primary:hover { background: var(--brand-dark); }
+.btn.small { padding: 4px 10px; font-size: 12px; }
+.btn.danger { color: var(--bad); }
+.btn:disabled { opacity: .55; cursor: default; }
+.btn:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, .chip:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+input[type=text], input[type=date], input[type=number], input[type=url], input[type=password], select, textarea {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 8px 12px; min-width: 0;
+}
+textarea { width: 100%; min-height: 110px; resize: vertical; }
+label.f { display: grid; gap: 4px; font-size: 12px; font-weight: 600; color: var(--muted); }
+.periodo { display: flex; flex-wrap: wrap; gap: 14px; align-items: end; margin-bottom: 14px; }
+.tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+.tab { border: 1px solid var(--border); background: var(--surface); border-radius: 999px; padding: 9px 20px; cursor: pointer; font-weight: 600; color: var(--brand-text); }
+.tab:hover { background: var(--brand-soft); }
+.tab[aria-selected="true"] { background: var(--brand); border-color: var(--brand); color: var(--on-brand); }
+[hidden] { display: none !important; }
+table { border-collapse: collapse; width: 100%; }
+th, td { padding: 6px 8px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: middle; }
+th { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); position: sticky; top: 0; background: var(--surface); z-index: 2; }
+.scroll { overflow: auto; max-width: 100%; max-height: 70vh; border: 1px solid var(--border); border-radius: 10px; }
+.scroll table { min-width: max-content; }
+.chip { display: inline-block; border: 1px solid var(--border); background: var(--surface-2); color: var(--muted); border-radius: 999px; padding: 2px 10px; font-size: 12px; font-weight: 600; cursor: pointer; margin: 2px 3px 2px 0; user-select: none; }
+.chip.on { background: var(--brand); border-color: var(--brand); color: var(--on-brand); }
+.tag { display: inline-block; border-radius: 6px; padding: 1px 8px; font-size: 11px; font-weight: 700; }
+.tag.ok { background: var(--ok-soft); color: var(--ok); }
+.tag.warn { background: var(--warn-soft); color: var(--warn); }
+.tag.bad { background: var(--bad-soft); color: var(--bad); }
+.muted { color: var(--muted); }
+.inativo td { opacity: .55; }
+.matriz th.dia { writing-mode: vertical-rl; transform: rotate(180deg); height: 120px; text-align: left; white-space: nowrap; }
+.matriz td.nome, .matriz th.nome { position: sticky; left: 0; background: var(--surface); z-index: 3; font-weight: 600; min-width: 130px; }
+.matriz td.c { text-align: center; padding: 3px; }
+.matriz input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--bad); }
+.matriz tr.semana td { background: var(--surface-2); font-size: 11px; color: var(--muted); }
+.cfg { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.tipo { border: 1px solid var(--border); border-radius: 12px; padding: 12px; background: var(--surface-2); }
+.tipo.off { opacity: .55; }
+.vagas { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 8px; }
+.vagas label { font-size: 11px; color: var(--muted); display: grid; gap: 2px; font-weight: 600; }
+.vagas input { width: 100%; text-align: center; padding: 4px; }
+.semana-t { margin: 16px 0 6px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; font-size: 12px; }
+.res td { vertical-align: top; }
+.res td.d { white-space: nowrap; font-weight: 700; }
+.res td.d small { display: block; color: var(--muted); font-weight: 500; }
+.slot { display: block; width: 100%; min-width: 120px; margin: 2px 0; padding: 4px 6px; font-size: 13px; }
+.slot.vago { border-color: var(--bad); background: var(--bad-soft); }
+.slot.alerta { border-color: var(--warn); background: var(--warn-soft); }
+.slot.fixo { border-left: 4px solid var(--brand); }
+.sc td { padding: 4px 8px; }
+.alertas li { margin: 4px 0; }
+.alertas .bad { color: var(--bad); }
+.alertas .warn { color: var(--warn); }
+.alertas .ok { color: var(--ok); }
+.barra { display: inline-block; height: 10px; border-radius: 5px; background: var(--brand); vertical-align: middle; }
+pre.code { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 12px; overflow: auto; max-height: 340px; font: 12px/1.45 ui-monospace, Consolas, monospace; white-space: pre; }
+dialog { border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); color: var(--text); padding: 0; width: min(920px, calc(100vw - 20px)); max-height: calc(100vh - 20px); }
+dialog::backdrop { background: rgba(0, 0, 0, .55); }
+.ficha { display: flex; flex-direction: column; max-height: calc(100vh - 20px); }
+.ficha-top { background: var(--surface-2); display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 14px 18px; border-bottom: 1px solid var(--border); }
+.ficha-top h2 { margin: 0; color: var(--brand-text); }
+.ficha-corpo { padding: 4px 18px 20px; overflow: auto; }
+table.pode th, table.pode td { text-align: center; }
+table.pode td:first-child, table.pode th:first-child { text-align: left; }
+.pode td.c input { width: 18px; height: 18px; accent-color: var(--brand); }
+.indcultos { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
+.indcultos .sem-t { flex: 1 0 100%; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; margin-top: 6px; }
+.ic { display: inline-flex; gap: 5px; align-items: center; border: 1px solid var(--border); border-radius: 8px; padding: 3px 8px; font-size: 12px; background: var(--surface-2); cursor: pointer; }
+.ic.on { background: var(--bad-soft); border-color: var(--bad); color: var(--bad); }
+.ic input { accent-color: var(--bad); }
+.grupo td { background: var(--surface-2); }
+.prio { display: flex; flex-wrap: wrap; gap: 10px; }
+.lista-ind { padding-left: 18px; margin: 6px 0; }
+.lista-ind li { margin: 4px 0; }
+.grid2 > * { min-width: 0; }
+.card { min-width: 0; }
+.grid2 { display: grid; grid-template-columns: minmax(0, 2.2fr) minmax(280px, 1fr); gap: 16px; align-items: start; }
+@media (max-width: 1100px) { .grid2 { grid-template-columns: 1fr; } }
+.msg { min-height: 1.3em; font-size: 13px; }
+.msg.ok { color: var(--ok); } .msg.err { color: var(--bad); }
+details > summary { cursor: pointer; font-weight: 700; }
+.toast { position: fixed; right: 16px; bottom: 16px; background: var(--text); color: var(--bg); padding: 10px 16px; border-radius: 10px; box-shadow: var(--shadow); z-index: 50; }
+/* marca e menu (mesmo padrão do site Louvor CEVD) */
+.site-nav { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; box-shadow: 0 2px 10px rgba(63, 81, 181, .12); margin-bottom: 18px; position: sticky; top: 8px; z-index: 40; }
+.site-nav-in { padding: 8px 14px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.site-brand { display: flex; align-items: center; gap: 10px; font-weight: 700; color: var(--brand-text); letter-spacing: .3px; }
+.site-brand img { border-radius: 50%; background: var(--surface); }
+.nav-acoes { margin-left: auto; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.theme-btn { width: 38px; height: 38px; flex: none; border-radius: 50%; border: 1px solid var(--border); background: var(--surface-2); color: var(--brand-text); cursor: pointer; display: inline-grid; place-items: center; font-size: 19px; line-height: 1; padding: 0; }
+.theme-btn::before { content: "\25D0"; }
+.theme-btn:hover { background: var(--brand-soft); }
+header.top { margin-bottom: 18px; }
+.card { padding: 20px; }
+.tipo { border-radius: 14px; }
+.scroll { border-radius: 12px; }
+th { background: var(--surface-2); }
+#tbMembros tbody tr:hover td { background: var(--brand-soft); }
+@media (max-width: 700px) { .site-brand span { display: none; } .card { padding: 14px; } }
+#loginGate { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: 16px; background: var(--bg); background-image: var(--page-bg); }
+#loginGate[hidden] { display: none; }
+#loginForm { width: min(380px, 100%); display: grid; gap: 12px; }
+#loginForm input { width: 100%; }
+body.bloqueado .wrap { display: none; }
+#btnSair[hidden] { display: none; }
+</style>
+</head>
+<body>
+<div id="loginGate" hidden>
+  <form id="loginForm" class="card" autocomplete="on">
+    <h1>Gerador de Escala</h1>
+    <p class="sub">Acesso restrito. Entre com o mesmo e-mail e senha do app.</p>
+    <label class="f">E-mail<input type="email" id="lgEmail" autocomplete="username" required></label>
+    <label class="f">Senha<input type="password" id="lgSenha" autocomplete="current-password" required></label>
+    <button class="btn primary" id="lgEntrar" type="submit">Entrar</button>
+    <p class="msg" id="lgMsg" role="alert"></p>
+  </form>
+</div>
+<div class="wrap">
+  <nav class="site-nav" aria-label="Barra do gerador">
+    <div class="site-nav-in">
+      <span class="site-brand"><img src="data:image/png;base64,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" alt="" width="34" height="34"><span>Louvor CEVD</span></span>
+      <div class="nav-acoes">
+        <button class="btn" id="btnBackup" type="button">Salvar backup</button>
+        <button class="btn" id="btnRestaurar" type="button">Abrir backup</button>
+        <input type="file" id="fileBackup" accept="application/json,.json" hidden>
+        <button class="btn" id="btnSair" type="button" hidden>Sair</button>
+        <button type="button" class="theme-btn" id="btnTema" aria-label="Alternar tema claro e escuro" title="Alternar tema"></button>
+      </div>
+    </div>
+  </nav>
+  <header class="top">
+    <div>
+      <h1>Gerador de Escala</h1>
+      <div class="sub">Privado: os dados ficam só neste navegador. Faça um backup de vez em quando.</div>
+    </div>
+  </header>
+
+  <section class="card periodo" aria-label="Período da escala">
+    <label class="f">Primeiro dia
+      <input type="date" id="pInicio">
+    </label>
+    <label class="f">Semanas
+      <input type="number" id="pSemanas" min="1" max="12" step="1" style="width:90px">
+    </label>
+    <div class="sub" id="pResumo"></div>
+  </section>
+
+  <nav class="tabs" role="tablist">
+    <button class="tab" role="tab" data-tab="membros" aria-selected="true">1. Membros</button>
+    <button class="tab" role="tab" data-tab="gerar" aria-selected="false">2. Gerar escala</button>
+    <button class="tab" role="tab" data-tab="exportar" aria-selected="false">3. Aplicar na planilha</button>
+  </nav>
+
+  <dialog id="dlgMembro" aria-labelledby="fichaTitulo">
+    <div class="ficha">
+      <div class="ficha-top"><h2 id="fichaTitulo"></h2><button class="btn" id="fichaFechar" type="button">Fechar</button></div>
+      <div id="fichaCorpo" class="ficha-corpo"></div>
+    </div>
+  </dialog>
+
+  <!-- ============ 1. MEMBROS ============ -->
+  <section id="tab-membros" class="card">
+    <h2>Membros e o que cada um faz</h2>
+    <p class="sub">Marque as funções de cada pessoa. Em <b>Abrir ficha</b> você define, para cada membro, <b>em quais cultos e o que ele pode fazer em cada um</b> (por exemplo, ministra de manhã e não à noite), se é jovem, se ministra a Santa Ceia e quando ele não pode (cultos do período, férias e dias fixos). Os valores iniciais vêm do histórico do app: revise quem aparece como "revisar". Inativo não entra na escala; o "Convidado" é o curinga.</p>
+    <div class="scroll" style="max-height:60vh">
+      <table id="tbMembros">
+        <thead><tr><th>Nome na planilha</th><th>Funções</th><th>Resumo</th><th>Prioridade</th><th>Ativo</th><th></th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="row" style="margin-top:12px">
+      <input type="text" id="novoNome" placeholder="Nome de quem vai entrar" style="min-width:220px">
+      <button class="btn primary" id="btnAddMembro" type="button">Adicionar membro</button>
+      <span class="grow"></span>
+      <button class="btn" id="btnRestaurarApp" type="button" title="Volta a lista de membros que veio do app">Restaurar lista do app</button>
+    </div>
+    <details style="margin-top:14px">
+      <summary>Colar uma lista de membros</summary>
+      <p class="sub">Uma pessoa por linha, no formato <code>Nome; Função, Função</code>. Exemplo: <code>Jessé; Ministro, Vocal, Baixo</code>. Funções: Ministro, Vocal (Back), Violão, Teclado, Guitarra, Baixo, Bateria, Sax.</p>
+      <textarea id="colarMembros" placeholder="Jessé; Ministro, Vocal, Baixo&#10;Rosy; Vocal"></textarea>
+      <div class="row" style="margin-top:8px">
+        <button class="btn" id="btnColar" type="button">Adicionar da lista colada</button>
+        <span class="msg" id="msgColar"></span>
+      </div>
+    </details>
+  </section>
+
+  <section id="tab-gerar" hidden>
+    <div class="card">
+      <h2>Cultos e quantas pessoas em cada função</h2>
+      <div class="cfg" id="cfgTipos"></div>
+      <h3>Regras de folga e equilíbrio</h3>
+      <div class="row" style="align-items:end">
+        <label class="f">Máximo de cultos por semana (por pessoa)
+          <input type="number" id="rMaxSemana" min="1" max="6" step="1" style="width:110px">
+        </label>
+        <label class="f">Semanas de folga no período (mínimo)
+          <input type="number" id="rFolgas" min="0" max="6" step="1" style="width:110px">
+        </label>
+        <label class="f">Tentativas (mais = melhor resultado)
+          <input type="number" id="rTent" min="50" max="3000" step="50" style="width:110px">
+        </label>
+      </div>
+      <div class="row" style="margin-top:10px">
+        <label><input type="checkbox" id="rCopia"> Domingo à noite repete a equipe da quinta (com ajustes)</label>
+        <label><input type="checkbox" id="rDom"> Permitir a mesma pessoa nos dois cultos de domingo</label>
+        <label><input type="checkbox" id="rConv"> Usar "Convidado" quando faltar gente</label>
+      </div>
+      <div class="row" style="margin-top:14px">
+        <button class="btn primary" id="btnGerar" type="button">Gerar escala</button>
+        <button class="btn" id="btnLimparTravas" type="button">Soltar escolhas manuais</button>
+        <span class="msg" id="msgGerar"></span>
+      </div>
+    </div>
+
+    <div class="card" id="cardSC" style="margin-top:16px"></div>
+    <div class="card" id="cardAnt" style="margin-top:16px"></div>
+
+    <div class="grid2" style="margin-top:16px" id="resultado" hidden>
+      <div class="card">
+        <h2>Escala gerada <span class="sub">(troque qualquer pessoa pela lista; a escolha fica travada ao gerar de novo)</span></h2>
+        <div id="resTabela"></div>
+      </div>
+      <div>
+        <div class="card">
+          <h2>Alertas</h2>
+          <ul class="alertas" id="alertas" style="padding-left:18px;margin:0"></ul>
+        </div>
+        <div class="card" style="margin-top:16px">
+          <h2>Carga por pessoa</h2>
+          <div class="scroll" style="max-height:50vh"><table id="tbCarga"></table></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 4. EXPORTAR ============ -->
+  <section id="tab-exportar" hidden>
+    <div class="card">
+      <h2>Como vai ficar na planilha</h2>
+      <p class="sub">Mesmas colunas da planilha da escala: Data, dia, hora, culto, Ministro (2), Back (3), Violão, Teclado, Guitarra, Baixo, Bateria, data do ensaio (coluna O) e horário do ensaio (coluna P).</p>
+      <div class="row" style="margin-bottom:8px">
+        <label><input type="checkbox" id="xSexta"> Incluir a linha de sexta vazia (como na planilha)</label>
+        <label><input type="checkbox" id="xEnsaio"> Preencher o ensaio de quinta e domingo (segunda às <input type="text" id="xEnsaioHora" value="19:00" style="width:64px">)</label>
+        <span class="grow"></span>
+        <button class="btn" id="btnCopiar" type="button">Copiar para colar na planilha</button>
+        <button class="btn" id="btnCsv" type="button">Baixar CSV</button>
+      </div>
+      <div class="scroll" style="max-height:46vh"><table id="tbExport"></table></div>
+      <div class="msg" id="msgExport"></div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <h2>Aplicar direto na planilha do Google</h2>
+      <p class="sub">Precisa de um pequeno script na planilha, criado uma única vez (passo a passo abaixo). Depois é só colar o endereço e a senha aqui e apertar o botão.</p>
+      <div class="row" style="align-items:end">
+        <label class="f grow">Endereço do aplicativo da web (termina em /exec)
+          <input type="url" id="sUrl" placeholder="https://script.google.com/macros/s/.../exec">
+        </label>
+        <label class="f">Senha do script (TOKEN)
+          <input type="password" id="sToken" autocomplete="off" style="min-width:200px">
+        </label>
+        <label class="f">Aba
+          <input type="text" id="sAba" placeholder="Escala" style="width:140px">
+        </label>
+      </div>
+      <div class="row" style="margin-top:10px">
+        <button class="btn primary" id="btnAplicar" type="button">Aplicar na planilha</button>
+        <span class="msg" id="msgAplicar"></span>
+      </div>
+      <details style="margin-top:14px">
+        <summary>Passo a passo para criar o script (uma vez só)</summary>
+        <ol>
+          <li>Abra a planilha da escala e vá em <b>Extensões &gt; Apps Script</b>.</li>
+          <li>Apague o que estiver no editor e cole o código abaixo. Troque <code>ABA</code> pelo nome exato da aba da escala.</li>
+          <li>Em <b>Configurações do projeto &gt; Propriedades do script</b>, crie a propriedade <code>TOKEN</code> com uma senha sua (qualquer texto longo).</li>
+          <li>Clique em <b>Implantar &gt; Nova implantação &gt; Aplicativo da Web</b>. Em "Executar como", escolha <b>Eu</b>. Em "Quem pode acessar", escolha <b>Qualquer pessoa</b>. Autorize quando pedir.</li>
+          <li>Copie o endereço que termina em <code>/exec</code> e a senha para os campos acima.</li>
+        </ol>
+        <div class="row" style="margin:6px 0"><button class="btn small" id="btnCopiarScript" type="button">Copiar código do script</button></div>
+        <pre class="code" id="codigoScript"></pre>
+      </details>
+    </div>
+  </section>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+// Login com os usuários do Supabase. Só vale quando o gerador está hospedado (https); aberto do computador, entra direto.
+(function () {
+  var URL_API = "https://ipdrbhkzluuwjulkhjkd.supabase.co", CHAVE = "sb_publishable_SVVAGw8jBQUOksd73d_zvQ_z_SacS65";   // chave pública (publishable), a mesma do app
+  var PERFIS = ["admin", "lider", "advanced"], PAPEIS_LOUVOR = ["lider", "administrador"], KEY = "gerador-sessao";
+  var local = location.protocol === "file:" || location.hostname === "localhost" || location.hostname === "127.0.0.1";
+  if (local && !/[?&]login=1/.test(location.search)) return;
+  var gate = document.getElementById("loginGate"), msg = document.getElementById("lgMsg"), sair = document.getElementById("btnSair");
+  document.body.classList.add("bloqueado"); gate.hidden = false; sair.hidden = false;
+  function ler() { try { return JSON.parse(localStorage.getItem(KEY) || "null"); } catch (e) { return null; } }
+  function gravar(x) { try { if (x) localStorage.setItem(KEY, JSON.stringify(x)); else localStorage.removeItem(KEY); } catch (e) {} }
+  function aviso(t, ok) { msg.textContent = t || ""; msg.className = "msg " + (ok ? "ok" : "err"); }
+  function auth(corpo, tipo) {
+    return fetch(URL_API + "/auth/v1/token?grant_type=" + tipo, { method: "POST", headers: { apikey: CHAVE, "Content-Type": "application/json" }, body: JSON.stringify(corpo) })
+      .then(function (r) { return r.json().then(function (j) { if (!r.ok) throw new Error(j.error_description || j.msg || "erro"); return j; }); });
+  }
+  function rest(caminho, sessao) {
+    return fetch(URL_API + "/rest/v1/" + caminho, { headers: { apikey: CHAVE, Authorization: "Bearer " + sessao.access_token } })
+      .then(function (r) { if (!r.ok) throw new Error("http " + r.status); return r.json(); });
+  }
+  function autorizado(sessao) {   // perfil de administração no app, ou líder/administrador do Louvor
+    return rest("membros?select=perfil&id=eq." + sessao.uid, sessao).then(function (l) {
+      if (l[0] && PERFIS.indexOf(String(l[0].perfil || "").toLowerCase()) >= 0) return true;
+      return rest("membros_ministerios?select=papel,ativo,ministerios(slug)&membro_id=eq." + sessao.uid, sessao).then(function (m) {
+        return m.some(function (x) { return x.ativo !== false && x.ministerios && x.ministerios.slug === "louvor" && PAPEIS_LOUVOR.indexOf(String(x.papel || "").toLowerCase()) >= 0; });
+      }).catch(function () { return false; });
+    });
+  }
+  function liberar() { document.body.classList.remove("bloqueado"); gate.hidden = true; }
+  function sairAgora() { gravar(null); location.reload(); }
+  sair.addEventListener("click", sairAgora);
+  function entrar(resp) {
+    var sessao = { access_token: resp.access_token, refresh_token: resp.refresh_token, exp: Date.now() + (resp.expires_in || 3600) * 1000, uid: resp.user && resp.user.id };
+    return autorizado(sessao).then(function (ok) {
+      if (!ok) { gravar(null); aviso("Esta conta não tem permissão para usar o gerador."); return; }
+      gravar(sessao); liberar();
+    });
+  }
+  var atual = ler();
+  if (atual && atual.refresh_token) {
+    aviso("Verificando acesso...", true);
+    var prom = atual.exp > Date.now() + 60000 ? Promise.resolve({ access_token: atual.access_token, refresh_token: atual.refresh_token, expires_in: (atual.exp - Date.now()) / 1000, user: { id: atual.uid } }) : auth({ refresh_token: atual.refresh_token }, "refresh_token");
+    prom.then(entrar).catch(function () { gravar(null); aviso(""); });
+  }
+  document.getElementById("loginForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var b = document.getElementById("lgEntrar"); b.disabled = true; aviso("Entrando...", true);
+    auth({ email: document.getElementById("lgEmail").value.trim(), password: document.getElementById("lgSenha").value }, "password")
+      .then(entrar).catch(function (err) { aviso(/invalid/i.test(err.message) ? "E-mail ou senha incorretos." : "Não foi possível entrar. Confira a internet e tente de novo."); })
+      .then(function () { b.disabled = false; document.getElementById("lgSenha").value = ""; });
+  });
+})();
+</script>
+<script>
+(function () {
+  var root = document.documentElement, K = "tema-gerador";
+  try { var sv = localStorage.getItem(K); if (sv === "dark" || sv === "light") root.setAttribute("data-theme", sv); } catch (e) {}
+  document.addEventListener("click", function (e) {
+    if (!(e.target.closest && e.target.closest("#btnTema"))) return;
+    var t = root.getAttribute("data-theme"), dark = t ? t === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+    root.setAttribute("data-theme", dark ? "light" : "dark");
+    try { localStorage.setItem(K, dark ? "light" : "dark"); } catch (err) {}
+  });
+})();
+</script>
+<script>
+(function () {
+'use strict';
+
+// ====================================================================== constantes
+var FUNCOES = ["Ministro", "Vocal", "Violão", "Teclado", "Guitarra", "Baixo", "Bateria", "Sax"];
+var ROTULO = { Ministro: "Ministro", Vocal: "Back", "Violão": "Violão", Teclado: "Teclado", Guitarra: "Guitarra", Baixo: "Baixo", Bateria: "Bateria", Sax: "Sax" };
+var CAP_PLANILHA = { Ministro: 2, Vocal: 3, "Violão": 1, Teclado: 1, Guitarra: 1, Baixo: 1, Bateria: 1, Sax: 0 };
+var DIAS = ["dom.", "seg.", "ter.", "qua.", "qui.", "sex.", "sáb."];
+var CHAVE = "gerador-escala-v1";
+
+// Membros do Louvor vindos do app (só nome na planilha e funções). a = ativo no ministério.
+var MEMBROS_APP = [
+  ["Adjanio", ["Ministro", "Vocal", "Violão"], 0], ["Aleane", ["Ministro", "Vocal"], 1], ["Ana Clara", ["Vocal"], 0],
+  ["Anne Gabrielly", ["Vocal"], 1], ["Cawan", ["Ministro", "Vocal", "Violão"], 1], ["Cilene", ["Ministro", "Vocal"], 1],
+  ["Convidado", ["Ministro", "Vocal", "Violão", "Teclado", "Guitarra", "Baixo", "Bateria"], 1, 1],
+  ["Dany", ["Ministro", "Vocal"], 0], ["Eduardo", ["Ministro", "Vocal"], 1], ["Eliana", ["Vocal"], 1],
+  ["Ewerton", ["Ministro", "Vocal", "Violão", "Teclado", "Guitarra", "Baixo"], 1], ["Felipe Silva", ["Bateria"], 1],
+  ["Gabriel", ["Teclado"], 1], ["Guilherme", ["Bateria"], 1], ["Henrique", ["Ministro", "Vocal", "Violão", "Baixo"], 0],
+  ["Isis", ["Ministro", "Vocal"], 1], ["Jessé", ["Ministro", "Vocal", "Violão", "Baixo"], 1],
+  ["Jhordan", ["Ministro", "Vocal", "Violão", "Baixo"], 1], ["Kaká", ["Ministro", "Vocal", "Violão", "Baixo"], 0],
+  ["Lucas", ["Ministro", "Vocal", "Violão", "Teclado", "Bateria"], 1], ["Marcos", ["Violão", "Guitarra"], 1],
+  ["Marilei", ["Ministro", "Vocal"], 1], ["Mikeias", ["Ministro", "Vocal", "Violão", "Baixo"], 1],
+  ["Naira", ["Ministro", "Vocal"], 1], ["Nayane", ["Ministro", "Vocal"], 0], ["Rosy", ["Vocal"], 1],
+  ["V. Mesquita", ["Ministro", "Vocal"], 1], ["Veronica", ["Ministro", "Vocal"], 1], ["Vitória Rodrigues", ["Vocal"], 0],
+  ["Wesley", ["Guitarra"], 0], ["Yokennan", ["Bateria"], 0]
+];
+
+// Ponto de partida tirado do histórico do app (quem já ministrou em cada culto, mín. 2 vezes; e quem serviu nos Jovens, mín. 3).
+// Ordem: [quinta, sábado, domingo manhã, domingo noite]. Quem tem a função Ministro e não aparece aqui começa sem nenhum culto: revise.
+var REGRAS_MINISTRO = { "Jessé": [1, 0, 1, 1], "Lucas": [1, 0, 0, 1], "Ewerton": [1, 1, 1, 1], "Mikeias": [0, 0, 1, 0], "Jhordan": [1, 1, 1, 1],
+  "Marilei": [1, 0, 0, 1], "Cawan": [1, 1, 0, 1], "Cilene": [1, 0, 0, 0], "Eduardo": [1, 0, 0, 0] };
+var JOVENS = ["Marcos", "Aleane", "Mikeias", "Rosy", "Jhordan", "Cawan", "V. Mesquita", "Felipe Silva", "Gabriel", "Guilherme"];
+var CHAVES_TIPO = ["qui", "sab", "dom1", "dom2"];
+var ROT_CURTO = { qui: "Qui", sab: "Sáb", dom1: "Dom ☀", dom2: "Dom ☾" };
+// Cada culto tem um "tipo": qui, sab, dom1 (manhã), dom2 (noite) e, na Santa Ceia, sc1 (manhã) e sc2 (noite).
+// m.nao["tipo|Função"] = true quer dizer que a pessoa NÃO faz aquela função naquele culto (o padrão é poder).
+function tipoDe(s) { return s.sc ? (s.tipo === "dom1" ? "sc1" : "sc2") : s.tipo; }
+function permitido(m, s, role) { return !(m.nao && m.nao[tipoDe(s) + "|" + role]); }
+function regrasPadrao(m) {
+  var nao = {};
+  if (m.funcoes.indexOf("Ministro") >= 0 && !m.convidado) {
+    var r = REGRAS_MINISTRO[m.nome] || [0, 0, 0, 0];
+    CHAVES_TIPO.forEach(function (k, i) { if (!r[i]) nao[k + "|Ministro"] = true; });
+    if (!r[3]) nao["sc2|Ministro"] = true;   // Santa Ceia da noite segue a restrição da noite; a da manhã não tem restrição
+  }
+  return { nao: nao, jovem: JOVENS.indexOf(m.nome) >= 0 };
+}
+function tiposPadrao() {
+  return {
+    qui:  { rotulo: "Quinta",         dow: 4, hora: "19:00", culto: "Passos de Fé",          ativo: true, jovens: "todos", vagas: { Ministro: 1, Vocal: 2, "Violão": 1, Teclado: 0, Guitarra: 1, Baixo: 1, Bateria: 1, Sax: 0 } },
+    sab:  { rotulo: "Sábado",         dow: 6, hora: "19:00", culto: "Jovens",                ativo: true, jovens: "so", vagas: { Ministro: 1, Vocal: 1, "Violão": 1, Teclado: 1, Guitarra: 0, Baixo: 1, Bateria: 1, Sax: 0 } },
+    dom1: { rotulo: "Domingo manhã",  dow: 0, hora: "07:00", culto: "Culto da Melhor Idade", ativo: true, jovens: "todos", ministroViolao: true, vagas: { Ministro: 1, Vocal: 0, "Violão": 1, Teclado: 0, Guitarra: 0, Baixo: 0, Bateria: 0, Sax: 0 } },
+    dom2: { rotulo: "Domingo noite",  dow: 0, hora: "17:30", culto: "Domingo",               ativo: true, jovens: "todos", vagas: { Ministro: 1, Vocal: 2, "Violão": 1, Teclado: 0, Guitarra: 1, Baixo: 1, Bateria: 1, Sax: 0 } }
+  };
+}
+var ORDEM_TIPOS = ["qui", "sab", "dom1", "dom2"];
+
+// ====================================================================== utilidades
+function $(s, r) { return (r || document).querySelector(s); }
+function $$(s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
+function esc(t) { return String(t == null ? "" : t).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+function pad(n) { return (n < 10 ? "0" : "") + n; }
+function iso(d) { return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); }
+function parseIso(s) { var p = String(s).split("-"); return new Date(+p[0], +p[1] - 1, +p[2], 12, 0, 0); }
+function dm(d) { return pad(d.getDate()) + "/" + pad(d.getMonth() + 1); }
+function addDias(d, n) { var x = new Date(d.getTime()); x.setDate(x.getDate() + n); return x; }
+function norm(t) { return String(t || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim(); }
+function uid() { return "m" + Math.random().toString(36).slice(2, 9); }
+function toast(msg) { var t = $("#toast"); t.textContent = msg; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(function () { t.hidden = true; }, 3200); }
+function proxQuinta() { var d = new Date(); d.setHours(12, 0, 0, 0); while (d.getDay() !== 4) d.setDate(d.getDate() + 1); return d; }
+function mulberry(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+
+// ====================================================================== estado
+var S;
+var SANTA_CEIA_PADRAO = ["Mikeias", "Ewerton"]; // ministros da Santa Ceia na planilha de 04/10
+function padrao() {
+  var membros = MEMBROS_APP.map(function (m) {
+    var base = { id: uid(), nome: m[0], funcoes: m[1].slice(), ativo: !!m[2], convidado: !!m[3], santaCeia: SANTA_CEIA_PADRAO.indexOf(m[0]) >= 0 };
+    var r = regrasPadrao(base); base.nao = r.nao; base.jovem = r.jovem;
+    return base;
+  });
+  return {
+    membros: membros, indisp: [], fixos: {}, escala: null, regraFix: {}, avisosRegra: [], santaCeia: { inicia: "", datas: {} },
+    periodo: { inicio: iso(proxQuinta()), semanas: 4 },
+    tipos: tiposPadrao(),
+    regras: { copiaQuinta: true, maxSemana: 2, folgas: 1, tentativas: 400, domDuplo: false, convidado: true },
+    export: { sexta: true, ensaio: true, ensaioHora: "19:00", url: "", token: "", aba: "Escala" }
+  };
+}
+function carregar() {
+  try {
+    var raw = localStorage.getItem(CHAVE);
+    if (raw) { var o = JSON.parse(raw); var base = padrao(); for (var k in base) if (!(k in o)) o[k] = base[k];
+      if (!o.santaCeia || !o.santaCeia.datas) o.santaCeia = { inicia: "", datas: {} };
+      if (!o.membros.some(function (m) { return "santaCeia" in m; })) o.membros.forEach(function (m) { m.santaCeia = SANTA_CEIA_PADRAO.indexOf(m.nome) >= 0; });
+      o.membros.forEach(function (m) {
+        if (!m.nao) {
+          var r = regrasPadrao(m);
+          if (m.ministra) { m.nao = {}; CHAVES_TIPO.forEach(function (k) { if (m.ministra[k] === false) m.nao[k + "|Ministro"] = true; }); if (m.ministra.dom2 === false) m.nao["sc2|Ministro"] = true; }
+          else m.nao = r.nao;
+          if (!("jovem" in m)) m.jovem = r.jovem;
+        }
+        delete m.ministra;
+      });
+      var tp = tiposPadrao(); Object.keys(tp).forEach(function (k) { if (o.tipos[k] && !o.tipos[k].jovens) o.tipos[k].jovens = tp[k].jovens; if (o.tipos[k] && !("ministroViolao" in o.tipos[k])) o.tipos[k].ministroViolao = !!tp[k].ministroViolao; });
+      if (!o.violao1) { o.violao1 = true; Object.keys(o.tipos).forEach(function (k) { if (!(+o.tipos[k].vagas["Violão"] > 0)) o.tipos[k].vagas["Violão"] = 1; }); }   // ministro que toca violão ocupa a vaga de violão
+      return o; }
+  } catch (e) {}
+  return padrao();
+}
+function salvar() { try { localStorage.setItem(CHAVE, JSON.stringify(S)); } catch (e) {} }
+S = carregar();
+
+// ====================================================================== serviços do período
+// Semana de escala = quinta a domingo. N semanas contam a partir da primeira quinta do período e terminam no domingo da última.
+// Se o primeiro dia cai de sexta a domingo, esses cultos entram antes como uma semana parcial.
+function periodoDatas() {
+  var ini = parseIso(S.periodo.inicio), nw = Math.max(1, Math.min(12, +S.periodo.semanas || 1));
+  var qui = addDias(ini, (4 - ini.getDay() + 7) % 7), fim = addDias(qui, (nw - 1) * 7 + 3);
+  return { ini: ini, qui: qui, fim: fim, n: Math.round((fim.getTime() - ini.getTime()) / 864e5) + 1 };
+}
+function nSemanas() { var d = parseIso(S.periodo.inicio).getDay(); return Math.max(1, Math.min(12, +S.periodo.semanas || 1)) + ((d === 5 || d === 6 || d === 0) ? 1 : 0); }
+function montarServicos() {
+  var out = [], pd = periodoDatas(), ini = pd.ini, n = pd.n;
+  for (var i = 0; i < n; i++) {
+    var d = addDias(ini, i);
+    ORDEM_TIPOS.forEach(function (k) {
+      var t = S.tipos[k];
+      if (!t.ativo || d.getDay() !== t.dow) return;
+      var sc = S.santaCeia && S.santaCeia.datas[iso(d)] && S.santaCeia.datas[iso(d)][k];
+      out.push({ id: iso(d) + "|" + k, data: iso(d), tipo: k, hora: t.hora, culto: sc ? "Santa Ceia" : t.culto, sc: !!sc, dow: d.getDay() });
+    });
+  }
+  out.sort(function (a, b) { return a.data < b.data ? -1 : a.data > b.data ? 1 : (a.hora < b.hora ? -1 : 1); });
+  var iniMs = ini.getTime();
+  var parcial = nSemanas() - Math.max(1, Math.min(12, +S.periodo.semanas || 1));   // 1 se há semana parcial antes da primeira quinta
+  out.forEach(function (s) { s.semana = Math.floor(Math.round((parseIso(s.data).getTime() - pd.qui.getTime()) / 864e5) / 7) + parcial; });
+  return out;
+}
+function nomeById(id) { var m = S.membros.filter(function (x) { return x.id === id; })[0]; return m ? m.nome : "?"; }
+function membroById(id) { return S.membros.filter(function (x) { return x.id === id; })[0] || null; }
+
+// indisponibilidade: devolve o motivo (texto) ou null
+function indisponivel(mid, s) {
+  for (var i = 0; i < S.indisp.length; i++) {
+    var e = S.indisp[i];
+    if (e.membro !== mid) continue;
+    if (e.tipo === "culto" && e.data === s.data && e.cultoTipo === s.tipo) return e.motivo || "indisponível neste culto";
+    if (e.tipo === "periodo" && s.data >= e.de && s.data <= (e.ate || e.de)) return e.motivo || "ausente no período";
+    if (e.tipo === "semanal" && e.dias.indexOf(s.dow) >= 0 && (!e.tipos || !e.tipos.length || e.tipos.indexOf(s.tipo) >= 0)) return e.motivo || "não pode neste dia";
+  }
+  return null;
+}
+
+// ====================================================================== gerador
+// Santa Ceia da NOITE: ministram só os marcados com o flag "Santa Ceia", em rodízio. Cada mês a vez avança um nome;
+// com dois nomes, eles se alternam de um mês para o outro. A Santa Ceia da manhã não tem restrição (segue as regras normais).
+var FX = {};   // travas efetivas (regra + escolhas manuais). "" = vaga travada (não preencher sozinho)
+function ministrosSantaCeia() {
+  return S.membros.filter(function (m) { return m.santaCeia && m.ativo && !m.convidado; })
+    .sort(function (a, b) { return a.nome.localeCompare(b.nome, "pt"); });
+}
+function regraSantaCeia(servicos) {
+  var sc = S.santaCeia, fix = {}, avisos = [], L = ministrosSantaCeia();
+  var datas = [];
+  servicos.forEach(function (s) { if (s.sc && datas.indexOf(s.data) < 0) datas.push(s.data); });
+  datas.sort();
+  if (!datas.length) return { fix: fix, avisos: avisos };
+  if (L.length < 2) { avisos.push("Marque pelo menos dois ministros de Santa Ceia na aba Membros."); return { fix: fix, avisos: avisos }; }
+  var off = Math.max(0, L.map(function (m) { return m.id; }).indexOf(sc.inicia));
+  datas.forEach(function (d, i) {
+    var manha = servicos.filter(function (s) { return s.data === d && s.tipo === "dom1" && s.sc; })[0];
+    var noite = servicos.filter(function (s) { return s.data === d && s.tipo === "dom2" && s.sc; })[0];
+    var itens = [noite].map(function (s) { return s ? { s: s, j: 1 } : null; }).filter(Boolean), usados = {};
+    // quem pode menos escolhe primeiro (ex.: quem só ministra de manhã)
+    function elegiveis(s) { return L.filter(function (m) { return permitido(m, s, "Ministro") && !indisponivel(m.id, s); }).length; }
+    itens.sort(function (a, b) { return elegiveis(a.s) - elegiveis(b.s) || a.j - b.j; });
+    itens.forEach(function (it) {
+      var s = it.s;
+      if (!(+S.tipos[s.tipo].vagas.Ministro > 0)) return;
+      var rot = dm(parseIso(s.data)) + " " + S.tipos[s.tipo].rotulo.toLowerCase();
+      var da_vez = (off + i) % L.length, escolhido = null, motivo = "";
+      for (var t = 0; t < L.length; t++) {            // a vez; se não puder, o próximo da fila
+        var m = L[(da_vez + t) % L.length];
+        if (t === 0) motivo = usados[m.id] ? "" : (indisponivel(m.id, s) ? "não pôde" : (!permitido(m, s, "Ministro") ? "não ministra neste culto (veja a ficha)" : ""));
+        if (usados[m.id] || !permitido(m, s, "Ministro") || indisponivel(m.id, s)) continue;
+        escolhido = m;
+        if (t > 0 && motivo) avisos.push("Santa Ceia " + rot + ": " + L[da_vez].nome + " " + motivo + ", ficou com " + m.nome + ".");
+        break;
+      }
+      if (!escolhido) { avisos.push("Santa Ceia " + rot + ": nenhum ministro de Santa Ceia pode neste culto. Escolha à mão."); fix[s.id + "|Ministro|0"] = ""; return; }
+      usados[escolhido.id] = 1;
+      fix[s.id + "|Ministro|0"] = escolhido.id;
+    });
+  });
+  return { fix: fix, avisos: avisos };
+}
+function vagasDoServico(s) {
+  var t = S.tipos[s.tipo], v = [];
+  FUNCOES.forEach(function (f) { var n = Math.max(0, +t.vagas[f] || 0); for (var k = 0; k < n; k++) v.push({ role: f, k: k }); });
+  return v;
+}
+function candidatos(role, s) {
+  var t = S.tipos[s.tipo];
+  return S.membros.filter(function (m) {
+    if (!m.ativo || m.convidado || m.funcoes.indexOf(role) < 0 || indisponivel(m.id, s)) return false;
+    if (!permitido(m, s, role)) return false;                              // o que cada um pode fazer em cada culto
+    if (t.jovens === "so" && !m.jovem) return false;                       // culto só de jovens
+    return true;
+  });
+}
+// Ministro que toca violão ministra e toca no mesmo culto (a mesma pessoa ocupa as duas vagas)
+function podePar(m, s) { return !!m && !m.convidado && m.ativo && m.funcoes.indexOf("Violão") >= 0 && permitido(m, s, "Violão") && !indisponivel(m.id, s); }
+// Domingo à noite repete a equipe da quinta da mesma semana, com ajustes: quem não pode no domingo sai (ex.: outro baterista);
+// se o ministro da quinta não ministra no domingo, quem tocou violão na quinta ministra e o ministro da quinta vira back.
+function jaNoDia(escala, id, s) {   // a pessoa já serve em outro culto do mesmo dia (ex.: domingo de manhã)
+  for (var chave in FX) { if (FX[chave] === id && chave.indexOf(s.data + "|") === 0 && chave.indexOf(s.id + "|") !== 0) return true; }   // ou está travada nele (ex.: Santa Ceia da noite)
+  return escala.some(function (x) { return x.s.data === s.data && x.s.id !== s.id && FUNCOES.some(function (f) { return (x.slots[f] || []).indexOf(id) >= 0; }); });
+}
+function desejosDom(q, s, escala) {
+  var d = {}, usados = {}, t = S.tipos[s.tipo], vagas = t.vagas;
+  function ok(id, role) {
+    var m = id && membroById(id);
+    return !!m && !m.convidado && m.ativo && m.funcoes.indexOf(role) >= 0 && !indisponivel(id, s) && permitido(m, s, role) && !(t.jovens === "so" && !m.jovem) && (S.regras.domDuplo || !jaNoDia(escala, id, s));
+  }
+  var minQ = (q.slots.Ministro || []).filter(Boolean), vioQ = (q.slots["Violão"] || []).filter(Boolean), fila = [], k = 0;
+  minQ.concat(vioQ).forEach(function (id) { if (fila.indexOf(id) < 0) fila.push(id); });
+  fila.forEach(function (id) { if (k < (+vagas.Ministro || 0) && ok(id, "Ministro") && !usados[id]) { d["Ministro|" + k++] = id; usados[id] = 1; } });
+  FUNCOES.forEach(function (f) {
+    if (f === "Ministro") return;
+    var lista = (q.slots[f] || []).filter(Boolean).slice(), kk = 0;
+    if (f === "Vocal") minQ.forEach(function (id) { if (lista.indexOf(id) < 0) lista.push(id); });   // ministro da quinta que não ministra vira back
+    lista.forEach(function (id) { if (kk < (+vagas[f] || 0) && !usados[id] && ok(id, f)) { d[f + "|" + kk++] = id; usados[id] = 1; } });
+  });
+  return d;
+}
+// ---- escala anterior (colada da planilha): serve de base para a próxima
+var COLS_ANT = [["Ministro", 4], ["Ministro", 5], ["Vocal", 6], ["Vocal", 7], ["Vocal", 8], ["Violão", 9], ["Teclado", 10], ["Guitarra", 11], ["Baixo", 12], ["Bateria", 13]];
+function anteriorItens() {
+  var a = S.anterior; if (!a || !a.itens) return [];
+  return a.itens.map(function (x) { return { s: { id: x.data + "|" + x.tipo, data: x.data, tipo: x.tipo, sc: !!x.sc, semana: -1 }, slots: x.slots }; });
+}
+function parseAnterior(texto) {
+  var ini = parseIso(S.periodo.inicio), porNome = {}, itens = [], desconhecidos = {}, ignoradas = 0;
+  S.membros.forEach(function (m) { if (!m.convidado) porNome[norm(m.nome)] = m.id; });
+  String(texto || "").split(/\r?\n/).forEach(function (linha) {
+    if (!linha.trim()) return;
+    var cel = linha.indexOf("\t") >= 0 ? linha.split("\t") : linha.split(/;/);
+    cel = cel.map(function (c) { return c.trim(); });
+    var i0 = -1;
+    for (var i = 0; i < cel.length; i++) { if (/^\d{1,2}\/\d{1,2}$/.test(cel[i])) { i0 = i; break; } }
+    if (i0 < 0) return;
+    var dd = cel[i0].split("/"), ano = ini.getFullYear(), d = new Date(ano, +dd[1] - 1, +dd[0], 12, 0, 0);
+    if (d.getTime() >= ini.getTime()) d = new Date(ano - 1, +dd[1] - 1, +dd[0], 12, 0, 0);
+    if ((ini.getTime() - d.getTime()) / 864e5 > 90) { ignoradas++; return; }
+    var dow = d.getDay(), hora = cel[i0 + 2] || "", h = parseInt(hora, 10), tipo = dow === 4 ? "qui" : dow === 6 ? "sab" : dow === 0 ? (h >= 0 && h < 12 ? "dom1" : "dom2") : "";
+    if (!tipo) return;
+    var slots = {}, algum = false;
+    FUNCOES.forEach(function (f) { slots[f] = []; });
+    COLS_ANT.forEach(function (c) {
+      String(cel[i0 + c[1] - 0] || "").split(/[,\/;]/).forEach(function (nome) {
+        nome = nome.trim(); if (!nome) return;
+        var id = porNome[norm(nome)];
+        if (id) { slots[c[0]].push(id); algum = true; } else desconhecidos[nome] = 1;
+      });
+    });
+    if (!algum) return;
+    itens.push({ data: iso(d), tipo: tipo, sc: /santa ceia/i.test(cel[i0 + 3] || ""), slots: slots });
+  });
+  itens.sort(function (a, b) { return a.data < b.data ? -1 : a.data > b.data ? 1 : (a.tipo < b.tipo ? -1 : 1); });
+  return { itens: itens, desconhecidos: Object.keys(desconhecidos), ignoradas: ignoradas };
+}
+function quintaDaSemana(escala, s) {
+  var q = null, t = parseIso(s.data).getTime();   // a quinta mais recente, nos 6 dias anteriores
+  escala.forEach(function (x) { var dias = (t - parseIso(x.s.data).getTime()) / 864e5; if (x.s.tipo === "qui" && dias > 0 && dias <= 6) q = x; });
+  if (!q) anteriorItens().forEach(function (x) { var dias = (t - parseIso(x.s.data).getTime()) / 864e5; if (x.s.tipo === "qui" && dias > 0 && dias <= 6) q = x; });   // a quinta veio da escala anterior
+  return q;
+}
+function pesoDe(m, f) {   // prioridade por função: quanto mais alta, mais vezes entra naquela função
+  if (!m) return 1;
+  var p = m.prioFn && f ? +m.prioFn[f] : 0;
+  if (!(p > 0)) p = +m.prioridade;
+  return p > 0 ? p : 1;
+}
+function pesoMedio(m, porFuncao) {   // peso do membro ponderado pelo que ele realmente faz na escala
+  var soma = 0, n = 0;
+  FUNCOES.forEach(function (f) { var c = porFuncao[m.id + "|" + f] || 0; soma += c * pesoDe(m, f); n += c; });
+  return n ? soma / n : 1;
+}
+function semBack(it) { return (it.slots.Ministro || []).some(function (id) { var m = id && membroById(id); return !!(m && m.semBack); }); }
+function afinidadeExclusiva(m) { return !!(m && m.afinidade && m.afinidade.length && !m.afinidadeSoft); }
+function afinidadeOk(m, it) {   // back com afinidade exclusiva só serve com os ministros marcados
+  if (!afinidadeExclusiva(m)) return true;
+  return (it.slots.Ministro || []).some(function (x) { return x && m.afinidade.indexOf(x) >= 0; });
+}
+function curinga() { return S.membros.filter(function (m) { return m.convidado && m.ativo; })[0] || null; }
+
+function tentar(servicos, rnd) {
+  var R = S.regras, nSem = nSemanas();
+  var limiteSemanas = Math.max(1, nSem - Math.max(0, +R.folgas || 0));
+  var cont = {}, semCont = {}, semanasUsadas = {}, ultimo = {}, flexMemo = {};
+  anteriorItens().forEach(function (x) { FUNCOES.forEach(function (f) { (x.slots[f] || []).forEach(function (id) { if (id) (ultimo[id] = ultimo[id] || []).push(parseIso(x.s.data).getTime()); }); }); });
+  var escala = servicos.map(function (s) { return { s: s, slots: {} }; });
+  var custo = 0, usoConv = 0, vazias = 0, estouro = 0, itAtual = null;
+
+  function flex(m) {
+    if (flexMemo[m.id] == null) flexMemo[m.id] = m.funcoes.length;
+    return flexMemo[m.id];
+  }
+  escala.forEach(function (it) {
+    var s = it.s, ocupados = {}, vagas = vagasDoServico(s); itAtual = it;
+    var desejos = null;
+    if (S.regras.copiaQuinta !== false && s.tipo === "dom2") { var qd = quintaDaSemana(escala, s); if (qd) desejos = desejosDom(qd, s, escala); }
+    FUNCOES.forEach(function (f) { it.slots[f] = []; });
+    // travas manuais primeiro
+    var livres = [];
+    vagas.forEach(function (v) {
+      var chave = s.id + "|" + v.role + "|" + v.k, fx = FX[chave];
+      if (fx !== undefined && (fx === "" || membroById(fx))) { it.slots[v.role][v.k] = fx || null; if (fx) { ocupados[fx] = 1; registra(fx, s); } }
+      else livres.push(v);
+    });
+    // mais difíceis primeiro (menos candidatos)
+    function livreNoDia(m, role) { return !ocupados[m.id] && (R.domDuplo || !jaNoDia(escala, m.id, s)) && (role !== "Vocal" || afinidadeOk(m, it)); }
+    livres.forEach(function (v) { v.n = candidatos(v.role, s).filter(function (m) { return livreNoDia(m, v.role); }).length; v.r = rnd(); });
+    livres.sort(function (a, b) { return (a.role === "Ministro" ? 0 : 1) - (b.role === "Ministro" ? 0 : 1) || a.n - b.n || a.r - b.r; });
+    livres.forEach(function (v) {
+      if (v.role === "Vocal" && semBack(it)) { it.slots.Vocal[v.k] = null; return; }   // ministro que não quer back
+      if (v.role === "Violão") {
+        var par = (it.slots.Ministro || []).map(function (id) { return id && membroById(id); }).filter(function (m) { return podePar(m, s) && it.slots["Violão"].indexOf(m.id) < 0; })[0];
+        if (par) { it.slots["Violão"][v.k] = par.id; return; }
+      }
+      var cs = candidatos(v.role, s).filter(function (m) { return livreNoDia(m, v.role); });
+      var ok = cs.filter(function (m) { return (semCont[m.id + "|" + s.semana] || 0) < R.maxSemana; });
+      var escolhido = null, forcou = false, des = desejos && desejos[v.role + "|" + v.k], pref = des && ok.filter(function (m) { return m.id === des; })[0];
+      if (pref) escolhido = pref;
+      else if (ok.length) escolhido = melhor(ok, s, v);
+      else if (cs.length && !(R.convidado && curinga() && curinga().funcoes.indexOf(v.role) >= 0)) { escolhido = melhor(cs, s, v); forcou = true; }
+      if (!escolhido && R.convidado) {
+        var c = curinga();
+        if (c && c.funcoes.indexOf(v.role) >= 0) { it.slots[v.role][v.k] = c.id; usoConv++; return; }
+      }
+      if (!escolhido && cs.length) { escolhido = melhor(cs, s, v); forcou = true; }
+      if (!escolhido) { it.slots[v.role][v.k] = null; vazias++; return; }
+      if (forcou) estouro++;
+      it.slots[v.role][v.k] = escolhido.id; ocupados[escolhido.id] = 1; registra(escolhido.id, s);
+    });
+  });
+  function registra(id, s) {
+    cont[id] = (cont[id] || 0) + 1;
+    semCont[id + "|" + s.semana] = (semCont[id + "|" + s.semana] || 0) + 1;
+    (semanasUsadas[id] = semanasUsadas[id] || {})[s.semana] = 1;
+    ultimo[id] = ultimo[id] || [];
+    ultimo[id].push(parseIso(s.data).getTime());
+  }
+  function melhor(lista, s, v) {
+    var t = parseIso(s.data).getTime(), best = null, bs = 1e9;
+    lista.forEach(function (m) {
+      var sc = ((cont[m.id] || 0) * 10 + (semCont[m.id + "|" + s.semana] || 0) * 8) / pesoDe(m, v.role);
+      (ultimo[m.id] || []).forEach(function (u) {
+        var dias = Math.abs(t - u) / 864e5;
+        if (dias <= 1) sc += (dias === 0 ? (R.domDuplo ? 6 : 40) : 14);
+        else if (dias <= 3) sc += 5; else if (dias <= 7) sc += 1.5;
+      });
+      var semanas = Object.keys(semanasUsadas[m.id] || {}).length;
+      if (!(semanasUsadas[m.id] || {})[s.semana] && semanas >= limiteSemanas) sc += 90; // folga mínima do período
+      if (S.tipos[s.tipo].jovens === "prefere" && !m.jovem) sc += 25;
+      if (v.role === "Ministro" && S.tipos[s.tipo].ministroViolao && m.funcoes.indexOf("Violão") < 0) sc += 35;   // preferência: ministro que toca violão
+      if (v.role === "Vocal" && m.afinidade && m.afinidade.length && itAtual) sc += (itAtual.slots.Ministro || []).some(function (x) { return x && m.afinidade.indexOf(x) >= 0; }) ? -20 : 15;   // back fica com o ministro de afinidade
+      if (v.role === "Violão" && itAtual) sc += (itAtual.slots.Ministro || []).some(function (x) { var mm = x && membroById(x); return mm && mm.violonistas && mm.violonistas.indexOf(m.id) >= 0; }) ? -25 : 0;   // violonista de quem ministra
+      sc += flex(m) * 0.5 + rnd() * 5;
+      if (sc < bs) { bs = sc; best = m; }
+    });
+    return best;
+  }
+  return { escala: escala };
+}
+
+// Custo de uma escala inteira (menor é melhor): vagas e conflitos pesam muito; o resto é equilíbrio e folga.
+function custoDe(escala) {
+  var R = S.regras, nSem = nSemanas(), limite = Math.max(1, nSem - Math.max(0, +R.folgas || 0));
+  var cont = {}, semCont = {}, usadas = {}, tempos = {}, uso = 0, vazias = 0, ruim = 0, porFuncao = {}, backIndevido = 0, afinViol = 0;
+  escala.forEach(function (it) {
+    var t = parseIso(it.s.data).getTime(), vistos = {};
+    FUNCOES.forEach(function (f) {
+      (it.slots[f] || []).forEach(function (id) {
+        if (!id) { if (!(f === "Vocal" && semBack(it))) vazias++; return; }
+        var m = membroById(id); if (!m) return;
+        if (m.convidado) { uso++; return; }
+        if (f === "Violão" && (it.slots.Ministro || []).indexOf(id) >= 0 && m.funcoes.indexOf("Violão") >= 0) return;   // ministro que toca violão
+        if (vistos[id]) ruim++;
+        vistos[id] = 1;
+        if (indisponivel(id, it.s)) ruim++;
+        cont[id] = (cont[id] || 0) + 1;
+        porFuncao[id + "|" + f] = (porFuncao[id + "|" + f] || 0) + 1;
+        if (f === "Vocal" && semBack(it)) backIndevido++;
+        semCont[id + "|" + it.s.semana] = (semCont[id + "|" + it.s.semana] || 0) + 1;
+        (usadas[id] = usadas[id] || {})[it.s.semana] = 1;
+        (tempos[id] = tempos[id] || []).push(t);
+      });
+    });
+  });
+  var repete = 0, ultimoSlot = {};
+  anteriorItens().forEach(function (x) { FUNCOES.forEach(function (f) { (x.slots[f] || []).forEach(function (id, k) { if (id) ultimoSlot[x.s.tipo + "|" + f + "|" + k] = id; }); }); });   // mesma pessoa na mesma vaga do mesmo culto em semanas seguidas: dá um pouco de custo, para variar
+  escala.forEach(function (it) {
+    FUNCOES.forEach(function (f) {
+      (it.slots[f] || []).forEach(function (id, k) {
+        if (!id) return; var m = membroById(id); if (!m || m.convidado) return;
+        var chave = it.s.tipo + "|" + f + "|" + k;
+        if (ultimoSlot[chave] === id) repete++;
+        ultimoSlot[chave] = id;
+      });
+    });
+  });
+  var quadFuncao = 0;   // reveza dentro de cada função (principalmente Ministro)
+  Object.keys(porFuncao).forEach(function (k) { quadFuncao += porFuncao[k] * porFuncao[k] * (k.split("|")[1] === "Ministro" ? 5 : 2) / pesoDe(membroById(k.split("|")[0]), k.split("|")[1]); });
+  var semViolao = 0;
+  escala.forEach(function (it) {
+    if (!S.tipos[it.s.tipo].ministroViolao) return;
+    (it.slots.Ministro || []).forEach(function (id) { var m = id && membroById(id); if (m && !m.convidado && m.funcoes.indexOf("Violão") < 0) semViolao++; });
+  });
+  var semPar = 0, semAfin = 0;
+  escala.forEach(function (it) {
+    var ms = (it.slots.Ministro || []).filter(Boolean), vs = it.slots["Violão"] || [];
+    var pos = ms.filter(function (id) { return podePar(membroById(id), it.s); }).length, nv = Math.max(0, +S.tipos[it.s.tipo].vagas["Violão"] || 0);
+    var want = Math.min(pos, nv), got = vs.filter(function (id) { return id && ms.indexOf(id) >= 0; }).length;
+    if (got < want) semPar += want - got;
+    ms.forEach(function (idM) {
+      var mm = membroById(idM); if (!mm || !mm.violonistas || !mm.violonistas.length || podePar(mm, it.s)) return;
+      if (!vs.some(function (x) { return x && mm.violonistas.indexOf(x) >= 0; })) semAfin += 1.4;
+    });
+    (it.slots.Vocal || []).forEach(function (id) {
+      var m = id && membroById(id); if (!m || m.convidado || !m.afinidade || !m.afinidade.length) return;
+      if (!ms.some(function (x) { return m.afinidade.indexOf(x) >= 0; })) { if (afinidadeExclusiva(m)) afinViol++; else semAfin++; }
+    });
+  });
+  var doisNoDia = 0;
+  if (!R.domDuplo) { var porDia = {}; escala.forEach(function (it) { var vis = {}; FUNCOES.forEach(function (f) { (it.slots[f] || []).forEach(function (id) { if (!id || vis[id]) return; vis[id] = 1; var m = membroById(id); if (!m || m.convidado) return; var k = it.s.data + "|" + id; porDia[k] = (porDia[k] || 0) + 1; if (porDia[k] > 1) doisNoDia++; }); }); }); }
+  var copia = 0;
+  if (R.copiaQuinta !== false) escala.forEach(function (it) {
+    if (it.s.tipo !== "dom2") return;
+    var q = quintaDaSemana(escala, it.s); if (!q) return;
+    var d = desejosDom(q, it.s, escala);
+    Object.keys(d).forEach(function (key) { var p = key.split("|"); if (p[0] === "Vocal" && semBack(it)) return; if ((it.slots[p[0]] || [])[+p[1]] !== d[key]) copia++; });
+  });
+  anteriorItens().forEach(function (x) { var t0 = parseIso(x.s.data).getTime(); FUNCOES.forEach(function (f) { (x.slots[f] || []).forEach(function (id) { if (id) (tempos[id] = tempos[id] || []).push(t0); }); }); });
+  var estouro = 0, folga = 0, quad = 0, perto = 0, naoJovem = 0;
+  escala.forEach(function (it) { if (S.tipos[it.s.tipo].jovens !== "prefere") return; FUNCOES.forEach(function (f) { (it.slots[f] || []).forEach(function (id) { var m = id && membroById(id); if (m && !m.convidado && !m.jovem) naoJovem++; }); }); });
+  Object.keys(semCont).forEach(function (k) { if (semCont[k] > R.maxSemana) estouro += semCont[k] - R.maxSemana; });
+  var memb = S.membros.filter(function (m) { return m.ativo && !m.convidado; });
+  memb.forEach(function (m) {
+    var c = cont[m.id] || 0; quad += c * c / pesoMedio(m, porFuncao);
+    var n = Object.keys(usadas[m.id] || {}).length; if (n > limite) folga += n - limite;
+    var ts = (tempos[m.id] || []).slice().sort(function (a, b) { return a - b; });
+    for (var i = 1; i < ts.length; i++) {
+      var dias = (ts[i] - ts[i - 1]) / 864e5;
+      if (dias === 0) perto += R.domDuplo ? 6 : 40; else if (dias <= 1) perto += 14; else if (dias <= 3) perto += 4;
+    }
+  });
+  return ruim * 5000 + vazias * 1000 + estouro * 250 + uso * 200 + folga * 120 + naoJovem * 8 + semViolao * 12 + doisNoDia * 600 + backIndevido * 500 + afinViol * 800 + semPar * 40 + semAfin * 18 + copia * 14 + repete * 6 + quadFuncao + perto + quad * 3;
+}
+
+// Melhora a escala trocando pessoas, uma vaga por vez, enquanto o custo cair.
+function melhorar(escala) {
+  var atual = custoDe(escala), mudou = true, passo = 0;
+  while (mudou && passo < 8) {
+    mudou = false; passo++;
+    escala.forEach(function (it) {
+      vagasDoServico(it.s).forEach(function (v) {
+        var chave = it.s.id + "|" + v.role + "|" + v.k;
+        if (FX[chave] !== undefined) return;
+        var ocupados = {};
+        FUNCOES.forEach(function (f) { (it.slots[f] || []).forEach(function (id, k) { if (id && !(f === v.role && k === v.k)) ocupados[id] = 1; }); });
+        if (v.role === "Violão") (it.slots.Ministro || []).forEach(function (id) { if (id && podePar(membroById(id), it.s)) delete ocupados[id]; });
+        var original = it.slots[v.role][v.k];
+        var opcoes = candidatos(v.role, it.s).filter(function (m) { return !ocupados[m.id] && m.id !== original && (S.regras.domDuplo || !jaNoDia(escala, m.id, it.s)) && (v.role !== "Vocal" || afinidadeOk(m, it)); });
+        var c0 = curinga(); if (S.regras.convidado && c0 && c0.funcoes.indexOf(v.role) >= 0 && c0.id !== original) opcoes.push(c0);
+        opcoes.push({ id: null });
+        var melhorId = original, melhorCusto = atual;
+        opcoes.forEach(function (m) {
+          if (m.id === original) return;
+          it.slots[v.role][v.k] = m.id;
+          var c = custoDe(escala);
+          if (c < melhorCusto - 1e-9) { melhorCusto = c; melhorId = m.id; }
+        });
+        it.slots[v.role][v.k] = melhorId;
+        if (melhorCusto < atual - 1e-9) { atual = melhorCusto; mudou = true; }
+      });
+    });
+  }
+  return atual;
+}
+
+function gerar() {
+  var servicos = montarServicos();
+  if (!servicos.length) return null;
+  var regra = regraSantaCeia(servicos);
+  FX = {}; var k0;
+  for (k0 in regra.fix) FX[k0] = regra.fix[k0];
+  for (k0 in S.fixos) FX[k0] = S.fixos[k0];       // escolhas manuais valem mais que a regra
+  S.regraFix = regra.fix; S.avisosRegra = regra.avisos;
+  var n = Math.max(20, +S.regras.tentativas || 300), best = null, bestC = Infinity, seed = Date.now() % 100000;
+  for (var i = 0; i < n; i++) {
+    var r = tentar(servicos, mulberry(seed + i * 7919)), c = custoDe(r.escala);
+    if (c < bestC) { bestC = c; best = r; }
+  }
+  melhorar(best.escala);
+  return best.escala.map(function (it) { return { id: it.s.id, data: it.s.data, tipo: it.s.tipo, hora: it.s.hora, culto: it.s.culto, sc: it.s.sc, dow: it.s.dow, semana: it.s.semana, slots: it.slots }; });
+}
+
+// ====================================================================== avaliação (alertas e carga)
+function avaliar() {
+  var alertas = [], carga = {}, porSemana = {};
+  var memb = S.membros.filter(function (m) { return m.ativo && !m.convidado; });
+  memb.forEach(function (m) { carga[m.id] = { total: 0, sem: {} }; });
+  var nSem = nSemanas();
+  if (!S.regras.domDuplo) {
+    var dd = {};
+    (S.escala || []).forEach(function (it) { var vis = {}; FUNCOES.forEach(function (f) { (it.slots[f] || []).forEach(function (id) { var m = id && membroById(id); if (!m || m.convidado || vis[id]) return; vis[id] = 1; var k = it.data + "|" + id; if (dd[k]) alertas.push({ n: "warn", t: m.nome + " serve nos dois cultos de " + dm(parseIso(it.data)) }); dd[k] = 1; }); }); });
+  }
+  (S.escala || []).forEach(function (it) {
+    var vistos = {};
+    FUNCOES.forEach(function (f) {
+      (it.slots[f] || []).forEach(function (id, k) {
+        var rot = dm(parseIso(it.data)) + " " + (it.culto || S.tipos[it.tipo].culto);
+        if (!id) { if (k < (+S.tipos[it.tipo].vagas[f] || 0) && !(f === "Vocal" && semBack(it))) alertas.push({ n: "bad", t: "Vaga sem ninguém: " + ROTULO[f] + " em " + rot }); return; }
+        var m = membroById(id);
+        if (!m) return;
+        var par = !m.convidado && f === "Violão" && (it.slots.Ministro || []).indexOf(id) >= 0 && m.funcoes.indexOf("Violão") >= 0;
+        if (!m.convidado) { if (vistos[id] && !par) alertas.push({ n: "bad", t: m.nome + " aparece duas vezes em " + rot }); vistos[id] = 1; }
+        var mot = !m.convidado && indisponivel(id, it);
+        if (mot) alertas.push({ n: "bad", t: m.nome + " está indisponível em " + rot + " (" + mot + ")" });
+        if (m.funcoes.indexOf(f) < 0) alertas.push({ n: "warn", t: m.nome + " não tem a função " + ROTULO[f] + " (" + rot + ")" });
+        if (!m.convidado && !permitido(m, it, f)) alertas.push({ n: "warn", t: m.nome + " não faz " + ROTULO[f] + " neste culto (" + rot + ")" });
+        if (par) return;   // ministra e toca violão: conta uma vez só
+        if (!m.convidado && f === "Vocal" && semBack(it)) alertas.push({ n: "warn", t: m.nome + " está de back, mas o ministro desse culto não quer back (" + rot + ")" });
+        if (!m.convidado && f === "Vocal" && !afinidadeOk(m, it)) alertas.push({ n: "warn", t: m.nome + " só faz back com os ministros marcados na ficha (" + rot + ")" });
+        if (!m.convidado && f === "Ministro" && S.tipos[it.tipo].ministroViolao && m.funcoes.indexOf("Violão") < 0) alertas.push({ n: "warn", t: m.nome + " ministra, mas não toca violão (" + rot + ")" });
+        if (!m.convidado && S.tipos[it.tipo].jovens === "so" && !m.jovem) alertas.push({ n: "warn", t: m.nome + " não é jovem, e este culto é só de jovens (" + rot + ")" });
+        if (m.convidado) { alertas.push({ n: "warn", t: "Convidado no lugar de " + ROTULO[f] + " em " + rot }); return; }
+        if (!m.ativo) alertas.push({ n: "warn", t: m.nome + " está inativo (" + rot + ")" });
+        if (!carga[id]) carga[id] = { total: 0, sem: {} };
+        carga[id].total++; carga[id].sem[it.semana] = (carga[id].sem[it.semana] || 0) + 1;
+      });
+    });
+  });
+  (S.avisosRegra || []).forEach(function (t) { alertas.push({ n: "warn", t: t }); });
+  Object.keys(carga).forEach(function (id) {
+    var c = carga[id], m = membroById(id);
+    Object.keys(c.sem).forEach(function (w) {
+      if (c.sem[w] > S.regras.maxSemana) alertas.push({ n: "warn", t: m.nome + " tem " + c.sem[w] + " cultos na semana " + (+w + 1) + " (máximo " + S.regras.maxSemana + ")" });
+    });
+    var usadas = Object.keys(c.sem).length;
+    if (usadas > nSem - S.regras.folgas) alertas.push({ n: "warn", t: m.nome + " serve em " + usadas + " de " + nSem + " semanas (folga mínima: " + S.regras.folgas + ")" });
+  });
+  return { alertas: alertas, carga: carga };
+}
+
+// ====================================================================== UI: abas
+function abrirAba(nome) {
+  $$(".tab").forEach(function (b) { b.setAttribute("aria-selected", String(b.dataset.tab === nome)); });
+  ["membros", "gerar", "exportar"].forEach(function (t) { $("#tab-" + t).hidden = t !== nome; });
+  if (nome === "gerar") renderGerar();
+  if (nome === "exportar") renderExport();
+}
+$$(".tab").forEach(function (b) { b.addEventListener("click", function () { abrirAba(b.dataset.tab); }); });
+
+// ---------------------------------------------------------------- período
+function renderPeriodo() {
+  $("#pInicio").value = S.periodo.inicio; $("#pSemanas").value = S.periodo.semanas;
+  var sv = montarServicos();
+  $("#pResumo").textContent = sv.length ? sv.length + " cultos de " + dm(parseIso(sv[0].data)) + " a " + dm(parseIso(sv[sv.length - 1].data)) + " (semanas de quinta a domingo)" : "Nenhum culto no período (veja os tipos de culto ativos na aba 3).";
+}
+$("#pInicio").addEventListener("change", function () { if (this.value) { S.periodo.inicio = this.value; S.escala = null; salvar(); renderPeriodo(); renderSC(); } });
+$("#pSemanas").addEventListener("change", function () { S.periodo.semanas = Math.max(1, Math.min(12, +this.value || 1)); S.escala = null; salvar(); renderPeriodo(); renderSC(); });
+
+// ---------------------------------------------------------------- 1. membros
+function resumoMembro(m) {
+  var tags = [];
+  if (m.jovem) tags.push('<span class="tag ok">Jovem</span>');
+  if (m.santaCeia) tags.push('<span class="tag ok">Santa Ceia</span>');
+  var restr = Object.keys(m.nao || {}).filter(function (k) { return m.nao[k] && m.funcoes.indexOf(k.split("|")[1]) >= 0; }).length;
+  if (restr) tags.push('<span class="tag warn" title="Combinações de culto e função que a pessoa não faz">' + restr + ' restrição(ões)</span>');
+  var ind = S.indisp.filter(function (e) { return e.membro === m.id; }).length;
+  if (ind) tags.push('<span class="tag bad">' + ind + ' indisp.</span>');
+  if (m.funcoes.indexOf("Ministro") >= 0 && !m.convidado && CHAVES_TIPO.every(function (k) { return m.nao && m.nao[k + "|Ministro"]; })) tags.push('<span class="tag warn" title="Não ministra em nenhum culto: abra a ficha e marque onde pode">revisar</span>');
+  return tags.join(" ") || '<span class="muted">—</span>';
+}
+function resumoPrioridade(m) {
+  var r = FUNCOES.filter(function (f) { return m.funcoes.indexOf(f) >= 0 && pesoDe(m, f) !== 1; }).map(function (f) {
+    var p = pesoDe(m, f);
+    return '<span class="tag ' + (p > 1 ? "ok" : "warn") + '">' + ROTULO[f] + ': ' + (p === 0.5 ? "baixa" : p === 2 ? "alta" : p === 3 ? "máxima" : p) + '</span>';
+  });
+  return r.length ? r.join(" ") : '<span class="muted">normal</span>';
+}
+var mostrarInativos = false;
+function renderMembros() {
+  var tb = $("#tbMembros tbody"), inativos = S.membros.filter(function (m) { return !m.ativo; }).length;
+  var ordem = S.membros.filter(function (m) { return m.ativo; });
+  var cab = inativos ? '<tr class="grupo"><td colspan="6"><button class="btn small" id="btnInativos" type="button" aria-expanded="' + mostrarInativos + '">' + (mostrarInativos ? "▾" : "▸") + ' Inativos (' + inativos + ')</button></td></tr>' : "";
+  ordem = ordem.concat(S.membros.filter(function (m) { return !m.ativo; }));
+  var corte = ordem.length - inativos;
+  tb.innerHTML = ordem.map(function (m, idx) {
+    var chips = FUNCOES.map(function (f) {
+      return '<span class="chip' + (m.funcoes.indexOf(f) >= 0 ? " on" : "") + '" role="button" tabindex="0" data-f="' + f + '" data-id="' + m.id + '">' + ROTULO[f] + '</span>';
+    }).join("");
+    return (idx === corte && cab ? cab : "") + '<tr class="' + (m.ativo ? "" : "inativo") + '" data-id="' + m.id + '"' + (!m.ativo && !mostrarInativos ? " hidden" : "") + '>' +
+      '<td><input type="text" class="nome-in" value="' + esc(m.nome) + '" data-id="' + m.id + '"' + (m.convidado ? ' title="Curinga: usado só quando faltar gente"' : "") + '>' + (m.convidado ? ' <span class="tag warn">curinga</span>' : "") + '</td>' +
+      '<td>' + chips + '</td>' +
+      '<td>' + resumoMembro(m) + '</td>' +
+      '<td>' + resumoPrioridade(m) + '</td>' +
+      '<td><input type="checkbox" class="ativo-in" data-id="' + m.id + '"' + (m.ativo ? " checked" : "") + ' aria-label="Ativo"></td>' +
+      '<td style="white-space:nowrap"><button class="btn small primary" data-edit="' + m.id + '" type="button">Abrir ficha</button> <button class="btn small danger" data-del="' + m.id + '" type="button">Remover</button></td></tr>';
+  }).join("");
+}
+$("#tbMembros").addEventListener("click", function (e) {
+  var chip = e.target.closest(".chip"), del = e.target.closest("[data-del]"), ed = e.target.closest("[data-edit]");
+  if (e.target.closest("#btnInativos")) { mostrarInativos = !mostrarInativos; renderMembros(); return; }
+  if (ed) { abrirMembro(ed.dataset.edit); return; }
+  if (chip) { toggleFuncao(chip.dataset.id, chip.dataset.f); renderMembros(); return; }
+  if (del && confirm("Remover " + nomeById(del.dataset.del) + "? As indisponibilidades dessa pessoa também saem.")) {
+    S.membros = S.membros.filter(function (m) { return m.id !== del.dataset.del; });
+    S.indisp = S.indisp.filter(function (x) { return x.membro !== del.dataset.del; }); S.escala = null; salvar(); renderMembros();
+  }
+});
+$("#tbMembros").addEventListener("keydown", function (e) { if ((e.key === "Enter" || e.key === " ") && e.target.classList.contains("chip")) { e.preventDefault(); e.target.click(); } });
+$("#tbMembros").addEventListener("change", function (e) {
+  var t = e.target;
+  if (t.classList.contains("nome-in")) { var m = membroById(t.dataset.id); m.nome = t.value.trim() || m.nome; salvar(); renderMembros(); }
+  if (t.classList.contains("ativo-in")) { membroById(t.dataset.id).ativo = t.checked; S.escala = null; salvar(); renderMembros(); }
+});
+function toggleFuncao(id, f) {
+  var m = membroById(id), i = m.funcoes.indexOf(f);
+  if (i >= 0) m.funcoes.splice(i, 1); else m.funcoes.push(f);
+  if (m.funcoes.indexOf("Ministro") < 0) m.santaCeia = false;
+  S.escala = null; salvar();
+}
+$("#btnAddMembro").addEventListener("click", function () {
+  var n = $("#novoNome").value.trim(); if (!n) return;
+  var novo = { id: uid(), nome: n, funcoes: [], ativo: true, convidado: false, santaCeia: false, jovem: false, nao: {} };
+  S.membros.push(novo); $("#novoNome").value = ""; salvar(); renderMembros(); abrirMembro(novo.id);
+});
+$("#btnColar").addEventListener("click", function () {
+  var linhas = $("#colarMembros").value.split(/\r?\n/).map(function (l) { return l.trim(); }).filter(Boolean), add = 0;
+  linhas.forEach(function (l) {
+    var p = l.split(";"), nome = p[0].trim(); if (!nome) return;
+    var fs = (p[1] || "").split(",").map(function (x) {
+      var n = norm(x); if (n === "back") n = "vocal";
+      return FUNCOES.filter(function (f) { return norm(f) === n; })[0];
+    }).filter(Boolean);
+    var ex = S.membros.filter(function (m) { return norm(m.nome) === norm(nome); })[0];
+    if (ex) { fs.forEach(function (f) { if (ex.funcoes.indexOf(f) < 0) ex.funcoes.push(f); }); }
+    else S.membros.push({ id: uid(), nome: nome, funcoes: fs, ativo: true, convidado: false, santaCeia: false, jovem: false, nao: {} });
+    add++;
+  });
+  $("#msgColar").textContent = add + " linha(s) processada(s)."; $("#msgColar").className = "msg ok";
+  salvar(); renderMembros();
+});
+$("#btnRestaurarApp").addEventListener("click", function () {
+  if (!confirm("Voltar à lista de membros do app? Suas alterações na lista e as indisponibilidades serão apagadas.")) return;
+  var b = padrao(); S.membros = b.membros; S.indisp = []; S.fixos = {}; S.escala = null; S.santaCeia = { inicia: "", datas: {} }; salvar(); renderMembros();
+});
+
+// ---------------------------------------------------------------- ficha do membro (abre ao clicar em "Abrir ficha")
+function TIPOS_CULTO() {
+  var l = [];
+  ORDEM_TIPOS.forEach(function (k) { if (S.tipos[k].ativo) l.push({ k: k, rot: S.tipos[k].rotulo + " · " + S.tipos[k].culto }); });
+  if (S.tipos.dom1.ativo) l.push({ k: "sc1", rot: "Santa Ceia · manhã" });
+  if (S.tipos.dom2.ativo) l.push({ k: "sc2", rot: "Santa Ceia · noite" });
+  return l;
+}
+var fichaId = null;
+function abrirMembro(id) { fichaId = id; renderFicha(); var d = $("#dlgMembro"); if (!d.open) d.showModal(); }
+function fecharFicha() { var d = $("#dlgMembro"); if (d.open) d.close(); }
+$("#dlgMembro").addEventListener("close", function () { fichaId = null; renderMembros(); });
+
+function renderFicha() {
+  var m = membroById(fichaId); if (!m) return;
+  var corpo = $("#fichaCorpo"), rolagem = corpo.scrollTop;
+  var funcs = FUNCOES.filter(function (f) { return m.funcoes.indexOf(f) >= 0; });
+  var h = '<div class="row" style="align-items:end"><label class="f grow">Nome na planilha<input type="text" id="fNome" value="' + esc(m.nome) + '"></label>' +
+    '<label><input type="checkbox" id="fAtivo"' + (m.ativo ? " checked" : "") + '> Ativo</label></div>';
+  h += '<h3>Funções</h3><div>' + FUNCOES.map(function (f) { return '<span class="chip' + (m.funcoes.indexOf(f) >= 0 ? " on" : "") + '" role="button" tabindex="0" data-fn="' + f + '">' + ROTULO[f] + '</span>'; }).join("") + '</div>';
+  h += '<div class="row" style="margin-top:8px"><label><input type="checkbox" id="fJovem"' + (m.jovem ? " checked" : "") + '> Jovem</label>' +
+    (m.funcoes.indexOf("Ministro") >= 0 ? '<label><input type="checkbox" id="fViolao"' + (m.funcoes.indexOf("Violão") >= 0 ? " checked" : "") + '> Toca violão (ministra e toca no mesmo culto)</label><label><input type="checkbox" id="fSC"' + (m.santaCeia ? " checked" : "") + '> Ministra a Santa Ceia</label>' : "") + '</div>';
+
+  if (m.funcoes.indexOf("Ministro") >= 0) h += '<div class="row" style="margin-top:8px"><label><input type="checkbox" id="fSemBack"' + (m.semBack ? " checked" : "") + '> Não quero back na minha escala</label></div>';
+  if (funcs.length) {
+    h += '<h3>Prioridade por função</h3><div class="prio">' + funcs.map(function (f) {
+      var p = pesoDe(m, f);
+      return '<label class="f">' + ROTULO[f] + '<select data-pf="' + f + '"><option value="0.5"' + (p === 0.5 ? " selected" : "") + '>Baixa</option><option value="1"' + (p === 1 ? " selected" : "") + '>Normal</option><option value="2"' + (p === 2 ? " selected" : "") + '>Alta</option><option value="3"' + (p === 3 ? " selected" : "") + '>Máxima</option></select></label>';
+    }).join("") + '</div><p class="sub">Quanto mais alta, mais vezes a pessoa entra naquela função (por exemplo, alta na guitarra e baixa no violão).</p>';
+  }
+  if (m.funcoes.indexOf("Vocal") >= 0) {
+    var mins = S.membros.filter(function (x) { return x.id !== m.id && x.ativo && !x.convidado && x.funcoes.indexOf("Ministro") >= 0; });
+    h += '<h3>Back: fica com o ministro</h3><div>' + (mins.length ? mins.map(function (x) { return '<span class="chip' + ((m.afinidade || []).indexOf(x.id) >= 0 ? " on" : "") + '" role="button" tabindex="0" data-af="' + x.id + '">' + esc(x.nome) + '</span>'; }).join("") : '<span class="muted">Nenhum ministro cadastrado.</span>') + '</div><p class="sub">Marque os ministros com quem este back serve. Sem ninguém marcado, ele serve com qualquer um.</p>' + ((m.afinidade || []).length ? '<label><input type="checkbox" id="fAfinSoft"' + (m.afinidadeSoft ? " checked" : "") + '> Só preferir esses ministros (se desmarcado, ele <b>só</b> faz back com eles)</label>' : "");
+  }
+
+  if (m.funcoes.indexOf("Ministro") >= 0 && m.funcoes.indexOf("Violão") < 0) {
+    var vio = S.membros.filter(function (x) { return x.id !== m.id && x.ativo && !x.convidado && x.funcoes.indexOf("Violão") >= 0; });
+    h += '<h3>Quem toca violão para ele</h3><div>' + (vio.length ? vio.map(function (x) { return '<span class="chip' + ((m.violonistas || []).indexOf(x.id) >= 0 ? " on" : "") + '" role="button" tabindex="0" data-vi="' + x.id + '">' + esc(x.nome) + '</span>'; }).join("") + '</div><p class="sub">Como este ministro não toca violão, marque quem toca por ele. O gerador tenta colocar um desses violonistas nos cultos em que ele ministra. Ou marque "Toca violão" lá em cima se ele mesmo toca.</p>' : '<span class="muted">Nenhum violonista cadastrado: marque a função Violão em alguém.</span></div>');
+  }
+
+  // matriz: o que pode fazer em cada culto
+  h += '<h3>O que pode fazer em cada culto</h3>';
+  if (!funcs.length) h += '<p class="muted">Marque pelo menos uma função acima.</p>';
+  else {
+    h += '<div class="scroll" style="max-height:none"><table class="pode"><thead><tr><th>Culto</th>' + funcs.map(function (f) { return '<th>' + ROTULO[f] + '</th>'; }).join("") + '<th></th></tr></thead><tbody>';
+    TIPOS_CULTO().forEach(function (c) {
+      h += '<tr><td>' + esc(c.rot) + '</td>' + funcs.map(function (f) {
+        return '<td class="c"><input type="checkbox" data-k="' + c.k + '" data-f="' + f + '"' + ((m.nao || {})[c.k + "|" + f] ? "" : " checked") + ' aria-label="' + esc(ROTULO[f] + " em " + c.rot) + '"></td>';
+      }).join("") + '<td style="white-space:nowrap"><button class="btn small" data-linha="' + c.k + ':1" type="button">todas</button> <button class="btn small" data-linha="' + c.k + ':0" type="button">nenhuma</button></td></tr>';
+    });
+    h += '</tbody></table></div><p class="sub">Desmarcado = a pessoa não faz aquela função naquele culto (por exemplo, não ministra domingo à noite).</p>';
+  }
+
+  // indisponibilidades nos cultos do período
+  var sv = montarServicos();
+  h += '<h3>Indisponível em cultos do período</h3>';
+  if (!sv.length) h += '<p class="muted">Nenhum culto no período.</p>';
+  else {
+    var semAtual = -1;
+    h += '<div class="indcultos">';
+    sv.forEach(function (sv1) {
+      if (sv1.semana !== semAtual) { semAtual = sv1.semana; h += '<div class="sem-t">Semana ' + (semAtual + 1) + '</div>'; }
+      var bloq = S.indisp.some(function (e) { return e.membro === m.id && e.tipo === "culto" && e.data === sv1.data && e.cultoTipo === sv1.tipo; });
+      var outro = !bloq && indisponivel(m.id, sv1);
+      h += '<label class="ic' + (bloq ? " on" : "") + '">' + (outro ? '<span class="tag bad" title="' + esc(outro) + '">já</span>' : '<input type="checkbox" data-ic-d="' + sv1.data + '" data-ic-t="' + sv1.tipo + '"' + (bloq ? " checked" : "") + '>') +
+        ' ' + dm(parseIso(sv1.data)) + ' ' + DIAS[sv1.dow] + ' ' + esc(sv1.hora) + '</label>';
+    });
+    h += '</div>';
+  }
+
+  // períodos e dias fixos
+  h += '<h3>Férias, viagens e dias fixos</h3>';
+  var lista = S.indisp.filter(function (e) { return e.membro === m.id && e.tipo !== "culto"; });
+  h += lista.length ? '<ul class="lista-ind">' + lista.map(function (e) { return '<li>' + esc(descreve(e)) + (e.motivo ? ' <span class="muted">(' + esc(e.motivo) + ')</span>' : "") + ' <button class="btn small danger" data-rem="' + e.id + '" type="button">Remover</button></li>'; }).join("") + '</ul>' : '<p class="muted">Nenhum cadastrado.</p>';
+  h += '<div class="row" style="align-items:end;margin-top:8px"><label class="f">Tipo <select id="fiTipo"><option value="periodo">Período (de... até...)</option><option value="semanal">Todo(s) dia(s) da semana</option></select></label>' +
+    '<span id="fiPeriodo" class="row"><label class="f">De <input type="date" id="fiDe"></label><label class="f">Até <input type="date" id="fiAte"></label></span>' +
+    '<span id="fiSemanal" class="row" hidden>' + [4, 5, 6, 0, 1, 2, 3].map(function (d) { return '<label><input type="checkbox" class="fiDia" value="' + d + '"> ' + DIAS[d] + '</label>'; }).join("") + ' <span class="sub">só nos cultos:</span> ' + ORDEM_TIPOS.map(function (k) { return '<label><input type="checkbox" class="fiTipoC" value="' + k + '"> ' + S.tipos[k].rotulo + '</label>'; }).join("") + '</span>' +
+    '<label class="f">Motivo <input type="text" id="fiMotivo" placeholder="férias, viagem..." style="min-width:150px"></label><button class="btn primary" id="fiAdd" type="button">Adicionar</button></div><div class="msg" id="fiMsg"></div>';
+  $("#fichaTitulo").textContent = m.nome;
+  corpo.innerHTML = h;
+  corpo.scrollTop = rolagem;
+}
+$("#fichaFechar").addEventListener("click", fecharFicha);
+$("#dlgMembro").addEventListener("click", function (e) { if (e.target === this) fecharFicha(); });
+$("#fichaCorpo").addEventListener("click", function (e) {
+  var m = membroById(fichaId); if (!m) return;
+  var vi = e.target.closest("[data-vi]");
+  if (vi) { m.violonistas = m.violonistas || []; var iv = m.violonistas.indexOf(vi.dataset.vi); if (iv >= 0) m.violonistas.splice(iv, 1); else m.violonistas.push(vi.dataset.vi); S.escala = null; salvar(); renderFicha(); return; }
+  var af = e.target.closest("[data-af]");
+  if (af) { m.afinidade = m.afinidade || []; var ix = m.afinidade.indexOf(af.dataset.af); if (ix >= 0) m.afinidade.splice(ix, 1); else m.afinidade.push(af.dataset.af); S.escala = null; salvar(); renderFicha(); return; }
+  var chip = e.target.closest("[data-fn]"), lin = e.target.closest("[data-linha]"), rem = e.target.closest("[data-rem]");
+  if (chip) { toggleFuncao(m.id, chip.dataset.fn); renderFicha(); return; }
+  if (lin) {
+    var pr = lin.dataset.linha.split(":"), k = pr[0], liberar = pr[1] === "1"; m.nao = m.nao || {};
+    FUNCOES.filter(function (f) { return m.funcoes.indexOf(f) >= 0; }).forEach(function (f) { if (liberar) delete m.nao[k + "|" + f]; else m.nao[k + "|" + f] = true; });
+    S.escala = null; salvar(); renderFicha(); return;
+  }
+  if (rem) { S.indisp = S.indisp.filter(function (x) { return x.id !== rem.dataset.rem; }); S.escala = null; salvar(); renderFicha(); return; }
+  if (e.target.id === "fiAdd") {
+    var msg = $("#fiMsg"), motivo = $("#fiMotivo").value.trim();
+    if ($("#fiTipo").value === "periodo") {
+      var de = $("#fiDe").value, ate = $("#fiAte").value || de;
+      if (!de) { msg.textContent = "Escolha a data inicial."; msg.className = "msg err"; return; }
+      if (ate < de) { msg.textContent = "A data final vem antes da inicial."; msg.className = "msg err"; return; }
+      S.indisp.push({ id: uid(), membro: m.id, tipo: "periodo", de: de, ate: ate, motivo: motivo });
+    } else {
+      var dias = $$(".fiDia:checked").map(function (c) { return +c.value; }), tipos = $$(".fiTipoC:checked").map(function (c) { return c.value; });
+      if (!dias.length) { msg.textContent = "Marque pelo menos um dia da semana."; msg.className = "msg err"; return; }
+      S.indisp.push({ id: uid(), membro: m.id, tipo: "semanal", dias: dias, tipos: tipos, motivo: motivo });
+    }
+    S.escala = null; salvar(); renderFicha(); toast("Indisponibilidade adicionada.");
+  }
+});
+$("#fichaCorpo").addEventListener("keydown", function (e) { if ((e.key === "Enter" || e.key === " ") && e.target.dataset && (e.target.dataset.fn || e.target.dataset.af || e.target.dataset.vi)) { e.preventDefault(); e.target.click(); } });
+$("#fichaCorpo").addEventListener("change", function (e) {
+  var m = membroById(fichaId), t = e.target; if (!m) return;
+  if (t.id === "fNome") { m.nome = t.value.trim() || m.nome; salvar(); $("#fichaTitulo").textContent = m.nome; return; }
+  if (t.id === "fAtivo") { m.ativo = t.checked; S.escala = null; salvar(); return; }
+  if (t.id === "fJovem") { m.jovem = t.checked; S.escala = null; salvar(); return; }
+  if (t.id === "fViolao") { toggleFuncao(m.id, "Violão"); renderFicha(); return; }
+  if (t.dataset.pf) { m.prioFn = m.prioFn || {}; m.prioFn[t.dataset.pf] = +t.value; S.escala = null; salvar(); renderMembros(); return; }
+  if (t.id === "fSemBack") { m.semBack = t.checked; S.escala = null; salvar(); return; }
+  if (t.id === "fAfinSoft") { m.afinidadeSoft = t.checked; S.escala = null; salvar(); return; }
+  if (t.id === "fSC") { m.santaCeia = t.checked; S.escala = null; salvar(); return; }
+  if (t.id === "fiTipo") { var per = t.value === "periodo"; $("#fiPeriodo").hidden = !per; $("#fiSemanal").hidden = per; return; }
+  if (t.dataset.k && t.dataset.f) { m.nao = m.nao || {}; var ch = t.dataset.k + "|" + t.dataset.f; if (t.checked) delete m.nao[ch]; else m.nao[ch] = true; S.escala = null; salvar(); return; }
+  if (t.dataset.icD) {
+    S.indisp = S.indisp.filter(function (x) { return !(x.membro === m.id && x.tipo === "culto" && x.data === t.dataset.icD && x.cultoTipo === t.dataset.icT); });
+    if (t.checked) S.indisp.push({ id: uid(), membro: m.id, tipo: "culto", data: t.dataset.icD, cultoTipo: t.dataset.icT, motivo: "" });
+    S.escala = null; salvar(); renderFicha();
+  }
+});
+
+// ---------------------------------------------------------------- texto das indisponibilidades (usado na ficha)
+function descreve(e) {
+  if (e.tipo === "culto") return dm(parseIso(e.data)) + " (" + S.tipos[e.cultoTipo].rotulo + ")";
+  if (e.tipo === "periodo") return dm(parseIso(e.de)) + (e.ate && e.ate !== e.de ? " a " + dm(parseIso(e.ate)) : "");
+  var dias = e.dias.map(function (d) { return DIAS[d]; }).join(", ");
+  return "Toda(o) " + dias + (e.tipos && e.tipos.length ? " (" + e.tipos.map(function (k) { return S.tipos[k].rotulo; }).join(", ") + ")" : "");
+}
+
+// ---------------------------------------------------------------- 3. gerar
+function renderConfig() {
+  $("#cfgTipos").innerHTML = ORDEM_TIPOS.map(function (k) {
+    var t = S.tipos[k];
+    return '<div class="tipo' + (t.ativo ? "" : " off") + '" data-k="' + k + '">' +
+      '<label><input type="checkbox" class="t-ativo"' + (t.ativo ? " checked" : "") + '> <b>' + t.rotulo + '</b> · ' + t.hora + '</label>' +
+      '<div class="row" style="margin-top:8px"><label class="f grow">Nome do culto <input type="text" class="t-culto" value="' + esc(t.culto) + '"></label>' +
+      '<label class="f">Hora <input type="text" class="t-hora" value="' + esc(t.hora) + '" style="width:80px"></label></div>' +
+      '<label style="display:block;margin-top:8px;font-size:12px"><input type="checkbox" class="t-violao"' + (t.ministroViolao ? " checked" : "") + '> Ministro de preferência toca violão</label>' +
+      '<label class="f" style="margin-top:8px">Quem pode servir <select class="t-jovens"><option value="todos"' + (t.jovens === "todos" ? " selected" : "") + '>Todos</option><option value="prefere"' + (t.jovens === "prefere" ? " selected" : "") + '>Jovens primeiro</option><option value="so"' + (t.jovens === "so" ? " selected" : "") + '>Somente jovens</option></select></label>' +
+      '<div class="vagas">' + FUNCOES.map(function (f) { return '<label>' + ROTULO[f] + '<input type="number" min="0" max="3" class="t-vaga" data-f="' + f + '" value="' + (+t.vagas[f] || 0) + '"></label>'; }).join("") + '</div></div>';
+  }).join("");
+  $("#rMaxSemana").value = S.regras.maxSemana; $("#rFolgas").value = S.regras.folgas; $("#rTent").value = S.regras.tentativas;
+  $("#rDom").checked = !!S.regras.domDuplo; $("#rCopia").checked = S.regras.copiaQuinta !== false; $("#rConv").checked = !!S.regras.convidado;
+}
+$("#cfgTipos").addEventListener("change", function (e) {
+  var box = e.target.closest(".tipo"); if (!box) return; var t = S.tipos[box.dataset.k];
+  if (e.target.classList.contains("t-ativo")) t.ativo = e.target.checked;
+  if (e.target.classList.contains("t-culto")) t.culto = e.target.value.trim() || t.culto;
+  if (e.target.classList.contains("t-hora")) t.hora = e.target.value.trim() || t.hora;
+  if (e.target.classList.contains("t-jovens")) t.jovens = e.target.value;
+  if (e.target.classList.contains("t-violao")) t.ministroViolao = e.target.checked;
+  if (e.target.classList.contains("t-vaga")) t.vagas[e.target.dataset.f] = Math.max(0, Math.min(3, +e.target.value || 0));
+  S.escala = null; salvar(); renderConfig(); renderPeriodo();
+});
+["rMaxSemana", "rFolgas", "rTent"].forEach(function (id) {
+  $("#" + id).addEventListener("change", function () {
+    S.regras.maxSemana = Math.max(1, +$("#rMaxSemana").value || 1); S.regras.folgas = Math.max(0, +$("#rFolgas").value || 0);
+    S.regras.tentativas = Math.max(50, +$("#rTent").value || 400); salvar();
+  });
+});
+$("#rCopia").addEventListener("change", function () { S.regras.copiaQuinta = this.checked; salvar(); });
+$("#rDom").addEventListener("change", function () { S.regras.domDuplo = this.checked; salvar(); });
+$("#rConv").addEventListener("change", function () { S.regras.convidado = this.checked; salvar(); });
+
+function renderSC() {
+  var sc = S.santaCeia, box = $("#cardSC"), L = ministrosSantaCeia();
+  if (L.length && !L.some(function (m) { return m.id === sc.inicia; })) sc.inicia = L[0].id;
+  var pd = periodoDatas(), ini = pd.ini, n = pd.n, doms = [];
+  for (var i = 0; i < n; i++) { var d = addDias(ini, i); if (d.getDay() === 0) doms.push(iso(d)); }
+  doms.forEach(function (k) { if (!sc.datas[k]) { var primeiro = parseIso(k).getDate() <= 7; sc.datas[k] = { dom1: primeiro, dom2: primeiro }; } });
+  var linhas = doms.map(function (k) {
+    var v = sc.datas[k];
+    return '<tr><td>' + dm(parseIso(k)) + ' dom.</td>' +
+      '<td><label><input type="checkbox" data-d="' + k + '" data-t="dom1"' + (v.dom1 ? " checked" : "") + (S.tipos.dom1.ativo ? "" : " disabled") + '> manhã (' + esc(S.tipos.dom1.hora) + ')</label></td>' +
+      '<td><label><input type="checkbox" data-d="' + k + '" data-t="dom2"' + (v.dom2 ? " checked" : "") + (S.tipos.dom2.ativo ? "" : " disabled") + '> noite (' + esc(S.tipos.dom2.hora) + ')</label></td></tr>';
+  }).join("");
+  box.innerHTML = '<h2>Santa Ceia</h2>' +
+    '<p class="sub">Na Santa Ceia da <b>noite</b> só ministram os ministros marcados com o flag <b>Santa Ceia</b> (podem ser dois ou mais). Eles se revezam: a cada mês a vez avança um nome. A Santa Ceia da <b>manhã não tem restrição</b>: segue as regras normais do domingo de manhã.</p>' +
+    '<div class="row" style="align-items:end">' +
+    '<div><div class="sub">Marcados agora:</div>' + (L.length ? L.map(function (m) { return '<span class="chip on">' + esc(m.nome) + '</span>'; }).join("") : '<span class="tag warn">nenhum</span>') + '</div>' +
+    '<label class="f">Na primeira Santa Ceia do período, a noite fica com <select id="scInicia">' +
+      L.map(function (m) { return '<option value="' + m.id + '"' + (m.id === sc.inicia ? " selected" : "") + '>' + esc(m.nome) + '</option>'; }).join("") + '</select></label></div>' +
+    (L.length === 1 ? '<p class="msg err">Marque pelo menos dois ministros de Santa Ceia para o rodízio.</p>' : '') +
+    '<h3>Domingos do período</h3>' +
+    (doms.length ? '<div class="scroll" style="max-height:220px"><table class="sc"><tbody>' + linhas + '</tbody></table></div>' : '<p class="muted">Nenhum domingo no período.</p>');
+}
+$("#cardSC").addEventListener("change", function (e) {
+  var t = e.target, sc = S.santaCeia;
+  if (t.id === "scInicia") sc.inicia = t.value;
+  else if (t.type === "checkbox") sc.datas[t.dataset.d][t.dataset.t] = t.checked;
+  else return;
+  S.escala = null; salvar(); renderSC(); renderPeriodo(); renderResultado();
+});
+function renderAnterior() {
+  var box = $("#cardAnt"), a = S.anterior, info = "";
+  if (a && a.itens && a.itens.length) {
+    info = '<p class="msg ok">Escala anterior em uso: ' + a.itens.length + ' cultos, de ' + dm(parseIso(a.itens[0].data)) + ' a ' + dm(parseIso(a.itens[a.itens.length - 1].data)) + '.' + (a.inicia ? " Santa Ceia da noite: o rodízio continua com " + esc(a.inicia) + "." : "") + '</p>' +
+      (a.desconhecidos && a.desconhecidos.length ? '<p class="msg err">Nomes que não bateram com a lista de membros (foram ignorados): ' + a.desconhecidos.map(esc).join(", ") + '. Confira a grafia na aba Membros.</p>' : "");
+  } else if (a && a.texto) info = '<p class="msg err">Não encontrei cultos nesse texto. Cole as linhas copiadas da planilha (colunas Data até Bateria).</p>';
+  box.innerHTML = '<h2>Escala anterior (opcional)</h2>' +
+    '<p class="sub">Use <b>Importar da planilha</b> para buscar a última escala direto da planilha publicada, ou cole aqui as linhas (copie da planilha, a partir da coluna Data). O gerador usa isso como base: quem serviu nos últimos dias descansa, as vagas variam em relação à última vez, o rodízio da Santa Ceia continua de onde parou e, se o período começar num domingo, a equipe de domingo à noite parte da quinta anterior.</p>' +
+    '<textarea id="antTexto" placeholder="05/11&#9;qui.&#9;19:00&#9;Passos de Fé&#9;Cawan&#9;...">' + esc(a && a.texto || "") + '</textarea>' +
+    '<div class="row" style="margin-top:8px"><button class="btn primary" id="btnAntPlanilha" type="button">Importar da planilha</button><button class="btn" id="btnAntUsar" type="button">Usar o texto colado</button><button class="btn" id="btnAntLimpar" type="button">Limpar</button></div>' +
+    '<p class="msg" id="antMsg"></p>' +
+    '<details><summary>Endereço da planilha publicada (CSV)</summary><input type="text" id="antUrl" style="width:100%;margin-top:6px" value="' + esc(S.anteriorUrl || PLANILHA_CSV) + '"></details>' + info;
+}
+var PLANILHA_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRr-IeGQaXSrMhllDs5sFerSyS2kh9y82GF49GnH44nJP7l4cGFImQpV_lmJMm2RIGZxI7TSeHHwrgh/pub?gid=1851257255&single=true&output=csv";
+function csvLinhas(text) {   // CSV com aspas -> lista de linhas (cada linha é uma lista de células)
+  var rows = [], row = [], cur = "", q = false;
+  for (var i = 0; i < text.length; i++) {
+    var c = text.charAt(i);
+    if (q) { if (c === '"') { if (text.charAt(i + 1) === '"') { cur += '"'; i++; } else q = false; } else cur += c; }
+    else if (c === '"') q = true;
+    else if (c === ",") { row.push(cur); cur = ""; }
+    else if (c === "\n") { row.push(cur); rows.push(row); row = []; cur = ""; }
+    else if (c !== "\r") cur += c;
+  }
+  if (cur || row.length) { row.push(cur); rows.push(row); }
+  return rows;
+}
+function importarDaPlanilha() {
+  var url = ($("#antUrl") && $("#antUrl").value.trim()) || S.anteriorUrl || PLANILHA_CSV, msg = $("#antMsg");
+  S.anteriorUrl = url; salvar();
+  msg.textContent = "Buscando a planilha..."; msg.className = "msg muted";
+  fetch(url, { cache: "no-store" }).then(function (r) { if (!r.ok) throw new Error("http " + r.status); return r.text(); }).then(function (t) {
+    var linhas = csvLinhas(t).filter(function (c) { return /^\d{1,2}\/\d{1,2}$/.test(String(c[0] || "").trim()); })
+      .map(function (c) { return c.slice(0, 14).join("\t"); });
+    if (!linhas.length) throw new Error("vazia");
+    usarAnterior(linhas.join("\n"));
+  }).catch(function () {
+    msg.textContent = "Não consegui ler a planilha. Confira o endereço da planilha publicada (CSV) e a internet, ou cole as linhas à mão.";
+    msg.className = "msg err";
+  });
+}
+function usarAnterior(texto) {
+  var r = parseAnterior(texto);
+  S.anterior = { texto: texto, itens: r.itens, desconhecidos: r.desconhecidos, inicia: "" };
+  // Santa Ceia da noite: o rodízio continua com o próximo da fila
+  var L = ministrosSantaCeia(), ult = null;
+  r.itens.forEach(function (x) { if (x.sc && x.tipo === "dom2" && x.slots.Ministro[0]) ult = x.slots.Ministro[0]; });
+  if (ult && L.length > 1) { var ix = L.map(function (m) { return m.id; }).indexOf(ult); if (ix >= 0) { var prox = L[(ix + 1) % L.length]; S.santaCeia.inicia = prox.id; S.anterior.inicia = prox.nome; } }
+  S.escala = null; salvar(); renderAnterior(); renderSC(); renderResultado();
+  toast(r.itens.length ? "Escala anterior carregada." : "Nenhum culto reconhecido.");
+}
+$("#cardAnt").addEventListener("click", function (e) {
+  if (e.target.id === "btnAntLimpar") { S.anterior = null; S.escala = null; salvar(); renderAnterior(); renderResultado(); return; }
+  if (e.target.id === "btnAntPlanilha") { importarDaPlanilha(); return; }
+  if (e.target.id !== "btnAntUsar") return;
+  usarAnterior($("#antTexto").value);
+});
+function renderGerar() { renderConfig(); renderSC(); renderAnterior(); renderResultado(); }
+$("#btnGerar").addEventListener("click", function () {
+  var msg = $("#msgGerar"); msg.textContent = "Gerando..."; msg.className = "msg muted";
+  setTimeout(function () {
+    var r = gerar();
+    if (!r) { msg.textContent = "Não há cultos no período. Ative pelo menos um tipo de culto."; msg.className = "msg err"; return; }
+    S.escala = r; salvar(); renderResultado();
+    var a = avaliar().alertas.filter(function (x) { return x.n === "bad"; }).length;
+    msg.textContent = a ? "Escala gerada, com " + a + " ponto(s) para resolver (veja os alertas)." : "Escala gerada sem conflitos."; msg.className = "msg " + (a ? "err" : "ok");
+  }, 30);
+});
+$("#btnLimparTravas").addEventListener("click", function () { S.fixos = {}; salvar(); toast("Escolhas manuais soltas. Gere de novo para refazer."); renderResultado(); });
+
+function opcoesSlot(role, it, atual) {
+  var s = it, ops = '<option value="">— vaga —</option>';
+  var lista = S.membros.filter(function (m) { return (m.ativo || m.id === atual) && m.funcoes.indexOf(role) >= 0; });
+  lista.sort(function (a, b) { return (a.convidado ? 1 : 0) - (b.convidado ? 1 : 0) || a.nome.localeCompare(b.nome, "pt"); });
+  lista.forEach(function (m) {
+    var mot = !m.convidado && indisponivel(m.id, s);
+    var restr = m.convidado ? "" : (!permitido(m, it, role) ? " ⚠ não faz isso aqui" : (S.tipos[it.tipo].jovens === "so" && !m.jovem ? " ⚠ não é jovem" : ""));
+    ops += '<option value="' + m.id + '"' + (m.id === atual ? " selected" : "") + '>' + esc(m.nome) + (mot ? " ⚠ indisponível" : "") + restr + '</option>';
+  });
+  return ops;
+}
+function renderResultado() {
+  var box = $("#resultado");
+  if (!S.escala || !S.escala.length) { box.hidden = true; return; }
+  box.hidden = false;
+  var roles = FUNCOES.filter(function (f) { return ORDEM_TIPOS.some(function (k) { return S.tipos[k].ativo && (+S.tipos[k].vagas[f] || 0) > 0; }); });
+  var h = "", semAtual = -1;
+  var porSemana = {};
+  S.escala.forEach(function (it) { (porSemana[it.semana] = porSemana[it.semana] || []).push(it); });
+  Object.keys(porSemana).forEach(function (w) {
+    var itens = porSemana[w];
+    h += '<div class="semana-t">Semana ' + (+w + 1) + ' · ' + dm(parseIso(itens[0].data)) + ' a ' + dm(parseIso(itens[itens.length - 1].data)) + '</div>';
+    h += '<div class="scroll" style="max-height:none"><table class="res"><thead><tr><th>Culto</th>' + roles.map(function (f) { return '<th>' + ROTULO[f] + '</th>'; }).join("") + '</tr></thead><tbody>';
+    itens.forEach(function (it) {
+      h += '<tr><td class="d">' + dm(parseIso(it.data)) + ' ' + DIAS[it.dow] + '<small>' + esc(it.hora) + ' · ' + esc((it.culto || S.tipos[it.tipo].culto)) + '</small></td>';
+      roles.forEach(function (f) {
+        var n = +S.tipos[it.tipo].vagas[f] || 0, c = "";
+        for (var k = 0; k < n; k++) {
+          var id = (it.slots[f] || [])[k] || "", m = id ? membroById(id) : null, chave = it.id + "|" + f + "|" + k;
+          var mot = m && !m.convidado && indisponivel(id, it);
+          var daRegra = !S.fixos[chave] && S.regraFix && S.regraFix[chave] !== undefined;
+          var semB = !id && f === "Vocal" && semBack(it), cls = "slot" + (!id && !semB ? " vago" : "") + (mot ? " alerta" : "") + (S.fixos[chave] || daRegra ? " fixo" : "");
+          c += '<select class="' + cls + '" data-it="' + it.id + '" data-f="' + f + '" data-k="' + k + '" title="' + (S.fixos[chave] ? "Escolha manual (travada)" : (daRegra ? "Regra da Santa Ceia (rodízio entre os ministros marcados)" : (semB ? "O ministro deste culto não quer back" : ""))) + '">' + opcoesSlot(f, it, id) + '</select>';
+        }
+        h += '<td>' + (c || '<span class="muted">—</span>') + '</td>';
+      });
+      h += '</tr>';
+    });
+    h += '</tbody></table></div>';
+  });
+  $("#resTabela").innerHTML = h;
+  var av = avaliar();
+  var ordem = { bad: 0, warn: 1, ok: 2 };
+  var al = av.alertas.slice().sort(function (a, b) { return ordem[a.n] - ordem[b.n]; });
+  $("#alertas").innerHTML = al.length ? al.map(function (a) { return '<li class="' + a.n + '">' + esc(a.t) + '</li>'; }).join("") : '<li class="ok">Nenhum conflito: ninguém indisponível, sem vagas e dentro dos limites.</li>';
+  var nSem = nSemanas();
+  var linhas = Object.keys(av.carga).map(function (id) { return { m: membroById(id), c: av.carga[id] }; }).filter(function (x) { return x.m; });
+  var ativos = S.membros.filter(function (m) { return m.ativo && !m.convidado; });
+  ativos.forEach(function (m) { if (!av.carga[m.id]) linhas.push({ m: m, c: { total: 0, sem: {} } }); });
+  var seen = {}; linhas = linhas.filter(function (x) { if (seen[x.m.id]) return false; seen[x.m.id] = 1; return true; });
+  linhas.sort(function (a, b) { return b.c.total - a.c.total || a.m.nome.localeCompare(b.m.nome, "pt"); });
+  var maxT = Math.max.apply(null, linhas.map(function (x) { return x.c.total; }).concat([1]));
+  var th = '<thead><tr><th>Pessoa</th><th>Cultos</th><th>Folgas</th></tr></thead><tbody>';
+  linhas.forEach(function (x) {
+    var usadas = Object.keys(x.c.sem).length, folgas = nSem - usadas;
+    th += '<tr><td>' + esc(x.m.nome) + '</td><td><span class="barra" style="width:' + Math.round(x.c.total / maxT * 70) + 'px"></span> ' + x.c.total + '</td><td>' + (x.c.total === 0 ? '<span class="tag warn">não escalado</span>' : folgas + " sem.") + '</td></tr>';
+  });
+  $("#tbCarga").innerHTML = th + '</tbody>';
+}
+$("#resTabela").addEventListener("change", function (e) {
+  var sel = e.target.closest("select.slot"); if (!sel) return;
+  var it = S.escala.filter(function (x) { return x.id === sel.dataset.it; })[0], f = sel.dataset.f, k = +sel.dataset.k, chave = it.id + "|" + f + "|" + k;
+  it.slots[f][k] = sel.value || null;
+  if (sel.value) S.fixos[chave] = sel.value; else delete S.fixos[chave];
+  salvar(); renderResultado();
+});
+
+// ---------------------------------------------------------------- 4. exportar
+function linhasPlanilha() {
+  if (!S.escala || !S.escala.length) return [];
+  var porBloco = {}, blocos = [];
+  S.escala.forEach(function (it) {
+    var d = parseIso(it.data), ini = addDias(d, -((d.getDay() + 3) % 7)), k = iso(ini);
+    if (!porBloco[k]) { porBloco[k] = { ini: ini, itens: [] }; blocos.push(k); }
+    porBloco[k].itens.push(it);
+  });
+  blocos.sort();
+  var out = [], avisos = [];
+  blocos.forEach(function (k, bi) {
+    var b = porBloco[k];
+    if (bi > 0) out.push(null);
+    var itens = b.itens, temQui = itens.some(function (i) { return i.tipo === "qui"; });
+    itens.forEach(function (it) {
+      out.push(montaLinha(it, avisos));
+      if (S.export.sexta && it.tipo === "qui") {
+        var sx = addDias(b.ini, 1);
+        out.push([dm(sx), DIAS[5], "19:00", "", "", "", "", "", "", "", "", "", "", "", "", ""]);
+      }
+    });
+    if (S.export.sexta && !temQui && itens.length) { /* sem quinta: não cria linha de sexta */ }
+  });
+  out.avisos = avisos;
+  return out;
+}
+function montaLinha(it, avisos) {
+  var d = parseIso(it.data), nomes = function (f) { return (it.slots[f] || []).filter(Boolean).map(nomeById); };
+  var r = [dm(d), DIAS[it.dow], it.hora, (it.culto || S.tipos[it.tipo].culto)];
+  var min = nomes("Ministro"), voc = nomes("Vocal");
+  r.push(min[0] || "", min[1] || "", voc[0] || "", voc[1] || "", voc[2] || "");
+  ["Violão", "Teclado", "Guitarra", "Baixo", "Bateria"].forEach(function (f) { r.push(nomes(f).join(", ")); });
+  // Ensaio: quinta e domingo ensaiam na segunda anterior à quinta da semana
+  var ensData = "", ensHora = "";
+  if (S.export.ensaio !== false && (it.tipo === "qui" || it.dow === 0)) { ensData = dm(addDias(d, -((d.getDay() + 3) % 7) - 3)); ensHora = S.export.ensaioHora || "19:00"; }
+  r.push(ensData, ensHora);   // O = data do ensaio, P = horário
+  if (nomes("Sax").length) avisos.push("Sax em " + dm(d) + " (" + nomes("Sax").join(", ") + "): a planilha não tem coluna de Sax, então não foi incluído.");
+  if (min.length > 2 || voc.length > 3) avisos.push("Mais pessoas do que colunas em " + dm(d) + ": algumas ficaram de fora.");
+  return r;
+}
+var CABECALHO = ["Data", "", "", "Culto", "Ministro", "Ministro", "Back", "Back", "Back", "Violão", "Teclado", "Guitarra", "Baixo", "Bateria", "Ensaio", "Horário"];
+function renderExport() {
+  $("#xSexta").checked = !!S.export.sexta; $("#xEnsaio").checked = S.export.ensaio !== false; $("#xEnsaioHora").value = S.export.ensaioHora || "19:00";
+  $("#sUrl").value = S.export.url || ""; $("#sToken").value = S.export.token || ""; $("#sAba").value = S.export.aba || "Escala";
+  var l = linhasPlanilha(), msg = $("#msgExport");
+  if (!l.length) { $("#tbExport").innerHTML = '<tbody><tr><td class="muted">Gere a escala na aba 3 para ver as linhas aqui.</td></tr></tbody>'; msg.textContent = ""; return; }
+  var h = '<thead><tr>' + CABECALHO.map(function (c) { return '<th>' + esc(c) + '</th>'; }).join("") + '</tr></thead><tbody>';
+  l.forEach(function (r) { h += r ? '<tr>' + r.map(function (c) { return '<td>' + esc(c) + '</td>'; }).join("") + '</tr>' : '<tr><td colspan="15" style="background:var(--surface-2);padding:2px"></td></tr>'; });
+  $("#tbExport").innerHTML = h + '</tbody>';
+  var av = l.avisos || [];
+  msg.innerHTML = av.length ? av.map(function (a) { return '<div class="warn" style="color:var(--warn)">' + esc(a) + '</div>'; }).join("") : "";
+}
+$("#xEnsaio").addEventListener("change", function () { S.export.ensaio = this.checked; salvar(); renderExport(); });
+$("#xEnsaioHora").addEventListener("change", function () { S.export.ensaioHora = this.value.trim() || "19:00"; salvar(); renderExport(); });
+$("#xSexta").addEventListener("change", function () { S.export.sexta = this.checked; salvar(); renderExport(); });
+["sUrl", "sToken", "sAba"].forEach(function (id) { $("#" + id).addEventListener("change", function () { S.export.url = $("#sUrl").value.trim(); S.export.token = $("#sToken").value; S.export.aba = $("#sAba").value.trim() || "Escala"; salvar(); }); });
+function tsv(l) { return l.map(function (r) { return r ? r.join("\t") : ""; }).join("\n"); }
+function csv(l) { return l.map(function (r) { return r ? r.map(function (c) { return /[",\n;]/.test(c) ? '"' + String(c).replace(/"/g, '""') + '"' : c; }).join(",") : ""; }).join("\r\n"); }
+$("#btnCopiar").addEventListener("click", function () {
+  var l = linhasPlanilha(); if (!l.length) return toast("Gere a escala primeiro.");
+  var t = tsv(l);
+  (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(function () { toast("Copiado. Cole na primeira célula livre da coluna A."); }, function () {
+    var ta = document.createElement("textarea"); ta.value = t; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); toast("Copiado. Cole na planilha."); } catch (e) { toast("Não consegui copiar."); } ta.remove();
+  });
+});
+$("#btnCsv").addEventListener("click", function () {
+  var l = linhasPlanilha(); if (!l.length) return toast("Gere a escala primeiro.");
+  var b = new Blob(["﻿" + csv(l)], { type: "text/csv;charset=utf-8" }), a = document.createElement("a");
+  a.href = URL.createObjectURL(b); a.download = "escala-" + S.periodo.inicio + ".csv"; document.body.appendChild(a); a.click(); a.remove();
+});
+
+// script do Google Apps Script (texto)
+var SCRIPT = [
+"// Gerador de Escala: recebe as linhas geradas e escreve na aba da escala.",
+"// Cole em Extensões > Apps Script. Crie a propriedade TOKEN em Propriedades do script.",
+"// A linha 1 é o cabeçalho e nunca é mexida. Tudo da linha 2 para baixo é apagado e só as linhas geradas (com dados) são inseridas.",
+"// As linhas em branco que separam as semanas ficam totalmente pretas. Fonte Arial 12, texto centralizado; A:D em negrito; O:P em negrito vermelho.",
+"var ABA = 'Escala';            // nome da aba (o gerador também envia o nome, que vale se existir)",
+"var COLUNAS = 16;              // A até P (O = data do ensaio, P = horário do ensaio)",
+"var PRETO = '#000000';",
+"var VERMELHO = '#FF0000';",
+"",
+"function geradorDoPost(e) {",
+"  try {",
+"    var req = JSON.parse(e.postData.contents);",
+"    var token = PropertiesService.getScriptProperties().getProperty('TOKEN');",
+"    if (!token || req.token !== token) return geradorResposta({ ok: false, erro: 'Senha (TOKEN) inválida.' });",
+"    var ss = SpreadsheetApp.getActiveSpreadsheet();",
+"    var sh = ss.getSheetByName(req.aba || ABA) || ss.getSheetByName(ABA);",
+"    if (!sh) return geradorResposta({ ok: false, erro: 'Aba não encontrada: ' + (req.aba || ABA) });",
+"    var linhas = req.linhas || [];",
+"    if (!linhas.length) return geradorResposta({ ok: false, erro: 'Nenhuma linha recebida.' });",
+"    var matriz = linhas.map(function (l) {",
+"      var r = l && l.length ? l.slice(0, COLUNAS) : [];",
+"      while (r.length < COLUNAS) r.push('');",
+"      return r;",
+"    });",
+"    var n = matriz.length;",
+"",
+"    // abre as linhas novas logo abaixo do cabeçalho e apaga tudo o que havia da linha 2 para baixo",
+"    var antes = sh.getMaxRows();",
+"    sh.insertRowsAfter(1, n);",
+"    if (antes > 1) sh.deleteRows(n + 2, antes - 1);",
+"    if (sh.getMaxColumns() < COLUNAS) sh.insertColumnsAfter(sh.getMaxColumns(), COLUNAS - sh.getMaxColumns());",
+"",
+"    var rg = sh.getRange(2, 1, n, COLUNAS);",
+"    rg.clearFormat();",
+"    rg.setNumberFormat('@');                 // mantém 'qui.', '19:00' e '05/11' como texto",
+"    rg.setFontFamily('Arial').setFontSize(12);",
+"    rg.setHorizontalAlignment('center').setVerticalAlignment('middle');   // centralizado na horizontal e na vertical",
+"    rg.setValues(matriz);",
+"    sh.getRange(2, 1, n, 4).setFontWeight('bold');                                   // A:D em negrito",
+"    sh.getRange(2, 15, n, 2).setFontWeight('bold').setFontColor(VERMELHO);           // O:P em negrito vermelho",
+"    // linha que divide as semanas (toda em branco): totalmente preta",
+"    matriz.forEach(function (r, idx) {",
+"      var vazia = r.every(function (c) { return String(c).trim() === ''; });",
+"      if (vazia) sh.getRange(2 + idx, 1, 1, COLUNAS).setBackground(PRETO);",
+"    });",
+"    return geradorResposta({ ok: true, modo: 'substituido', linhaInicial: 2, linhas: n, removidas: Math.max(0, antes - 1) });",
+"  } catch (err) {",
+"    return geradorResposta({ ok: false, erro: String(err) });",
+"  }",
+"}",
+"",
+"// Se este projeto ainda não tem doPost, ele repassa para o gerador. Se já tem, apague esta linha e chame geradorDoPost(e) de dentro do seu doPost.",
+"function doPost(e) { return geradorDoPost(e); }",
+"",
+"function geradorResposta(obj) {",
+"  return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);",
+"}"
+].join("\n");
+$("#codigoScript").textContent = SCRIPT;
+$("#btnCopiarScript").addEventListener("click", function () {
+  (navigator.clipboard ? navigator.clipboard.writeText(SCRIPT) : Promise.reject()).then(function () { toast("Código copiado."); }, function () { toast("Selecione o texto e copie."); });
+});
+$("#btnAplicar").addEventListener("click", function () {
+  var l = linhasPlanilha(), msg = $("#msgAplicar");
+  if (!l.length) { msg.textContent = "Gere a escala primeiro."; msg.className = "msg err"; return; }
+  if (!S.export.url || !S.export.token) { msg.textContent = "Preencha o endereço e a senha do script."; msg.className = "msg err"; return; }
+  var primeira = l.filter(Boolean)[0];
+  if (!confirm("Isto APAGA tudo da linha 2 para baixo na aba \"" + S.export.aba + "\" e escreve " + l.length + " linhas no lugar. Continuar?")) return;
+  msg.textContent = "Enviando..."; msg.className = "msg muted";
+  fetch(S.export.url, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body: JSON.stringify({ token: S.export.token, aba: S.export.aba, linhas: l.map(function (r) { return r || []; }), primeira: { data: primeira[0], hora: primeira[2] } }) })
+    .then(function (r) { return r.json(); })
+    .then(function (j) {
+      if (j.ok) { msg.textContent = "Planilha atualizada a partir da linha " + j.linhaInicial + " (" + j.linhas + " linhas)."; msg.className = "msg ok"; }
+      else { msg.textContent = "A planilha recusou: " + j.erro; msg.className = "msg err"; }
+    })
+    .catch(function () { msg.textContent = "Não consegui falar com o script. Confira o endereço e se a implantação está como 'Qualquer pessoa'."; msg.className = "msg err"; });
+});
+
+// ---------------------------------------------------------------- backup
+$("#btnBackup").addEventListener("click", function () {
+  var b = new Blob([JSON.stringify(S, null, 1)], { type: "application/json" }), a = document.createElement("a");
+  a.href = URL.createObjectURL(b); a.download = "gerador-escala-backup-" + iso(new Date()) + ".json"; document.body.appendChild(a); a.click(); a.remove();
+});
+$("#btnRestaurar").addEventListener("click", function () { $("#fileBackup").click(); });
+$("#fileBackup").addEventListener("change", function () {
+  var f = this.files[0]; if (!f) return;
+  var r = new FileReader();
+  r.onload = function () {
+    try { var o = JSON.parse(r.result); if (!o.membros || !o.tipos) throw 0; S = o; salvar(); iniciar(); toast("Backup carregado."); }
+    catch (e) { toast("Esse arquivo não parece um backup do gerador."); }
+  };
+  r.readAsText(f); this.value = "";
+});
+
+function iniciar() { renderPeriodo(); renderMembros(); renderConfig(); abrirAba("membros"); }
+iniciar();
+})();
+</script>
+</body>
+</html>

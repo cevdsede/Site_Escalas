@@ -289,7 +289,7 @@ function groupsFromCsv(text) {
   var groups = [[]], repCol = -1;
   csvRows(text).forEach(function (r) {
     var c = r.map(function (s) { return s.trim(); });
-    while (c.length < 15) c.push("");
+    while (c.length < 16) c.push("");
     if (c[0].toLowerCase() === "data") {
       // coluna opcional com as músicas do culto, separadas por ponto e vírgula
       c.forEach(function (h, i) { if (repCol < 0 && /^(repert|m[uú]sicas)/i.test(h)) repCol = i; });
@@ -297,8 +297,8 @@ function groupsFromCsv(text) {
     if (/^\d{1,2}\/\d{1,2}$/.test(c[0])) {
       var min = [c[4], c[5]].filter(Boolean).join(",");
       var back = [c[6], c[7], c[8]].filter(Boolean).join(",");
-      groups[groups.length - 1].push([c[0], c[2], c[3], min, back, c[9], c[10], c[11], c[12], c[13], c[14] || "", c[1], repCol >= 0 ? (c[repCol] || "").replace(/\|/g, " ") : ""].join("|"));
-    } else if (c.slice(0, 15).every(function (x) { return !x; })) {
+      groups[groups.length - 1].push([c[0], c[2], c[3], min, back, c[9], c[10], c[11], c[12], c[13], [c[14], c[15]].filter(Boolean).join(" "), c[1], repCol >= 0 ? (c[repCol] || "").replace(/\|/g, " ") : ""].join("|"));
+    } else if (c.slice(0, 16).every(function (x) { return !x; })) {
       if (groups[groups.length - 1].length) groups.push([]);
     }
   });
