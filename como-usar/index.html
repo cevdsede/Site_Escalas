@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#3f51b5">
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="icon" type="image/png" href="../icons/icon-192.png">
+<link rel="apple-touch-icon" href="../icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Escala">
+<title>Como usar o site</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400,500,600,700,800&display=swap">
+<link rel="stylesheet" href="../theme.css">
+<script src="../theme.js"></script>
+<script src="../site.js" defer></script>
+<style>
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); background-image: var(--page-bg); background-attachment: fixed; color: var(--text); font-family: var(--font); font-size: 15px; line-height: 1.45; min-height: 100vh; padding: 16px clamp(16px, 3vw, 40px) 48px; }
+.wrap { max-width: 1040px; margin: 0 auto; display: flex; flex-direction: column; gap: 22px; }
+.tutorial { margin: 0; }
+    /* Tutorial na página inicial */
+    .tutorial { background: var(--surface); box-shadow: var(--shadow); border-radius: var(--radius); padding: 28px 18px; flex: 1 1 100%; max-width: 1040px; box-sizing: border-box; min-width: 280px; }
+    .tutorial h1 { margin: 0 0 6px; font-size: clamp(28px, 6vw, 40px); line-height: 1.1; letter-spacing: -0.02em; color: var(--brand-text); }
+    .tutorial .intro { margin: 0 0 18px; color: var(--muted); }
+    .tutorial details { border: 1px solid var(--border); border-radius: 14px; background: var(--surface-2); margin-top: 10px; overflow: hidden; }
+    .tutorial summary { cursor: pointer; list-style: none; padding: 14px 16px; font-weight: 700; display: flex; align-items: center; gap: 12px; color: var(--text); }
+    .tutorial summary::-webkit-details-marker { display: none; }
+    .tutorial summary .num { flex: none; width: 30px; height: 30px; border-radius: 50%; background: var(--brand); color: var(--on-brand); display: grid; place-items: center; font-size: 14px; }
+    .tutorial summary::after { content: "\25B8"; margin-left: auto; color: var(--brand-text); transition: transform .15s; }
+    .tutorial details[open] > summary::after { transform: rotate(90deg); }
+    .tutorial summary:focus-visible { outline: 2px solid var(--brand-text); outline-offset: -2px; }
+    .tutorial .passo { display: flex; gap: 22px; align-items: flex-start; padding: 4px 16px 18px; flex-wrap: wrap; }
+    .tutorial .passo .texto { flex: 1 1 260px; min-width: 0; line-height: 1.55; }
+    .tutorial .passo .texto p { margin: 0 0 10px; }
+    .tutorial .passo ul { margin: 0 0 10px; padding-left: 20px; }
+    .tutorial .passo li { margin: 4px 0; }
+    .tutorial .passo figure { margin: 0 auto; flex: 0 0 auto; }
+    .tutorial .passo img { display: block; width: 240px; max-width: 100%; height: auto; border-radius: 22px; border: 6px solid var(--text); box-shadow: var(--shadow); background: var(--surface); }
+    .tutorial .passo figcaption { text-align: center; font-size: 12px; color: var(--muted); margin-top: 8px; }
+    .tutorial .dica { background: var(--brand-soft); border-radius: 10px; padding: 10px 12px; color: var(--text); }
+    @media (max-width: 650px) { .tutorial { padding: 22px 12px; } .tutorial .passo { padding: 4px 12px 16px; } }
+    .wrap > .tutorial { flex: none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav class="site-nav rounded" aria-label="Menu principal">
+    <div class="site-nav-in">
+      <a class="site-brand" href="../"><img src="../logo%20louvor.png" alt="" width="34" height="34"><span>Louvor CEVD</span></a>
+      <div class="site-links"><a href="../">Início</a><a href="../escala/">Escala</a><a href="../musicas/biblioteca-musicas.html">Músicas</a><a href="../musicas/repertorio.html">Repertório</a></div>
+      <button type="button" class="theme-btn" data-theme-toggle></button>
+    </div>
+  </nav>
+    <main class="tutorial" id="tutorial" aria-labelledby="tutTitulo">
+      <h1 id="tutTitulo">Como usar o site</h1>
+      <p class="intro">Passo a passo rápido, com as telas do celular. Toque em cada item para abrir.</p>
+      <details open>
+        <summary><span class="num">1</span>Instalar o app no celular</summary>
+        <div class="passo">
+          <div class="texto"><p>Instale o site como um aplicativo: ele ganha um ícone na tela inicial e abre em tela cheia.</p>
+<ul>
+<li><b>Android (Chrome ou Edge):</b> toque em <b>Instalar app</b> na tela inicial. Se o botão não aparecer, abra o menu do navegador (⋮) e escolha <b>Instalar app</b> ou <b>Adicionar à tela inicial</b>.</li>
+<li><b>iPhone (Safari):</b> toque em <b>Compartilhar</b> e depois em <b>Adicionar à Tela de Início</b>.</li>
+</ul>
+<p class="dica"><b>Sem internet?</b> O app guarda a última escala e a lista de músicas que você abriu. Mesmo sem sinal você consegue ver a escala.</p>
+<p>O botão <b>◐</b> no canto troca entre o tema claro e o escuro.</p></div>
+          <figure><img src="../tutorial/passo-inicio.jpg" alt="Tela inicial do site" loading="lazy" width="375" height="812"><figcaption>Tela inicial do site</figcaption></figure>
+        </div>
+      </details>
+      <details>
+        <summary><span class="num">2</span>Ver a escala</summary>
+        <div class="passo">
+          <div class="texto"><p>Toque em <b>Link da Escala</b>. A tela mostra os próximos cultos, por semana.</p>
+<ul>
+<li><b>Esta semana</b> mostra só a semana atual. <b>Tudo</b> mostra todos os cultos futuros.</li>
+<li>O quadro <b>Próximo culto</b> traz a data, o horário e o ministro. O botão <b>Agendar</b> coloca o culto no calendário do celular.</li>
+<li>Semanas que já passaram e dias sem ninguém escalado não aparecem.</li>
+<li>A escala é atualizada sozinha sempre que a planilha muda.</li>
+</ul></div>
+          <figure><img src="../tutorial/passo-escala.jpg" alt="Escala: próximo culto e filtro por pessoa" loading="lazy" width="375" height="812"><figcaption>Escala: próximo culto e filtro por pessoa</figcaption></figure>
+        </div>
+      </details>
+      <details>
+        <summary><span class="num">3</span>Ver só a sua escala</summary>
+        <div class="passo">
+          <div class="texto"><p>Em <b>Filtrar por pessoa</b>, toque no seu nome. A lista passa a mostrar só os seus cultos, e o quadro do próximo culto mostra a sua função.</p>
+<ul>
+<li>Aparecem só os nomes de quem está na escala.</li>
+<li>As escalas que já passaram ficam apagadas, só para consulta.</li>
+<li><b>Exportar escala (imagem)</b> gera uma imagem com as escalas futuras para você salvar ou mandar no grupo. Com seu nome escolhido, a imagem traz só as suas escalas. Com <b>Todos</b>, traz a escala completa.</li>
+<li><b>Agendar todas as escalas</b> coloca todos os seus cultos futuros no calendário de uma vez.</li>
+</ul></div>
+          <figure><img src="../tutorial/passo-filtro.jpg" alt="Escala filtrada por uma pessoa" loading="lazy" width="375" height="812"><figcaption>Escala filtrada por uma pessoa</figcaption></figure>
+        </div>
+      </details>
+      <details>
+        <summary><span class="num">4</span>Entender o cartão de cada culto</summary>
+        <div class="passo">
+          <div class="texto"><p>Cada culto mostra a data, o horário, o nome do culto e a equipe completa, cada função com seu ícone:</p>
+<ul>
+<li><b>Ministro</b> (microfone com coroa), <b>Back</b>, <b>Teclado</b>, <b>Guitarra</b>, <b>Baixo</b>, <b>Bateria</b>, <b>Violão</b> e <b>Sax</b>.</li>
+<li>Quando você está filtrando uma pessoa, o nome dela fica destacado.</li>
+<li>O aviso laranja <b>Confira</b> aparece quando a mesma pessoa está em mais de uma função no culto.</li>
+<li>A marca <b>Próximo</b> indica o culto mais perto de hoje.</li>
+</ul></div>
+          <figure><img src="../tutorial/passo-culto.jpg" alt="Cartão de um culto com a equipe" loading="lazy" width="375" height="812"><figcaption>Cartão de um culto com a equipe</figcaption></figure>
+        </div>
+      </details>
+      <details>
+        <summary><span class="num">5</span>Montar o repertório do culto</summary>
+        <div class="passo">
+          <div class="texto"><p>No cartão do culto, toque em <b>+ Música</b>.</p>
+<ul>
+<li>Escolha <b>quem vai cantar</b> (o ministro do culto).</li>
+<li>Digite para filtrar e escolha a <b>música</b> na lista.</li>
+<li>Escolha o <b>tom</b>. Se ainda não souber, deixe em <b>Definir depois</b>.</li>
+<li>Digite o <b>PIN</b> do ministério e toque em <b>Adicionar</b>. Quem não tem o PIN pode ver o repertório, mas não consegue adicionar músicas.</li>
+</ul>
+<p>Na aba <b>Repertório</b> do menu você vê o repertório de cada culto e o <b>histórico</b>, agrupado pelo nome do ministro.</p></div>
+          <figure><img src="../tutorial/passo-musica.jpg" alt="Formulário para adicionar música ao culto" loading="lazy" width="375" height="812"><figcaption>Formulário para adicionar música ao culto</figcaption></figure>
+        </div>
+      </details>
+      <details>
+        <summary><span class="num">6</span>Biblioteca de Músicas</summary>
+        <div class="passo">
+          <div class="texto"><p>Toque em <b>Biblioteca de Músicas</b> (ou em <b>Músicas</b> no menu do alto). É o acervo do ministério.</p>
+<ul>
+<li><b>Buscar</b> por nome da música ou do cantor.</li>
+<li><b>Filtrar</b> por tema e por estilo, e ordenar a lista.</li>
+<li>Cada música tem os botões <b>YouTube</b>, <b>Spotify</b>, <b>Letra</b> e <b>Cifra</b> (quando cadastrados).</li>
+<li><b>+ Nova música</b> cadastra uma música que ainda não está na lista.</li>
+</ul></div>
+          <figure><img src="../tutorial/passo-biblioteca.jpg" alt="Biblioteca de Músicas" loading="lazy" width="375" height="812"><figcaption>Biblioteca de Músicas</figcaption></figure>
+        </div>
+      </details>
+      <details>
+        <summary><span class="num">7</span>Lista de músicas do Passos de Fé</summary>
+        <div class="passo">
+          <div class="texto"><p>Na tela inicial, o botão laranja <b>Lista música Passos de Fé</b> abre a lista do culto de quinta, na ordem de ensaio.</p>
+<ul>
+<li>Cada música tem os atalhos de <b>YouTube</b>, <b>Spotify</b>, <b>letra</b> e <b>cifra</b>.</li>
+<li><b>Playlist no YouTube Music</b> abre a playlist completa.</li>
+<li><b>Todas do tema na Biblioteca</b> leva à Biblioteca já filtrada em Passos de Fé.</li>
+</ul></div>
+          
+        </div>
+      </details>
+    </main>
+</div>
+</body>
+</html>

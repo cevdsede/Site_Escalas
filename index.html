@@ -166,6 +166,7 @@
       .container .logo { max-width: 140px; margin-bottom: 0; }
       .container h1 { margin-bottom: 8px; font-size: 2.4em; }
       .container > .spreadsheet { margin-top: 0; }
+      .container > .spreadsheet.ultimo { grid-column: 1 / -1; justify-self: center; width: calc(50% - 16px); }   /* última linha, centralizado entre as duas colunas */
       .spreadsheet a, .spreadsheet button { max-width: none; }
     }
 
@@ -450,13 +451,18 @@
       </div>
 
       <div class="spreadsheet">
-        <button type="button" id="openMusic" class="coral" aria-haspopup="dialog">
+        <button type="button" id="openMusic" aria-haspopup="dialog">
           <i class="fa-solid fa-music"></i> Lista música Passos de Fé
         </button>
       </div>
 
       <div class="spreadsheet" id="installBox">
         <button type="button" id="install" class="ghost"><i class="fa-solid fa-download"></i> Instalar app</button>
+      </div>
+      <div class="spreadsheet ultimo">
+        <a href="como-usar/" class="ghost">
+          <i class="fa-solid fa-circle-question"></i> Como usar
+        </a>
       </div>
       <p class="help" id="installHelp" hidden>Para instalar: no Chrome ou Edge, abra o menu do navegador (⋮) e toque em "Instalar app" ou "Adicionar à tela inicial". No iPhone, toque em Compartilhar e depois em "Adicionar à Tela de Início".</p>
     </div>

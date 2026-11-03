@@ -2,12 +2,14 @@
 // Com internet, as páginas vêm sempre da rede (versão mais nova); sem internet, vêm do cache.
 // A escala e a lista de músicas ficam salvas no aparelho pelas próprias páginas (localStorage).
 // Mude o número de CACHE a cada publicação para os aparelhos mostrarem o aviso de versão nova.
-var CACHE = "escala-v18";
+var CACHE = "escala-v19";
 var SHELL = [
   "./",
   "index.html",
   "escala/",
   "escala/index.html",
+  "como-usar/",
+  "como-usar/index.html",
   "musicas/biblioteca-musicas.html",
   "musicas/repertorio.html",
   "logo%20louvor.png",
@@ -17,7 +19,13 @@ var SHELL = [
   "site.js",
   "passos-de-fe.json",
   "icons/icon-192.png",
-  "icons/icon-512.png"
+  "icons/icon-512.png",
+  "tutorial/passo-inicio.jpg",
+  "tutorial/passo-escala.jpg",
+  "tutorial/passo-filtro.jpg",
+  "tutorial/passo-culto.jpg",
+  "tutorial/passo-musica.jpg",
+  "tutorial/passo-biblioteca.jpg"
 ];
 var CDN = ["fonts.googleapis.com", "fonts.gstatic.com", "cdnjs.cloudflare.com"];
 var WAIT_MS = 4000; // rede lenta: depois disso usa o que está salvo
