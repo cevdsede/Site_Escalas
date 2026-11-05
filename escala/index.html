@@ -114,6 +114,18 @@ dialog#repDialog::backdrop { background: rgba(0, 0, 0, .55); }
 .rep-form label { display: grid; gap: 5px; font-size: 13px; font-weight: 600; color: var(--muted); }
 .rep-form input, .rep-form select { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font: inherit; font-weight: 400; }
 .rep-form select[size] { padding: 4px; }
+.rep-link { justify-self: start; background: none; border: 0; padding: 2px 0; font: inherit; font-size: 13px; font-weight: 600; color: var(--brand-text); text-decoration: underline; cursor: pointer; }
+.rep-link:focus-visible { outline: 2px solid var(--brand-text); outline-offset: 2px; }
+.rep-nova { display: grid; gap: 12px; padding: 12px; border: 1px dashed var(--border); border-radius: 12px; background: var(--surface-2); }
+.rep-nova[hidden] { display: none; }
+.rep-res { display: grid; gap: 6px; }
+.rep-res[hidden] { display: none; }
+.rep-res button { text-align: left; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 8px 12px; font: inherit; color: var(--text); cursor: pointer; display: grid; gap: 2px; }
+.rep-res button:hover { border-color: var(--brand-text); }
+.rep-res button:focus-visible { outline: 2px solid var(--brand-text); outline-offset: 2px; }
+.rep-res .t { font-weight: 700; }
+.rep-res .a { font-size: 12px; color: var(--muted); }
+.rep-res .vazio { font-size: 12px; color: var(--muted); }
 .rep-form option:disabled { color: var(--muted); }
 .rep-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .rep-row label[hidden] { display: none; }
@@ -180,6 +192,28 @@ body { margin: 0; }
       <input id="fBusca" type="search" placeholder="Digite para filtrar…" autocomplete="off">
       <select id="fMusica" size="6" required></select>
     </label>
+    <button type="button" class="rep-link" id="fNovaLink" aria-expanded="false">Não encontrou a música? Cadastrar música nova</button>
+    <div id="fNova" class="rep-nova" hidden>
+      <label>Buscar na internet
+        <input id="fNovaWeb" type="search" placeholder="Nome da música ou do cantor…" autocomplete="off">
+      </label>
+      <div id="fNovaRes" class="rep-res" hidden></div>
+      <label>Nome da música
+        <input id="fNovaMusica" type="text" maxlength="120" autocomplete="off">
+      </label>
+      <label>Cantor ou banda
+        <input id="fNovaCantor" type="text" maxlength="120" autocomplete="off">
+      </label>
+      <div class="rep-row">
+        <label>Tema
+          <select id="fNovaTema"></select>
+        </label>
+        <label>Estilo
+          <select id="fNovaEstilo"></select>
+        </label>
+      </div>
+      <p class="rep-sub">A música entra na Biblioteca de Músicas e já é adicionada a este culto.</p>
+    </div>
     <div class="rep-row">
       <label>Tom (opcional)
         <select id="fTom"></select>
@@ -716,6 +750,7 @@ function openRep(svc) {
   var t0 = document.createElement("option"); t0.value = ""; t0.textContent = "Definir depois"; tom.appendChild(t0);
   api.tons.forEach(function (t) { var o = document.createElement("option"); o.value = t.id; o.textContent = t.nome; tom.appendChild(o); });
   document.getElementById("fBusca").value = "";
+  mostrarNova(false);
   document.getElementById("fPinLabel").hidden = !api.pin_obrigatorio;
   document.getElementById("fPin").required = !!api.pin_obrigatorio;
   try { document.getElementById("fPin").value = sessionStorage.getItem("escala.pin") || ""; } catch (e) {}
@@ -724,27 +759,106 @@ function openRep(svc) {
   if (repDialog.showModal) repDialog.showModal(); else repDialog.setAttribute("open", "");
 }
 document.getElementById("fBusca").addEventListener("input", fillRepSongs);
+var BIB_URL = "https://ipdrbhkzluuwjulkhjkd.supabase.co/functions/v1/biblioteca-musicas", bibMeta = null, ultimaCriada = null;
+function novaMusicaAberta() { return !document.getElementById("fNova").hidden; }
+function mostrarNova(on) {
+  document.getElementById("fNova").hidden = !on;
+  document.getElementById("fNovaLink").setAttribute("aria-expanded", String(on));
+  document.getElementById("fNovaLink").textContent = on ? "Voltar para a lista de músicas" : "Não encontrou a música? Cadastrar música nova";
+  document.getElementById("fMusica").required = !on;
+  document.getElementById("fSave").textContent = on ? "Cadastrar e adicionar" : "Adicionar";
+}
+function preencherMeta(meta) {
+  var tema = document.getElementById("fNovaTema"), est = document.getElementById("fNovaEstilo");
+  tema.textContent = ""; est.textContent = "";
+  var t0 = document.createElement("option"); t0.value = ""; t0.textContent = "Selecione…"; tema.appendChild(t0);
+  (meta.temas || []).forEach(function (t) { var o = document.createElement("option"); o.value = t; o.textContent = t; tema.appendChild(o); });
+  (meta.estilos || []).forEach(function (t) { var o = document.createElement("option"); o.value = t; o.textContent = t; est.appendChild(o); });
+}
+document.getElementById("fNovaLink").addEventListener("click", function () {
+  var abrir = !novaMusicaAberta();
+  mostrarNova(abrir);
+  if (!abrir) return;
+  var busca = document.getElementById("fBusca").value.trim();
+  if (busca && !document.getElementById("fNovaWeb").value) { document.getElementById("fNovaWeb").value = busca; buscarNaWeb(); }
+  if (bibMeta) { if (!document.getElementById("fNovaTema").options.length) preencherMeta(bibMeta); return; }
+  fMsg("Carregando temas…");
+  fetch(BIB_URL).then(function (r) { if (!r.ok) throw new Error("http"); return r.json(); }).then(function (j) {
+    bibMeta = { temas: j.temas || [], estilos: j.estilos || [] }; preencherMeta(bibMeta); fMsg("");
+  }).catch(function () { fMsg("Não consegui carregar os temas. Confira a internet e tente de novo.", "err"); });
+});
+// Busca no iTunes (gratuita, sem chave): preenche nome e cantor com os dados do catálogo
+var webTimer = null, webSeq = 0;
+function limpaTitulo(t) { return String(t || "").replace(/\s*[\(\[][^\)\]]*[\)\]]/g, "").replace(/\s+-\s+(ao vivo|live|remaster.*|single|ep).*$/i, "").replace(/\s+/g, " ").trim(); }
+function buscarNaWeb() {
+  var q = document.getElementById("fNovaWeb").value.trim(), box = document.getElementById("fNovaRes");
+  if (q.length < 3) { box.hidden = true; box.textContent = ""; return; }
+  var seq = ++webSeq;
+  fetch("https://itunes.apple.com/search?media=music&entity=song&limit=15&country=BR&term=" + encodeURIComponent(q))
+    .then(function (r) { if (!r.ok) throw new Error("http"); return r.json(); })
+    .then(function (j) {
+      if (seq !== webSeq) return;
+      var vistos = {}, itens = [];
+      (j.results || []).forEach(function (x) {
+        var t = limpaTitulo(x.trackName), a = String(x.artistName || "").replace(/\s+/g, " ").trim(), k = normTxt(t) + "|" + normTxt(a);
+        if (!t || !a || vistos[k] || itens.length >= 6) return;
+        vistos[k] = 1; itens.push({ t: t, a: a });
+      });
+      box.textContent = "";
+      if (!itens.length) { var v = document.createElement("div"); v.className = "vazio"; v.textContent = "Nada encontrado. Digite o nome e o cantor abaixo."; box.appendChild(v); }
+      itens.forEach(function (i) {
+        var b = document.createElement("button"); b.type = "button";
+        var t = document.createElement("span"); t.className = "t"; t.textContent = i.t;
+        var a = document.createElement("span"); a.className = "a"; a.textContent = i.a;
+        b.appendChild(t); b.appendChild(a);
+        b.addEventListener("click", function () {
+          document.getElementById("fNovaMusica").value = i.t; document.getElementById("fNovaCantor").value = i.a;
+          box.hidden = true; box.textContent = ""; document.getElementById("fNovaTema").focus();
+        });
+        box.appendChild(b);
+      });
+      box.hidden = false;
+    }).catch(function () { if (seq === webSeq) { box.hidden = true; } });
+}
+document.getElementById("fNovaWeb").addEventListener("input", function () { clearTimeout(webTimer); webTimer = setTimeout(buscarNaWeb, 400); });
+function criarMusicaNova(pin) {   // cadastra na Biblioteca e devolve o id da música
+  var m = document.getElementById("fNovaMusica").value.trim(), c = document.getElementById("fNovaCantor").value.trim();
+  var tema = document.getElementById("fNovaTema").value, estilo = document.getElementById("fNovaEstilo").value;
+  if (!m || !c || !tema) return Promise.reject(new Error("Preencha o nome da música, o cantor e o tema."));
+  var chave = m.toLowerCase() + "|" + c.toLowerCase();
+  if (ultimaCriada && ultimaCriada.chave === chave) return Promise.resolve(ultimaCriada.id);   // já cadastrada nesta janela (falha ao adicionar ao culto): reaproveita
+  return fetch(BIB_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ musica: m, cantor: c, tema: tema, estilo: estilo, pin: pin }) })
+    .then(function (r) {
+      return r.json().catch(function () { return {}; }).then(function (j) {
+        if (r.status === 409) throw new Error("Essa música já está cadastrada. Procure pelo nome na lista.");
+        if (!r.ok) throw new Error(j.error || "Erro ao cadastrar a música.");
+        ultimaCriada = { chave: chave, id: j.id };
+        return j.id;
+      });
+    });
+}
 document.getElementById("fClose").addEventListener("click", function () { repDialog.close(); });
 document.getElementById("repForm").addEventListener("submit", function (e) {
   e.preventDefault();
   if (!curSvc) return;
-  var musica = document.getElementById("fMusica").value;
-  if (!musica) { fMsg("Escolha uma música da lista.", "err"); return; }
+  var novo = novaMusicaAberta(), musica = document.getElementById("fMusica").value;
+  if (!novo && !musica) { fMsg("Escolha uma música da lista.", "err"); return; }
   var save = document.getElementById("fSave");
   save.disabled = true;
   fMsg("Salvando…");
   var pin = document.getElementById("fPin").value;
-  fetch(API_URL, {
+  var criar = novo ? criarMusicaNova(pin) : Promise.resolve(musica);
+  criar.then(function (idMusica) { return fetch(API_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       id_culto: curSvc.api.id,
       id_membros: document.getElementById("fMembro").value,
-      id_musicas: musica,
+      id_musicas: idMusica,
       id_tons: document.getElementById("fTom").value === "" ? null : Number(document.getElementById("fTom").value),
       pin: pin
     })
-  }).then(function (r) {
+  }); }).then(function (r) {
     return r.json().catch(function () { return {}; }).then(function (j) {
       if (!r.ok) throw new Error(j.error || "Erro ao salvar.");
     });
@@ -754,6 +868,7 @@ document.getElementById("repForm").addEventListener("submit", function (e) {
     document.getElementById("fBusca").value = "";
     document.getElementById("fMusica").value = "";
     document.getElementById("fTom").value = "";
+    if (novaMusicaAberta()) { document.getElementById("fNovaMusica").value = ""; document.getElementById("fNovaCantor").value = ""; mostrarNova(false); }
     return loadApi().then(function () { if (curSvc) { var k = curSvc.iso + " " + curSvc.time; curSvc = findSvc(k) || curSvc; fillRepSongs(); } });
   }).catch(function (err) {
     fMsg(err && err.message && err.message !== "Failed to fetch" ? err.message : "Sem conexão. Tente de novo.", "err");

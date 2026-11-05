@@ -35,6 +35,13 @@
   .form .actions { display: flex; gap: 8px; margin-top: 6px; }
   .form .actions .btn { flex: 1; }
   .msg { font-size: 13px; min-height: 1.2em; }
+  .webres { display: grid; gap: 6px; }
+  .webres[hidden] { display: none; }
+  .webres button { text-align: left; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 8px 12px; font: inherit; color: var(--text); cursor: pointer; display: grid; gap: 2px; }
+  .webres button:hover { border-color: var(--brand-text); }
+  .webres .t { font-weight: 700; }
+  .webres .a { font-size: 12px; color: var(--muted); }
+  .webres .vazio { font-size: 12px; color: var(--muted); }
   .msg.err { color: #dc2626; }
   .msg.ok { color: #059669; }
   .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
@@ -116,6 +123,8 @@
 <dialog id="addDialog">
   <h2>Nova música</h2>
   <form class="form" id="addForm">
+    <input id="fWeb" type="search" placeholder="Buscar na internet (nome ou cantor)…" autocomplete="off">
+    <div class="webres" id="fWebRes" hidden></div>
     <input id="fSong" placeholder="Nome da música" maxlength="120" required>
     <input id="fSinger" placeholder="Cantor / Banda" maxlength="120" required>
     <div class="row">
@@ -309,6 +318,38 @@
   const fMsg = (text, kind) => { $('fMsg').textContent = text; $('fMsg').className = 'msg ' + (kind || ''); };
   $('addBtn').onclick = () => { fMsg(''); $('addDialog').showModal(); $('fSong').focus(); };
   $('fCancel').onclick = () => $('addDialog').close();
+  // Busca no iTunes (gratuita, sem chave): preenche nome e cantor
+  const limpaTitulo = (t) => String(t || '').replace(/\s*[\(\[][^\)\]]*[\)\]]/g, '').replace(/\s+-\s+(ao vivo|live|remaster.*|single|ep).*$/i, '').replace(/\s+/g, ' ').trim();
+  let webTimer = null, webSeq = 0;
+  async function buscarNaWeb() {
+    const q = $('fWeb').value.trim(), box = $('fWebRes');
+    if (q.length < 3) { box.hidden = true; box.textContent = ''; return; }
+    const seq = ++webSeq;
+    try {
+      const r = await fetch('https://itunes.apple.com/search?media=music&entity=song&limit=15&country=BR&term=' + encodeURIComponent(q));
+      if (!r.ok) throw new Error('http');
+      const j = await r.json();
+      if (seq !== webSeq) return;
+      const vistos = new Set(), itens = [];
+      for (const x of j.results || []) {
+        const t = limpaTitulo(x.trackName), a = String(x.artistName || '').replace(/\s+/g, ' ').trim(), k = (t + '|' + a).toLowerCase();
+        if (!t || !a || vistos.has(k) || itens.length >= 6) continue;
+        vistos.add(k); itens.push({ t, a });
+      }
+      box.textContent = '';
+      if (!itens.length) { const v = document.createElement('div'); v.className = 'vazio'; v.textContent = 'Nada encontrado. Digite o nome e o cantor abaixo.'; box.appendChild(v); }
+      for (const i of itens) {
+        const b = document.createElement('button'); b.type = 'button';
+        const t = document.createElement('span'); t.className = 't'; t.textContent = i.t;
+        const a = document.createElement('span'); a.className = 'a'; a.textContent = i.a;
+        b.append(t, a);
+        b.onclick = () => { $('fSong').value = i.t; $('fSinger').value = i.a; box.hidden = true; box.textContent = ''; $('fTheme').focus(); };
+        box.appendChild(b);
+      }
+      box.hidden = false;
+    } catch { if (seq === webSeq) box.hidden = true; }
+  }
+  $('fWeb').addEventListener('input', () => { clearTimeout(webTimer); webTimer = setTimeout(buscarNaWeb, 400); });
   $('addForm').onsubmit = async (e) => {
     e.preventDefault();
     $('fSave').disabled = true;
@@ -325,7 +366,7 @@
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || 'Erro ao salvar.');
       fMsg('Música adicionada!', 'ok');
-      $('fSong').value = ''; $('fSinger').value = '';
+      $('fSong').value = ''; $('fSinger').value = ''; $('fWeb').value = ''; $('fWebRes').hidden = true;
       await loadData();
       setTimeout(() => $('addDialog').close(), 700);
     } catch (err) {
