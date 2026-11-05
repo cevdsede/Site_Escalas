@@ -407,13 +407,15 @@ function hasPerson(s, n) { return ROLES.some(function (r) { return s[r[1]].index
 function isEmpty(s) { return !s.rep.length && !ROLES.some(function (r) { return s[r[1]].length; }); }
 function rolesOf(s, n) { return ROLES.filter(function (r) { return s[r[1]].indexOf(n) >= 0; }).map(function (r) { return r[0]; }); }
 // Same person listed in more than one role in the same service (guests excluded).
+// Pessoa em duas funções: só avisa quando uma delas é Bateria ou Baixo (as demais combinações são normais).
 function doubled(s) {
-  var seen = {}, out = [];
+  var funcs = {}, ordem = [], out = [];
   ROLES.forEach(function (r) { s[r[1]].forEach(function (n) {
     if (n === "Convidado") return;
-    seen[n] = (seen[n] || 0) + 1;
-    if (seen[n] === 2) out.push(n);
+    if (!funcs[n]) { funcs[n] = []; ordem.push(n); }
+    funcs[n].push(r[1]);
   }); });
+  ordem.forEach(function (n) { if (funcs[n].length > 1 && (funcs[n].indexOf("bat") >= 0 || funcs[n].indexOf("bai") >= 0)) out.push(n); });
   return out;
 }
 function pad(n) { return (n < 10 ? "0" : "") + n; }
@@ -541,7 +543,7 @@ function render() {
       var dup = doubled(s);
       if (dup.length) {
         var warn = el("span", "badge warn", "Confira: " + dup.join(", ") + " em 2 funções");
-        warn.title = "A mesma pessoa aparece em mais de uma função neste culto";
+        warn.title = "A mesma pessoa aparece em mais de uma função neste culto, e uma delas é Bateria ou Baixo";
         head.appendChild(warn);
       }
       if (k >= todayKey()) head.appendChild(calLink(s));
