@@ -1,8 +1,9 @@
 // Service worker: deixa o site abrir sem internet.
 // Com internet, as páginas vêm sempre da rede (versão mais nova); sem internet, vêm do cache.
 // A escala e a lista de músicas ficam salvas no aparelho pelas próprias páginas (localStorage).
-// Mude o número de CACHE a cada publicação para os aparelhos mostrarem o aviso de versão nova.
-var CACHE = "escala-v19";
+// Mude o número em version.js a cada publicação para os aparelhos mostrarem o aviso de versão nova.
+importScripts("version.js");
+var CACHE = "escala-v" + SITE_VERSAO;
 var SHELL = [
   "./",
   "index.html",
@@ -17,6 +18,7 @@ var SHELL = [
   "theme.css",
   "theme.js",
   "site.js",
+  "version.js",
   "passos-de-fe.json",
   "icons/icon-192.png",
   "icons/icon-512.png",
