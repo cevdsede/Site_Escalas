@@ -92,7 +92,7 @@
       if (o.pinRequired) {
         var label = document.createElement("label"); label.textContent = "PIN";
         pin = document.createElement("input");
-        pin.type = "password"; pin.autocomplete = "off"; pin.required = true;
+        pin.type = "password"; pin.autocomplete = "off"; pin.autocapitalize = "off"; pin.setAttribute("autocorrect", "off"); pin.spellcheck = false; pin.required = true;
         try { pin.value = sessionStorage.getItem("escala.pin") || ""; } catch (e) {}
         label.appendChild(pin);
         form.appendChild(label);
@@ -167,7 +167,7 @@
     if (o.pinRequired) {
       var lp = document.createElement("label"); lp.textContent = "PIN";
       pin = document.createElement("input");
-      pin.type = "password"; pin.autocomplete = "off"; pin.required = true;
+      pin.type = "password"; pin.autocomplete = "off"; pin.autocapitalize = "off"; pin.setAttribute("autocorrect", "off"); pin.spellcheck = false; pin.required = true;
       try { pin.value = sessionStorage.getItem("escala.pin") || ""; } catch (e) {}
       lp.appendChild(pin);
       form.appendChild(lp);
