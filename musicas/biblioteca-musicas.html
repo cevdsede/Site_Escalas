@@ -35,6 +35,7 @@
   .form .actions { display: flex; gap: 8px; margin-top: 6px; }
   .form .actions .btn { flex: 1; }
   .msg { font-size: 13px; min-height: 1.2em; }
+  .webcheck { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; }
   .webres { display: grid; gap: 6px; }
   .webres[hidden] { display: none; }
   .webres button { text-align: left; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 8px 12px; font: inherit; color: var(--text); cursor: pointer; display: grid; gap: 2px; }
@@ -124,6 +125,7 @@
   <h2>Nova música</h2>
   <form class="form" id="addForm">
     <input id="fWeb" type="search" placeholder="Buscar na internet (nome ou cantor)…" autocomplete="off">
+    <label class="webcheck"><input id="fGospel" type="checkbox" checked> Somente música gospel</label>
     <div class="webres" id="fWebRes" hidden></div>
     <input id="fSong" placeholder="Nome da música" maxlength="120" required>
     <input id="fSinger" placeholder="Cantor / Banda" maxlength="120" required>
@@ -320,24 +322,26 @@
   $('fCancel').onclick = () => $('addDialog').close();
   // Busca no iTunes (gratuita, sem chave): preenche nome e cantor
   const limpaTitulo = (t) => String(t || '').replace(/\s*[\(\[][^\)\]]*[\)\]]/g, '').replace(/\s+-\s+(ao vivo|live|remaster.*|single|ep).*$/i, '').replace(/\s+/g, ' ').trim();
+  const GOSPEL = /gospel|relig|crist|christian|louvor|adora|worship|espiritual|inspir/i;
   let webTimer = null, webSeq = 0;
   async function buscarNaWeb() {
     const q = $('fWeb').value.trim(), box = $('fWebRes');
     if (q.length < 3) { box.hidden = true; box.textContent = ''; return; }
     const seq = ++webSeq;
     try {
-      const r = await fetch('https://itunes.apple.com/search?media=music&entity=song&limit=15&country=BR&term=' + encodeURIComponent(q));
+      const r = await fetch('https://itunes.apple.com/search?media=music&entity=song&limit=' + ($('fGospel').checked ? 50 : 15) + '&country=BR&term=' + encodeURIComponent($('fGospel').checked ? q + ' gospel' : q));
       if (!r.ok) throw new Error('http');
       const j = await r.json();
       if (seq !== webSeq) return;
       const vistos = new Set(), itens = [];
       for (const x of j.results || []) {
+        if ($('fGospel').checked && !GOSPEL.test(x.primaryGenreName || '')) continue;
         const t = limpaTitulo(x.trackName), a = String(x.artistName || '').replace(/\s+/g, ' ').trim(), k = (t + '|' + a).toLowerCase();
         if (!t || !a || vistos.has(k) || itens.length >= 6) continue;
         vistos.add(k); itens.push({ t, a });
       }
       box.textContent = '';
-      if (!itens.length) { const v = document.createElement('div'); v.className = 'vazio'; v.textContent = 'Nada encontrado. Digite o nome e o cantor abaixo.'; box.appendChild(v); }
+      if (!itens.length) { const v = document.createElement('div'); v.className = 'vazio'; v.textContent = $('fGospel').checked ? 'Nada encontrado entre as músicas gospel. Desmarque "Somente música gospel" ou digite o nome e o cantor abaixo.' : 'Nada encontrado. Digite o nome e o cantor abaixo.'; box.appendChild(v); }
       for (const i of itens) {
         const b = document.createElement('button'); b.type = 'button';
         const t = document.createElement('span'); t.className = 't'; t.textContent = i.t;
@@ -349,6 +353,7 @@
       box.hidden = false;
     } catch { if (seq === webSeq) box.hidden = true; }
   }
+  $('fGospel').addEventListener('change', buscarNaWeb);
   $('fWeb').addEventListener('input', () => { clearTimeout(webTimer); webTimer = setTimeout(buscarNaWeb, 400); });
   $('addForm').onsubmit = async (e) => {
     e.preventDefault();
