@@ -91,10 +91,13 @@ h1 { color: var(--brand-text); font-family: var(--font-display); font-weight: 70
 .add-rep:hover { border-color: var(--brand-text); }
 .add-rep:focus-visible { outline: 2px solid var(--brand-text); outline-offset: 2px; }
 .rep-list { display: flex; flex-direction: column; }
-.rep-item { display: grid; grid-template-columns: 76px minmax(0, 1fr) auto auto; gap: 10px; align-items: baseline; padding: 5px 0; border-top: 1px solid var(--border); font-size: 14px; }
+.rep-item { display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; gap: 10px; align-items: start; padding: 8px 0; border-top: 1px solid var(--border); font-size: 14px; }
 .rep-item:first-child { border-top: 0; }
 .rep-item .tom { font-weight: 600; color: var(--muted); font-variant-numeric: tabular-nums; font-size: 13px; }
-.rep-item .mus { color: var(--text); font-weight: 500; text-decoration: none; overflow-wrap: anywhere; }
+.rep-item .mus { color: var(--text); font-weight: 600; text-decoration: none; overflow-wrap: break-word; word-break: normal; }
+.mus-box { min-width: 0; display: grid; gap: 2px; }
+.mus-sub { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; font-size: 12.5px; color: var(--muted); }
+.mus-min { background: var(--brand-soft); color: var(--brand-text); font-weight: 600; border-radius: 999px; padding: 0 8px; }
 .rep-item .mus:hover { color: var(--brand-text); text-decoration: underline; }
 .rep-item .who-rep { color: var(--muted); font-size: 13px; text-align: right; }
 .del-rep { border: 0; background: transparent; color: var(--muted); cursor: pointer; padding: 0 8px; border-radius: 8px; font-size: 18px; line-height: 1; }
@@ -105,7 +108,7 @@ h1 { color: var(--brand-text); font-family: var(--font-display); font-weight: 70
 .tom-btn.vazio { color: var(--brand-text); border-color: var(--border); }
 .tom-btn:focus-visible { outline: 2px solid var(--brand-text); outline-offset: 2px; }
 .rep-empty { color: var(--muted); font-size: 14px; }
-@media (max-width: 480px) { .rep-item { grid-template-columns: 64px minmax(0, 1fr) auto; } .rep-item .who-rep { display: none; } }
+@media (max-width: 480px) { .rep-item { grid-template-columns: 56px minmax(0, 1fr) auto; gap: 8px; } }
 dialog#repDialog { border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); color: var(--text); padding: 0; width: min(520px, calc(100vw - 24px)); max-height: calc(100vh - 24px); }
 dialog#repDialog::backdrop { background: rgba(0, 0, 0, .55); }
 .rep-form { display: grid; gap: 12px; padding: 18px; }
@@ -593,11 +596,17 @@ function render() {
               tb.addEventListener("click", (function (item) { return function () { editarTomItem(item); }; })(i));
               row.appendChild(tb);
             } else row.appendChild(el("span", "tom", i.tom || "—"));
+            var box = el("div", "mus-box");
             var a = el("a", "mus", i.musica);
             a.href = "../musicas/biblioteca-musicas.html?q=" + encodeURIComponent(i.musica);
             a.title = "Abrir na biblioteca de músicas";
-            row.appendChild(a);
-            row.appendChild(el("span", "who-rep", i.ministro));
+            box.appendChild(a);
+            var sub = el("div", "mus-sub");
+            if (i.cantor) sub.appendChild(el("span", "mus-cantor", i.cantor));
+            var primeiro = String(i.ministro || "").trim().split(/\s+/)[0];
+            if (primeiro) { var mn = el("span", "mus-min", primeiro); mn.title = "Ministro: " + i.ministro; sub.appendChild(mn); }
+            box.appendChild(sub);
+            row.appendChild(box);
             if (i.id) {
               var del = el("button", "del-rep", "\u00d7");
               del.type = "button";
