@@ -944,9 +944,11 @@ function ativarArrasto(ul, svc) {
     if (!h) return;
     var row = h.closest(".rep-item");
     e.preventDefault();
-    try { h.setPointerCapture(e.pointerId); } catch (err) {}
+    var pid = e.pointerId;
     row.classList.add("arrastando"); ul.classList.add("ordenando");
+    // os ouvintes ficam no documento: ao mover a linha no DOM o navegador solta a captura do ponteiro da alça
     function mover(ev) {
+      if (ev.pointerId !== pid) return;
       var y = ev.clientY, alvo = null, irmaos = linhas().filter(function (r) { return r !== row; });
       for (var k = 0; k < irmaos.length; k++) {
         var b = irmaos[k].getBoundingClientRect();
@@ -955,12 +957,13 @@ function ativarArrasto(ul, svc) {
       if (alvo) { if (row.nextElementSibling !== alvo) ul.insertBefore(row, alvo); }
       else if (ul.lastElementChild !== row) ul.appendChild(row);
     }
-    function soltar() {
-      h.removeEventListener("pointermove", mover); h.removeEventListener("pointerup", soltar); h.removeEventListener("pointercancel", soltar);
+    function soltar(ev) {
+      if (ev && ev.pointerId !== pid) return;
+      document.removeEventListener("pointermove", mover); document.removeEventListener("pointerup", soltar); document.removeEventListener("pointercancel", soltar);
       row.classList.remove("arrastando"); ul.classList.remove("ordenando");
       salvarSeMudou();
     }
-    h.addEventListener("pointermove", mover); h.addEventListener("pointerup", soltar); h.addEventListener("pointercancel", soltar);
+    document.addEventListener("pointermove", mover); document.addEventListener("pointerup", soltar); document.addEventListener("pointercancel", soltar);
   });
   ul.addEventListener("keydown", function (e) {
     var h = e.target.closest ? e.target.closest(".drag-rep") : null;
