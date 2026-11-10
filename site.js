@@ -210,6 +210,70 @@
     sel.focus();
   };
 
+  // ---------- Reordenar as músicas do repertório de um culto ----------
+  // Uso: SiteRep.reordenar({ apiUrl, idCulto, ids (na nova ordem), pinRequired, onDone, onCancel })
+  window.SiteRep.reordenar = function (o) {
+    function enviar(pin) {
+      return fetch(o.apiUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ acao: "reordenar", id_culto: o.idCulto, ids: o.ids, pin: pin || "" })
+      }).then(function (r) {
+        return r.json().catch(function () { return {}; }).then(function (j) {
+          if (!r.ok) { var e = new Error(j.error || "Erro ao salvar a ordem."); e.status = r.status; throw e; }
+        });
+      });
+    }
+    function pronto() { if (o.onDone) o.onDone(); }
+    function cancelou() { if (o.onCancel) o.onCancel(); }
+    var salvo = "";
+    try { salvo = sessionStorage.getItem("escala.pin") || ""; } catch (e) {}
+    if (!o.pinRequired || salvo) {
+      enviar(salvo).then(pronto).catch(function (err) {
+        if (o.pinRequired && err.status === 403) pedirPin("PIN incorreto. Digite de novo."); else { window.alert(err && err.message && err.message !== "Failed to fetch" ? err.message : "Sem conexão. Tente de novo."); cancelou(); }
+      });
+      return;
+    }
+    pedirPin("");
+    function pedirPin(aviso) {
+      var old = document.getElementById("ordemDialog");
+      if (old) old.remove();
+      var dlg = document.createElement("dialog");
+      dlg.id = "ordemDialog"; dlg.className = "dlg"; dlg.setAttribute("aria-labelledby", "ordemTitle");
+      var form = document.createElement("form"); form.className = "dlg-form";
+      var h = document.createElement("h2"); h.id = "ordemTitle"; h.textContent = "Salvar a nova ordem";
+      var p = document.createElement("p"); p.textContent = "Digite o PIN para gravar a ordem das músicas.";
+      var lp = document.createElement("label"); lp.textContent = "PIN";
+      var pin = document.createElement("input");
+      pin.type = "password"; pin.autocomplete = "off"; pin.autocapitalize = "off"; pin.setAttribute("autocorrect", "off"); pin.spellcheck = false; pin.required = true;
+      lp.appendChild(pin);
+      var msg = document.createElement("div"); msg.className = "dlg-msg" + (aviso ? " err" : ""); msg.setAttribute("role", "status"); msg.textContent = aviso;
+      var actions = document.createElement("div"); actions.className = "dlg-actions";
+      var cancel = document.createElement("button"); cancel.type = "button"; cancel.className = "dlg-btn"; cancel.textContent = "Cancelar";
+      var ok = document.createElement("button"); ok.type = "submit"; ok.className = "dlg-btn primary"; ok.textContent = "Salvar ordem";
+      actions.appendChild(cancel); actions.appendChild(ok);
+      [h, p, lp, msg, actions].forEach(function (x) { form.appendChild(x); });
+      dlg.appendChild(form); document.body.appendChild(dlg);
+      var concluido = false, fechado = false;
+      function fechar() { if (fechado) return; fechado = true; try { dlg.close(); } catch (e3) {} dlg.remove(); if (!concluido) cancelou(); }
+      cancel.addEventListener("click", fechar);
+      dlg.addEventListener("close", fechar);
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        ok.disabled = true; msg.textContent = "Salvando\u2026"; msg.className = "dlg-msg";
+        var v = pin.value;
+        enviar(v).then(function () {
+          try { sessionStorage.setItem("escala.pin", v); } catch (e2) {}
+          concluido = true; fechar(); pronto();
+        }).catch(function (err) {
+          msg.textContent = err && err.message && err.message !== "Failed to fetch" ? err.message : "Sem conexão. Tente de novo.";
+          msg.className = "dlg-msg err"; ok.disabled = false;
+        });
+      });
+      dlg.showModal(); pin.focus();
+    }
+  };
+
   setupInstall();
   setupWorker();
 })();
