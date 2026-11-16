@@ -21,6 +21,9 @@ body { margin: 0; background: var(--bg); background-image: var(--page-bg); backg
 header { display: flex; flex-direction: column; gap: 6px; }
 h1 { color: var(--brand-text); font-weight: 700; font-size: clamp(30px, 6vw, 44px); line-height: 1.05; margin: 0; letter-spacing: -0.02em; }
 .sub { color: var(--muted); margin: 0; }
+.playlist { align-self: flex-start; display: inline-flex; align-items: center; gap: 8px; margin-top: 4px; padding: 9px 18px; border-radius: 999px; background: #eab308; color: #1f2937; font-weight: 700; text-decoration: none; box-shadow: 0 6px 16px rgba(234, 179, 8, 0.35); transition: transform .15s, box-shadow .15s; }
+.playlist:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(234, 179, 8, 0.45); }
+.playlist:focus-visible { outline: 2px solid var(--brand-text); outline-offset: 3px; }
 .legenda { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--muted); align-items: center; }
 .filtro { display: flex; flex-direction: column; gap: 10px; }
 .filtro-label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
@@ -67,6 +70,7 @@ h1 { color: var(--brand-text); font-weight: 700; font-size: clamp(30px, 6vw, 44p
   <header>
     <h1>Réveillon</h1>
     <p class="sub">As duas bandas e as músicas de cada uma</p>
+    <a class="playlist" href="https://music.youtube.com/playlist?list=PLE7nj23t-mEitsiidAhZ-EJDAQ5cn9FsE&si=1QbFBi_qhFhv0zuZ&drli=1" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path fill="currentColor" d="M8 5v14l11-7z"/></svg> Playlist do Réveillon no YouTube Music</a>
     <div class="legenda" aria-label="Legenda">
       <span id="lgMin"></span>
       <span><span class="pessoa incerto">Nome*</span> ainda não confirmado</span>
