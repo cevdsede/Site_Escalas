@@ -13,6 +13,8 @@ var SHELL = [
   "como-usar/index.html",
   "reveillon/",
   "reveillon/index.html",
+  "anotacoes/",
+  "anotacoes/index.html",
   "musicas/biblioteca-musicas.html",
   "musicas/repertorio.html",
   "logo%20louvor.png",

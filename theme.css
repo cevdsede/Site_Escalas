@@ -90,6 +90,8 @@
 .site-brand:focus-visible, .site-links a:focus-visible { outline: 2px solid var(--brand-text); outline-offset: 2px; }
 @media (max-width: 700px) { .site-brand span { display: none; } .site-nav-in { padding: 8px 10px; gap: 6px; } .site-links { gap: 0; } .site-links a { padding: 8px 9px; font-size: .88em; } }
 @media (max-width: 380px) { .site-links a { padding: 8px 6px; font-size: .8em; } }
+/* celular: logo e tema na primeira linha, links na segunda (cabem os cinco, sem quebrar o botão de tema) */
+@media (max-width: 480px) { .site-nav-in { gap: 4px 8px; } .site-brand { order: 1; } .theme-btn { order: 2; margin-left: auto; } .site-links { order: 3; flex: 1 1 100%; margin-left: 0; justify-content: space-between; } .site-links a { padding: 8px 8px; font-size: .88em; } }
 
 /* Aviso de versão nova */
 .update-bar { position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 2000; max-width: 480px; margin: 0 auto; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; box-shadow: var(--shadow); font-size: 14px; }

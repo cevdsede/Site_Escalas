@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#3f51b5">
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="icon" type="image/png" href="../icons/icon-192.png">
+<link rel="apple-touch-icon" href="../icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Escala">
+<title>Anotações</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400,500,600,700,800&display=swap">
+<link rel="stylesheet" href="../theme.css">
+<script src="../theme.js"></script>
+<script src="../site.js" defer></script>
+<style>
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); background-image: var(--page-bg); background-attachment: fixed; color: var(--text); font-family: var(--font); font-size: 15px; line-height: 1.45; min-height: 100vh; padding: 16px clamp(16px, 3vw, 40px) 60px; }
+.wrap { max-width: 1000px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px; }
+header { display: flex; flex-direction: column; gap: 6px; }
+h1 { color: var(--brand-text); font-weight: 700; font-size: clamp(30px, 6vw, 44px); line-height: 1.05; margin: 0; letter-spacing: -0.02em; }
+.sub { color: var(--muted); margin: 0; }
+.painel { background: var(--surface); box-shadow: var(--shadow); border-radius: var(--radius); padding: 16px; display: grid; gap: 12px; }
+.linha { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; }
+.linha .grow { flex: 1 1 220px; min-width: 0; }
+label.f { display: grid; gap: 4px; font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+select, button, input[type=range] { font: inherit; color: inherit; }
+select { width: 100%; padding: 9px 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg); color: var(--text); text-transform: none; letter-spacing: 0; font-weight: 500; }
+.btn { text-decoration: none; display: inline-block; font-weight: 600; border: 1px solid var(--border); background: var(--surface-2); color: var(--brand-text); border-radius: 999px; padding: 8px 14px; cursor: pointer; }
+.btn:hover { background: var(--brand-soft); }
+.btn.primary { background: var(--brand); border-color: var(--brand); color: var(--on-brand); }
+.btn.danger { color: #dc2626; }
+.btn:disabled { opacity: .5; cursor: default; }
+.btn:focus-visible, select:focus-visible, textarea:focus-visible, input:focus-visible { outline: 2px solid var(--brand-text); outline-offset: 2px; }
+.tam { display: inline-flex; align-items: center; gap: 6px; }
+.tam output { min-width: 44px; text-align: center; font-weight: 700; font-variant-numeric: tabular-nums; }
+.vel { display: inline-flex; align-items: center; gap: 8px; }
+.vel input { width: 120px; accent-color: var(--brand); }
+.status { font-size: 13px; color: var(--muted); min-height: 1.2em; }
+.status.ok { color: #059669; }
+.titulo-musica { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; }
+.titulo-musica h2 { margin: 0; font-size: 22px; color: var(--brand-text); }
+.titulo-musica span { color: var(--muted); }
+.nav-musicas { display: flex; gap: 8px; align-items: center; }
+.nav-musicas select { flex: 1 1 auto; }
+.ajuda { font-size: 13px; color: var(--muted); }
+.ajuda a { color: var(--brand-text); font-weight: 600; }
+#texto { width: 100%; min-height: 320px; padding: 14px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg); color: var(--text); resize: none; overflow: hidden; line-height: 1.55; white-space: pre-wrap; display: block; }
+#texto.mono { white-space: pre; overflow-x: auto; }
+.leitura #texto { border-color: transparent; background: transparent; padding: 8px 2px; min-height: 60vh; }
+.leitura .so-edicao, .leitura header, .leitura .nao-leitura { display: none !important; }
+.leitura .barra-fixa { position: sticky; top: 8px; z-index: 30; }
+.dica-leitura { text-align: center; color: var(--muted); font-size: 13px; }
+@media (max-width: 560px) { .painel { padding: 12px; gap: 8px; } .vel input { width: 90px; } .btn { padding: 7px 12px; } label.f { font-size: 11px; } }
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+  <nav class="site-nav rounded nao-leitura" aria-label="Menu principal">
+    <div class="site-nav-in">
+      <a class="site-brand" href="../"><img src="../logo%20louvor.png" alt="" width="34" height="34"><span>Louvor CEVD</span></a>
+      <div class="site-links"><a href="../">Início</a><a href="../escala/">Escala</a><a href="../musicas/biblioteca-musicas.html">Músicas</a><a href="../musicas/repertorio.html">Repertório</a><a href="./" aria-current="page">Notas</a></div>
+      <button type="button" class="theme-btn" data-theme-toggle></button>
+    </div>
+  </nav>
+  <header>
+    <h1>Anotações</h1>
+    <p class="sub">Letra e cifra de cada música do repertório. O texto fica salvo só neste aparelho e é gravado sozinho a cada alteração.</p>
+  </header>
+
+  <section class="painel barra-fixa" aria-label="Ajustes de leitura">
+    <div class="linha">
+      <label class="f grow">Fonte
+        <select id="fonte">
+          <option value="montserrat">Padrão do site</option>
+          <option value="arial">Arial</option>
+          <option value="georgia">Serifada (Georgia)</option>
+          <option value="mono">Cifra (letra fixa)</option>
+        </select>
+      </label>
+      <div class="tam" role="group" aria-label="Tamanho da letra">
+        <button type="button" class="btn" id="menos" aria-label="Diminuir a letra">A−</button>
+        <output id="tamTxt" aria-live="polite"></output>
+        <button type="button" class="btn" id="mais" aria-label="Aumentar a letra">A+</button>
+      </div>
+      <div class="vel">
+        <button type="button" class="btn primary" id="rolar" aria-pressed="false">▶ Rolar</button>
+        <label class="f" style="grid-auto-flow:column;align-items:center;gap:8px">Velocidade <input type="range" id="vel" min="1" max="10" step="1" aria-label="Velocidade da rolagem"></label>
+      </div>
+      <button type="button" class="btn" id="leitura">Modo leitura</button>
+    </div>
+  </section>
+
+  <section class="painel nao-leitura" id="escolha">
+    <div class="nav-musicas">
+      <button type="button" class="btn" id="ant" aria-label="Música anterior">◀</button>
+      <select id="musica" aria-label="Música"></select>
+      <button type="button" class="btn" id="prox" aria-label="Próxima música">▶</button>
+    </div>
+    <div class="linha">
+      <button type="button" class="btn" id="outra">+ Outra música</button>
+      <span class="status" id="apiMsg"></span>
+    </div>
+  </section>
+
+  <section class="painel" id="editor">
+    <div class="titulo-musica"><h2 id="tit">Selecione uma música</h2><span id="cant"></span></div>
+    <div class="linha so-edicao">
+      <a class="btn" id="bLetra" target="_blank" rel="noopener noreferrer">Buscar letra</a>
+      <a class="btn" id="bCifra" target="_blank" rel="noopener noreferrer">Buscar cifra</a>
+      <button type="button" class="btn" id="colar">Colar o que copiei</button>
+      <button type="button" class="btn danger" id="limparEsta">Limpar esta música</button>
+      <span class="status" id="salvo" role="status" aria-live="polite"></span>
+    </div>
+    <p class="ajuda so-edicao">Toque em <b>Buscar letra</b> ou <b>Buscar cifra</b>, copie o texto no site que abrir e volte aqui em <b>Colar o que copiei</b>. Para ver as cifras alinhadas, escolha a fonte <b>Cifra (letra fixa)</b>.</p>
+    <textarea id="texto" spellcheck="false" placeholder="Cole ou escreva aqui a letra ou a cifra desta música…" aria-label="Anotação da música"></textarea>
+  </section>
+
+  <div class="linha nao-leitura" style="justify-content:space-between">
+    <span class="ajuda">As anotações ficam só neste aparelho (não vão para o banco). Limpar o histórico do navegador apaga tudo.</span>
+    <button type="button" class="btn danger" id="limparTudo">Limpar tudo</button>
+  </div>
+  <p class="dica-leitura" id="dicaLeitura" hidden></p>
+</div>
+<script>
+var API_URL = "https://ipdrbhkzluuwjulkhjkd.supabase.co/functions/v1/repertorio-publico";
+var KEY = "anotacoes.v1", KEY_API = "anotacoes.api";
+var FONTES = {
+  montserrat: '"Montserrat", "Segoe UI", system-ui, sans-serif',
+  arial: 'Arial, Helvetica, sans-serif',
+  georgia: 'Georgia, "Times New Roman", serif',
+  mono: 'ui-monospace, "Cascadia Mono", Consolas, "Courier New", monospace'
+};
+function $(id) { return document.getElementById(id); }
+function norm(t) { return String(t || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/\s+/g, " ").trim(); }
+function chave(t, c) { return norm(t) + "|" + norm(c); }
+
+// ---------- armazenamento local ----------
+var dados = { config: { fonte: "montserrat", tam: 20, vel: 3, leitura: false }, notas: {}, extras: [], atual: "" };
+try { var salvo = JSON.parse(localStorage.getItem(KEY) || "null"); if (salvo) { dados.config = Object.assign(dados.config, salvo.config || {}); dados.notas = salvo.notas || {}; dados.extras = salvo.extras || []; dados.atual = salvo.atual || ""; } } catch (e) {}
+function gravar() { try { localStorage.setItem(KEY, JSON.stringify(dados)); return true; } catch (e) { return false; } }
+
+// ---------- lista de músicas (repertório do app + as que a pessoa adicionou) ----------
+var grupos = [], lista = [];   // grupos: [{rotulo, itens:[{k,t,c}]}]; lista: itens na ordem
+function dataCurta(iso) { var p = String(iso || "").split("-"); return p.length === 3 ? p[2] + "/" + p[1] : ""; }
+function montaLista(api) {
+  grupos = [];
+  var hoje = new Date().toISOString().slice(0, 10), proximos = [], passados = [];
+  ((api && api.repertorios) || []).forEach(function (r) {
+    if (!r.culto || !r.itens || !r.itens.length) return;
+    var g = { rotulo: dataCurta(r.culto.data) + (r.culto.horario ? " " + r.culto.horario : "") + " · " + (r.culto.nome || "Culto"), data: r.culto.data || "", itens: r.itens.map(function (i) { return { k: chave(i.musica, i.cantor), t: i.musica, c: i.cantor || "" }; }) };
+    (g.data >= hoje ? proximos : passados).push(g);
+  });
+  proximos.sort(function (a, b) { return a.data < b.data ? -1 : 1; });
+  passados.sort(function (a, b) { return a.data < b.data ? 1 : -1; });
+  proximos.forEach(function (g) { grupos.push(g); });
+  var jaNa = {};
+  grupos.concat(passados).forEach(function (g) { g.itens.forEach(function (i) { jaNa[i.k] = 1; }); });
+  passados.forEach(function (g) { g.rotulo = "Anterior · " + g.rotulo; grupos.push(g); });
+  var outras = [];
+  dados.extras.forEach(function (e) { outras.push({ k: chave(e.t, e.c), t: e.t, c: e.c || "" }); });
+  Object.keys(dados.notas).forEach(function (k) { if (!jaNa[k] && !outras.some(function (o) { return o.k === k; })) outras.push({ k: k, t: dados.notas[k].t, c: dados.notas[k].c || "" }); });
+  if (outras.length) grupos.push({ rotulo: "Outras músicas", itens: outras });
+  lista = [];
+  var vistos = {};
+  grupos.forEach(function (g) { g.itens.forEach(function (i) { if (!vistos[i.k]) { vistos[i.k] = 1; lista.push(i); } }); });
+}
+function desenhaSelect() {
+  var sel = $("musica"); sel.textContent = "";
+  if (!lista.length) { var o = document.createElement("option"); o.value = ""; o.textContent = "Nenhuma música no repertório ainda. Use + Outra música."; sel.appendChild(o); return; }
+  grupos.forEach(function (g) {
+    var og = document.createElement("optgroup"); og.label = g.rotulo;
+    g.itens.forEach(function (i) {
+      var o = document.createElement("option"); o.value = i.k;
+      var tem = dados.notas[i.k] && dados.notas[i.k].texto;
+      o.textContent = (tem ? "● " : "○ ") + i.t + (i.c ? " — " + i.c : "");
+      og.appendChild(o);
+    });
+    sel.appendChild(og);
+  });
+  if (!lista.some(function (i) { return i.k === dados.atual; })) dados.atual = lista[0].k;
+  sel.value = dados.atual;
+}
+function itemAtual() { return lista.filter(function (i) { return i.k === dados.atual; })[0] || null; }
+
+// ---------- editor ----------
+var gravaTimer = null;
+function ajustaAltura() { var t = $("texto"); t.style.height = "auto"; t.style.height = Math.max(t.scrollHeight + 4, dados.config.leitura ? 0 : 320) + "px"; }
+function mostraMusica() {
+  var it = itemAtual(), t = $("texto");
+  $("tit").textContent = it ? it.t : "Selecione uma música"; $("cant").textContent = it && it.c ? it.c : "";
+  var q = it ? (it.t + " " + it.c).trim() : "";
+  $("bLetra").href = "https://www.letras.mus.br/?q=" + encodeURIComponent(q);
+  $("bCifra").href = "https://www.cifraclub.com.br/?q=" + encodeURIComponent(q);
+  t.disabled = !it; t.value = it && dados.notas[it.k] ? dados.notas[it.k].texto || "" : "";
+  ["bLetra", "bCifra", "colar", "limparEsta"].forEach(function (id) { var e = $(id); if (id === "bLetra" || id === "bCifra") { e.style.pointerEvents = it ? "" : "none"; e.style.opacity = it ? "" : ".5"; } else e.disabled = !it; });
+  $("salvo").textContent = ""; ajustaAltura();
+  if (dados.config.leitura) { $("dicaLeitura").hidden = false; $("dicaLeitura").textContent = t.value ? "" : "Sem anotação para esta música. Toque em Editar para escrever."; $("dicaLeitura").hidden = !!t.value; }
+}
+function salvarTexto(agora) {
+  var it = itemAtual(); if (!it) return;
+  function faz() {
+    var txt = $("texto").value;
+    if (txt) dados.notas[it.k] = { t: it.t, c: it.c, texto: txt, em: Date.now() }; else delete dados.notas[it.k];
+    var ok = gravar();
+    $("salvo").textContent = ok ? "Salvo ✓" : "Não consegui salvar (sem espaço no aparelho)"; $("salvo").className = "status" + (ok ? " ok" : "");
+    var o = $("musica").querySelector('option[value="' + it.k.replace(/"/g, '\\"') + '"]');
+    if (o) o.textContent = (txt ? "● " : "○ ") + it.t + (it.c ? " — " + it.c : "");
+  }
+  clearTimeout(gravaTimer);
+  if (agora) faz(); else { $("salvo").textContent = "Salvando…"; $("salvo").className = "status"; gravaTimer = setTimeout(faz, 250); }
+}
+$("texto").addEventListener("input", function () { ajustaAltura(); salvarTexto(false); });
+$("texto").addEventListener("blur", function () { salvarTexto(true); });
+document.addEventListener("visibilitychange", function () { if (document.hidden) salvarTexto(true); });
+window.addEventListener("pagehide", function () { salvarTexto(true); });
+
+function escolher(k) { salvarTexto(true); dados.atual = k; gravar(); $("musica").value = k; mostraMusica(); }
+$("musica").addEventListener("change", function () { escolher(this.value); });
+function vizinha(d) { var i = lista.map(function (x) { return x.k; }).indexOf(dados.atual); if (i < 0 || !lista.length) return; escolher(lista[(i + d + lista.length) % lista.length].k); }
+$("ant").addEventListener("click", function () { vizinha(-1); });
+$("prox").addEventListener("click", function () { vizinha(1); });
+$("outra").addEventListener("click", function () {
+  var t = (prompt("Nome da música:") || "").trim(); if (!t) return;
+  var c = (prompt("Cantor ou banda (pode deixar vazio):") || "").trim();
+  var k = chave(t, c);
+  if (!dados.extras.some(function (e) { return chave(e.t, e.c) === k; })) dados.extras.push({ t: t, c: c });
+  salvarTexto(true); dados.atual = k; gravar(); montaLista(apiAtual); desenhaSelect(); mostraMusica(); $("texto").focus();
+});
+$("colar").addEventListener("click", function () {
+  if (!navigator.clipboard || !navigator.clipboard.readText) { $("salvo").textContent = "Seu navegador não deixa colar por aqui. Cole direto na caixa."; return; }
+  navigator.clipboard.readText().then(function (txt) {
+    if (!txt) { $("salvo").textContent = "Não há nada copiado."; return; }
+    var t = $("texto"); if (t.value && !confirm("Já existe texto nesta música. Substituir pelo que você copiou?")) return;
+    t.value = txt.replace(/\r\n/g, "\n"); ajustaAltura(); salvarTexto(true);
+  }).catch(function () { $("salvo").textContent = "Não consegui ler a área de transferência. Cole direto na caixa."; });
+});
+$("limparEsta").addEventListener("click", function () {
+  var it = itemAtual(); if (!it || !$("texto").value) return;
+  if (!confirm("Apagar a anotação de \"" + it.t + "\"?")) return;
+  $("texto").value = ""; ajustaAltura(); salvarTexto(true);
+});
+$("limparTudo").addEventListener("click", function () {
+  var n = Object.keys(dados.notas).length;
+  if (!confirm(n ? "Apagar TODAS as anotações deste aparelho (" + n + (n === 1 ? " música" : " músicas") + ")? Isso não pode ser desfeito." : "Não há anotações para apagar.")) return;
+  if (!n) return;
+  dados.notas = {}; dados.extras = []; gravar(); montaLista(apiAtual); desenhaSelect(); mostraMusica();
+  $("salvo").textContent = "Tudo apagado."; $("salvo").className = "status ok";
+});
+
+// ---------- aparência: fonte, tamanho, modo leitura ----------
+function aplicaConfig() {
+  var c = dados.config, t = $("texto");
+  t.style.fontFamily = FONTES[c.fonte] || FONTES.montserrat; t.style.fontSize = c.tam + "px";
+  t.classList.toggle("mono", c.fonte === "mono"); t.wrap = c.fonte === "mono" ? "off" : "soft";
+  $("fonte").value = c.fonte; $("tamTxt").textContent = c.tam + " px"; $("vel").value = c.vel;
+  document.getElementById("app").classList.toggle("leitura", !!c.leitura);
+  $("leitura").textContent = c.leitura ? "Editar" : "Modo leitura"; t.readOnly = !!c.leitura;
+  ajustaAltura();
+}
+$("fonte").addEventListener("change", function () { dados.config.fonte = this.value; gravar(); aplicaConfig(); });
+$("menos").addEventListener("click", function () { dados.config.tam = Math.max(12, dados.config.tam - 2); gravar(); aplicaConfig(); });
+$("mais").addEventListener("click", function () { dados.config.tam = Math.min(64, dados.config.tam + 2); gravar(); aplicaConfig(); });
+$("vel").addEventListener("input", function () { dados.config.vel = +this.value; gravar(); });
+$("leitura").addEventListener("click", function () { salvarTexto(true); dados.config.leitura = !dados.config.leitura; gravar(); aplicaConfig(); mostraMusica(); window.scrollTo(0, 0); });
+
+// ---------- rolagem automática ----------
+var rolando = false, acum = 0, ultimo = 0, quadro = null, tela = null;
+function passo(ts) {
+  if (!rolando) return;
+  var dt = Math.min(0.1, (ts - ultimo) / 1000); ultimo = ts;
+  acum += dados.config.vel * 8 * dt;
+  var px = Math.floor(acum);
+  if (px >= 1) { window.scrollBy(0, px); acum -= px; }
+  if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2) { parar(); return; }
+  quadro = requestAnimationFrame(passo);
+}
+function iniciar() {
+  rolando = true; acum = 0; ultimo = performance.now();
+  $("rolar").textContent = "⏸ Parar"; $("rolar").setAttribute("aria-pressed", "true");
+  try { if (navigator.wakeLock && navigator.wakeLock.request) navigator.wakeLock.request("screen").then(function (w) { tela = w; }).catch(function () {}); } catch (e) {}
+  quadro = requestAnimationFrame(passo);
+}
+function parar() {
+  rolando = false; if (quadro) cancelAnimationFrame(quadro);
+  $("rolar").textContent = "▶ Rolar"; $("rolar").setAttribute("aria-pressed", "false");
+  try { if (tela) { tela.release(); tela = null; } } catch (e) {}
+}
+$("rolar").addEventListener("click", function () { if (rolando) parar(); else iniciar(); });
+document.addEventListener("keydown", function (e) { if (e.key === "Escape" && rolando) parar(); });
+
+// ---------- carga: repertório do app (guarda uma cópia para funcionar sem internet) ----------
+var apiAtual = null;
+try { apiAtual = JSON.parse(localStorage.getItem(KEY_API) || "null"); } catch (e) {}
+function iniciaTela() { montaLista(apiAtual); desenhaSelect(); aplicaConfig(); mostraMusica(); }
+iniciaTela();
+fetch(API_URL, { cache: "no-store" }).then(function (r) { if (!r.ok) throw new Error("http"); return r.json(); }).then(function (j) {
+  apiAtual = { repertorios: j.repertorios || [] };
+  try { localStorage.setItem(KEY_API, JSON.stringify(apiAtual)); } catch (e) {}
+  salvarTexto(true); montaLista(apiAtual); desenhaSelect(); mostraMusica();
+  $("apiMsg").textContent = "Repertório atualizado.";
+}).catch(function () { $("apiMsg").textContent = apiAtual ? "Sem conexão: mostrando o último repertório salvo." : "Sem conexão com o repertório. Você ainda pode usar + Outra música."; });
+</script>
+</body>
+</html>

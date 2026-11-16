@@ -465,6 +465,12 @@
         </a>
       </div>
 
+      <div class="spreadsheet ultimo">
+        <a href="anotacoes/">
+          <i class="fa-solid fa-note-sticky"></i> Anotações
+        </a>
+      </div>
+
       <div class="spreadsheet ultimo" id="installBox">
         <button type="button" id="install" class="ghost"><i class="fa-solid fa-download"></i> Instalar app</button>
       </div>
@@ -559,8 +565,8 @@
           var links = document.createElement('div'); links.className = 'music-links';
           [['yt', 'YouTube', 'fa-brands fa-youtube', yt],
            ['sp', 'Spotify', 'fa-brands fa-spotify', m.spotify || 'https://open.spotify.com/search/' + q],
-           ['lt', 'Letra', 'fa-solid fa-microphone-lines', m.letra || 'https://www.google.com/search?q=' + q + '%20letra%20site%3Aletras.mus.br'],
-           ['cf', 'Cifra', 'fa-solid fa-guitar', m.cifra || 'https://www.google.com/search?q=' + q + '%20cifra%20site%3Acifraclub.com.br']].forEach(function (k) {
+           ['lt', 'Letra', 'fa-solid fa-microphone-lines', m.letra || 'https://www.letras.mus.br/?q=' + q],
+           ['cf', 'Cifra', 'fa-solid fa-guitar', m.cifra || 'https://www.cifraclub.com.br/?q=' + q]].forEach(function (k) {
             var l = document.createElement('a');
             l.href = k[3]; l.target = '_blank'; l.rel = 'noopener noreferrer'; l.className = 'music-link ' + k[0];
             l.title = k[1]; l.setAttribute('aria-label', k[1] + ': ' + oficial.musica);
