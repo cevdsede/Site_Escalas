@@ -150,22 +150,23 @@ var grupos = [];   // [{rotulo, data, itens:[{k,t,c}]}] - cada música aparece u
 function dataCurta(iso) { var p = String(iso || "").split("-"); return p.length === 3 ? p[2] + "/" + p[1] : ""; }
 function montaLista(api) {
   grupos = [];
-  var hoje = new Date().toISOString().slice(0, 10), proximos = [], passados = [], vistos = {};
+  // só os cultos da semana (a partir de segunda-feira) e os futuros
+  var agora = new Date(), seg = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate() - ((agora.getDay() + 6) % 7));
+  var desde = seg.getFullYear() + "-" + ("0" + (seg.getMonth() + 1)).slice(-2) + "-" + ("0" + seg.getDate()).slice(-2);
+  var proximos = [], vistos = {};
   ((api && api.repertorios) || []).forEach(function (r) {
     if (!r.culto || !r.itens || !r.itens.length) return;
     var g = { rotulo: dataCurta(r.culto.data) + (r.culto.horario ? " " + r.culto.horario : "") + " · " + (r.culto.nome || "Culto"), data: r.culto.data || "", itens: r.itens.map(function (i) { return { k: chave(i.musica, i.cantor), t: i.musica, c: i.cantor || "" }; }) };
-    (g.data >= hoje ? proximos : passados).push(g);
+    if (g.data >= desde) proximos.push(g);
   });
   proximos.sort(function (a, b) { return a.data < b.data ? -1 : 1; });
-  passados.sort(function (a, b) { return a.data < b.data ? 1 : -1; });
-  passados.forEach(function (g) { g.rotulo = "Anterior · " + g.rotulo; });
-  proximos.concat(passados).forEach(function (g) {
+  proximos.forEach(function (g) {
     g.itens = g.itens.filter(function (i) { if (vistos[i.k]) return false; vistos[i.k] = 1; return true; });
     if (g.itens.length) grupos.push(g);
   });
   var outras = [];
   dados.extras.forEach(function (e) { var k = chave(e.t, e.c); if (!vistos[k]) { vistos[k] = 1; outras.push({ k: k, t: e.t, c: e.c || "" }); } });
-  Object.keys(dados.notas).forEach(function (k) { if (!vistos[k]) { vistos[k] = 1; outras.push({ k: k, t: dados.notas[k].t, c: dados.notas[k].c || "" }); } });
+  // as anotações de músicas que saíram da lista continuam guardadas no aparelho e voltam quando a música entrar num repertório
   if (outras.length) grupos.push({ rotulo: "Outras músicas", data: "", itens: outras });
 }
 function todas() { var l = []; grupos.forEach(function (g) { g.itens.forEach(function (i) { l.push(i); }); }); return l; }
@@ -223,7 +224,7 @@ function desenhaTudo() {
     });
     if (!algum) tit.classList.add("vazio");
   });
-  if (!n) { var v = document.createElement("p"); v.className = "vazio-msg"; v.textContent = "Nenhuma música no repertório ainda. Use + Outra música."; box.appendChild(v); }
+  if (!n) { var v = document.createElement("p"); v.className = "vazio-msg"; v.textContent = "Nenhuma música nos cultos desta semana ou futuros ainda. Use + Outra música."; box.appendChild(v); }
   atualizaIr(); aplicaConfig();
 }
 
