@@ -426,6 +426,14 @@
       .music-list { padding: 14px 14px max(24px, env(safe-area-inset-bottom)); grid-template-columns: 1fr; gap: 12px; }
       .music-link { padding: 13px 0; font-size: 15px; }
     }
+    /* Instalar app e Como usar: lado a lado, na última linha e um pouco separados dos outros */
+    .rodape { display: flex; justify-content: center; gap: 10px; margin-top: 36px; }
+    .rodape .spreadsheet { margin-top: 0; flex: 1 1 0; min-width: 0; max-width: 200px; }
+    .rodape .spreadsheet a, .rodape .spreadsheet button { padding-left: 10px; padding-right: 10px; max-width: none; }
+    @media (min-width: 900px) {
+      .container > .rodape { grid-column: 1 / -1; gap: 32px; margin-top: 16px; }
+      .rodape .spreadsheet { flex: 0 1 calc(50% - 16px); max-width: none; }
+    }
     .versao { flex: 1 1 100%; text-align: center; margin: -12px 0 0; font-size: 12px; color: var(--muted); }
   </style>
 </head>
@@ -471,13 +479,15 @@
         </a>
       </div>
 
-      <div class="spreadsheet ultimo" id="installBox">
-        <button type="button" id="install" class="ghost"><i class="fa-solid fa-download"></i> Instalar app</button>
-      </div>
-      <div class="spreadsheet ultimo">
-        <a href="como-usar/" class="ghost">
-          <i class="fa-solid fa-circle-question"></i> Como usar
-        </a>
+      <div class="rodape">
+        <div class="spreadsheet" id="installBox">
+          <button type="button" id="install" class="ghost"><i class="fa-solid fa-download"></i> Instalar app</button>
+        </div>
+        <div class="spreadsheet">
+          <a href="como-usar/" class="ghost">
+            <i class="fa-solid fa-circle-question"></i> Como usar
+          </a>
+        </div>
       </div>
       <p class="help" id="installHelp" hidden>Para instalar: no Chrome ou Edge, abra o menu do navegador (⋮) e toque em "Instalar app" ou "Adicionar à tela inicial". No iPhone, toque em Compartilhar e depois em "Adicionar à Tela de Início".</p>
     </div>
