@@ -46,11 +46,21 @@ select { width: 100%; padding: 9px 12px; border-radius: 10px; border: 1px solid 
 .nav-musicas select { flex: 1 1 auto; }
 .ajuda { font-size: 13px; color: var(--muted); }
 .ajuda a { color: var(--brand-text); font-weight: 600; }
-#texto { width: 100%; min-height: 320px; padding: 14px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg); color: var(--text); resize: none; overflow: hidden; line-height: 1.55; white-space: pre-wrap; display: block; }
-#texto.mono { white-space: pre; overflow-x: auto; }
-.leitura #texto { border-color: transparent; background: transparent; padding: 8px 2px; min-height: 60vh; }
-.leitura .so-edicao, .leitura header, .leitura .nao-leitura { display: none !important; }
-.leitura .barra-fixa { position: sticky; top: 8px; z-index: 30; }
+.grupo-titulo { margin: 8px 0 0; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+.musica { background: var(--surface); box-shadow: var(--shadow); border-radius: var(--radius); padding: 16px; display: grid; gap: 10px; scroll-margin-top: 12px; }
+.musica-topo { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 12px; }
+.musica-topo h3 { margin: 0; font-size: 22px; color: var(--brand-text); }
+.musica-topo span { color: var(--muted); }
+.ferramentas { display: flex; flex-wrap: wrap; gap: 8px; }
+.ferramentas .btn { padding: 5px 12px; font-size: 13px; }
+.texto { width: 100%; min-height: 160px; padding: 14px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg); color: var(--text); resize: none; overflow: hidden; line-height: 1.55; white-space: pre-wrap; display: block; }
+.texto.mono { white-space: pre; overflow-x: auto; }
+.leitura .texto { border-color: transparent; background: transparent; padding: 4px 2px; min-height: 0; }
+.leitura .musica { box-shadow: none; background: transparent; padding: 18px 0 8px; border-top: 1px solid var(--border); border-radius: 0; }
+.leitura .musica.vazia, .leitura .grupo-titulo.vazio { display: none; }
+.leitura .ferramentas, .leitura .so-edicao, .leitura header, .leitura .nao-leitura { display: none !important; }
+.leitura .musica-topo h3 { font-size: 1.15em; }
+.leitura .painel.vazio-msg { color: var(--muted); text-align: center; padding: 18px; }
 .dica-leitura { text-align: center; color: var(--muted); font-size: 13px; }
 @media (max-width: 560px) { .painel { padding: 12px; gap: 8px; } .vel input { width: 90px; } .btn { padding: 7px 12px; } label.f { font-size: 11px; } }
 </style>
@@ -66,7 +76,7 @@ select { width: 100%; padding: 9px 12px; border-radius: 10px; border: 1px solid 
   </nav>
   <header>
     <h1>Anotações</h1>
-    <p class="sub">Letra e cifra de cada música do repertório. O texto fica salvo só neste aparelho e é gravado sozinho a cada alteração.</p>
+    <p class="sub">Letra e cifra de todas as músicas do repertório numa página só. O texto fica salvo só neste aparelho e é gravado sozinho a cada alteração.</p>
   </header>
 
   <section class="painel barra-fixa" aria-label="Ajustes de leitura">
@@ -86,42 +96,35 @@ select { width: 100%; padding: 9px 12px; border-radius: 10px; border: 1px solid 
       </div>
       <div class="vel">
         <button type="button" class="btn primary" id="rolar" aria-pressed="false">▶ Rolar</button>
-        <label class="f" style="grid-auto-flow:column;align-items:center;gap:8px">Velocidade <input type="range" id="vel" min="1" max="10" step="1" aria-label="Velocidade da rolagem"></label>
+        <label class="f" style="grid-auto-flow:column;align-items:center;gap:8px">Velocidade <input type="range" id="vel" min="1" max="20" step="1" aria-label="Velocidade da rolagem"><output id="velTxt" style="min-width:20px;text-align:center"></output></label>
       </div>
       <button type="button" class="btn" id="leitura">Modo leitura</button>
     </div>
   </section>
 
   <section class="painel nao-leitura" id="escolha">
-    <div class="nav-musicas">
-      <button type="button" class="btn" id="ant" aria-label="Música anterior">◀</button>
-      <select id="musica" aria-label="Música"></select>
-      <button type="button" class="btn" id="prox" aria-label="Próxima música">▶</button>
+    <div class="linha">
+      <label class="f grow">Culto
+        <select id="culto" aria-label="Mostrar músicas de qual culto"></select>
+      </label>
+      <label class="f grow">Ir para a música
+        <select id="ir" aria-label="Ir para a música"></select>
+      </label>
     </div>
     <div class="linha">
       <button type="button" class="btn" id="outra">+ Outra música</button>
       <span class="status" id="apiMsg"></span>
-    </div>
-  </section>
-
-  <section class="painel" id="editor">
-    <div class="titulo-musica"><h2 id="tit">Selecione uma música</h2><span id="cant"></span></div>
-    <div class="linha so-edicao">
-      <a class="btn" id="bLetra" target="_blank" rel="noopener noreferrer">Buscar letra</a>
-      <a class="btn" id="bCifra" target="_blank" rel="noopener noreferrer">Buscar cifra</a>
-      <button type="button" class="btn" id="colar">Colar o que copiei</button>
-      <button type="button" class="btn danger" id="limparEsta">Limpar esta música</button>
       <span class="status" id="salvo" role="status" aria-live="polite"></span>
     </div>
-    <p class="ajuda so-edicao">Toque em <b>Buscar letra</b> ou <b>Buscar cifra</b>, copie o texto no site que abrir e volte aqui em <b>Colar o que copiei</b>. Para ver as cifras alinhadas, escolha a fonte <b>Cifra (letra fixa)</b>.</p>
-    <textarea id="texto" spellcheck="false" placeholder="Cole ou escreva aqui a letra ou a cifra desta música…" aria-label="Anotação da música"></textarea>
+    <p class="ajuda">Todas as músicas ficam nesta página, uma abaixo da outra. Em cada uma, toque em <b>Buscar letra</b> ou <b>Buscar cifra</b>, copie o texto no site que abrir e volte em <b>Colar o que copiei</b>. Para ver as cifras alinhadas, escolha a fonte <b>Cifra (letra fixa)</b>.</p>
   </section>
+
+  <main id="lista" aria-label="Músicas e anotações"></main>
 
   <div class="linha nao-leitura" style="justify-content:space-between">
     <span class="ajuda">As anotações ficam só neste aparelho (não vão para o banco). Limpar o histórico do navegador apaga tudo.</span>
     <button type="button" class="btn danger" id="limparTudo">Limpar tudo</button>
   </div>
-  <p class="dica-leitura" id="dicaLeitura" hidden></p>
 </div>
 <script>
 var API_URL = "https://ipdrbhkzluuwjulkhjkd.supabase.co/functions/v1/repertorio-publico";
@@ -137,16 +140,17 @@ function norm(t) { return String(t || "").normalize("NFD").replace(/[̀-ͯ]/g, "
 function chave(t, c) { return norm(t) + "|" + norm(c); }
 
 // ---------- armazenamento local ----------
-var dados = { config: { fonte: "montserrat", tam: 20, vel: 3, leitura: false }, notas: {}, extras: [], atual: "" };
-try { var salvo = JSON.parse(localStorage.getItem(KEY) || "null"); if (salvo) { dados.config = Object.assign(dados.config, salvo.config || {}); dados.notas = salvo.notas || {}; dados.extras = salvo.extras || []; dados.atual = salvo.atual || ""; } } catch (e) {}
+var dados = { config: { fonte: "montserrat", tam: 20, vel: 4, leitura: false, v: 2 }, notas: {}, extras: [] };
+try { var salvo = JSON.parse(localStorage.getItem(KEY) || "null"); if (salvo) { dados.config = Object.assign(dados.config, salvo.config || {}); dados.notas = salvo.notas || {}; dados.extras = salvo.extras || []; } } catch (e) {}
+if (dados.config.v !== 2) { dados.config.vel = 4; dados.config.v = 2; }   // a escala da velocidade mudou (agora mais lenta)
 function gravar() { try { localStorage.setItem(KEY, JSON.stringify(dados)); return true; } catch (e) { return false; } }
 
 // ---------- lista de músicas (repertório do app + as que a pessoa adicionou) ----------
-var grupos = [], lista = [];   // grupos: [{rotulo, itens:[{k,t,c}]}]; lista: itens na ordem
+var grupos = [];   // [{rotulo, data, itens:[{k,t,c}]}] - cada música aparece uma vez (a anotação é a mesma em qualquer culto)
 function dataCurta(iso) { var p = String(iso || "").split("-"); return p.length === 3 ? p[2] + "/" + p[1] : ""; }
 function montaLista(api) {
   grupos = [];
-  var hoje = new Date().toISOString().slice(0, 10), proximos = [], passados = [];
+  var hoje = new Date().toISOString().slice(0, 10), proximos = [], passados = [], vistos = {};
   ((api && api.repertorios) || []).forEach(function (r) {
     if (!r.culto || !r.itens || !r.itens.length) return;
     var g = { rotulo: dataCurta(r.culto.data) + (r.culto.horario ? " " + r.culto.horario : "") + " · " + (r.culto.nome || "Culto"), data: r.culto.data || "", itens: r.itens.map(function (i) { return { k: chave(i.musica, i.cantor), t: i.musica, c: i.cantor || "" }; }) };
@@ -154,123 +158,161 @@ function montaLista(api) {
   });
   proximos.sort(function (a, b) { return a.data < b.data ? -1 : 1; });
   passados.sort(function (a, b) { return a.data < b.data ? 1 : -1; });
-  proximos.forEach(function (g) { grupos.push(g); });
-  var jaNa = {};
-  grupos.concat(passados).forEach(function (g) { g.itens.forEach(function (i) { jaNa[i.k] = 1; }); });
-  passados.forEach(function (g) { g.rotulo = "Anterior · " + g.rotulo; grupos.push(g); });
-  var outras = [];
-  dados.extras.forEach(function (e) { outras.push({ k: chave(e.t, e.c), t: e.t, c: e.c || "" }); });
-  Object.keys(dados.notas).forEach(function (k) { if (!jaNa[k] && !outras.some(function (o) { return o.k === k; })) outras.push({ k: k, t: dados.notas[k].t, c: dados.notas[k].c || "" }); });
-  if (outras.length) grupos.push({ rotulo: "Outras músicas", itens: outras });
-  lista = [];
-  var vistos = {};
-  grupos.forEach(function (g) { g.itens.forEach(function (i) { if (!vistos[i.k]) { vistos[i.k] = 1; lista.push(i); } }); });
-}
-function desenhaSelect() {
-  var sel = $("musica"); sel.textContent = "";
-  if (!lista.length) { var o = document.createElement("option"); o.value = ""; o.textContent = "Nenhuma música no repertório ainda. Use + Outra música."; sel.appendChild(o); return; }
-  grupos.forEach(function (g) {
-    var og = document.createElement("optgroup"); og.label = g.rotulo;
-    g.itens.forEach(function (i) {
-      var o = document.createElement("option"); o.value = i.k;
-      var tem = dados.notas[i.k] && dados.notas[i.k].texto;
-      o.textContent = (tem ? "● " : "○ ") + i.t + (i.c ? " — " + i.c : "");
-      og.appendChild(o);
-    });
-    sel.appendChild(og);
+  passados.forEach(function (g) { g.rotulo = "Anterior · " + g.rotulo; });
+  proximos.concat(passados).forEach(function (g) {
+    g.itens = g.itens.filter(function (i) { if (vistos[i.k]) return false; vistos[i.k] = 1; return true; });
+    if (g.itens.length) grupos.push(g);
   });
-  if (!lista.some(function (i) { return i.k === dados.atual; })) dados.atual = lista[0].k;
-  sel.value = dados.atual;
+  var outras = [];
+  dados.extras.forEach(function (e) { var k = chave(e.t, e.c); if (!vistos[k]) { vistos[k] = 1; outras.push({ k: k, t: e.t, c: e.c || "" }); } });
+  Object.keys(dados.notas).forEach(function (k) { if (!vistos[k]) { vistos[k] = 1; outras.push({ k: k, t: dados.notas[k].t, c: dados.notas[k].c || "" }); } });
+  if (outras.length) grupos.push({ rotulo: "Outras músicas", data: "", itens: outras });
 }
-function itemAtual() { return lista.filter(function (i) { return i.k === dados.atual; })[0] || null; }
+function todas() { var l = []; grupos.forEach(function (g) { g.itens.forEach(function (i) { l.push(i); }); }); return l; }
+function itemPorK(k) { return todas().filter(function (i) { return i.k === k; })[0] || null; }
+function rotuloOpcao(i) { return (dados.notas[i.k] && dados.notas[i.k].texto ? "● " : "○ ") + i.t + (i.c ? " — " + i.c : ""); }
 
-// ---------- editor ----------
-var gravaTimer = null;
-function ajustaAltura() { var t = $("texto"); t.style.height = "auto"; t.style.height = Math.max(t.scrollHeight + 4, dados.config.leitura ? 0 : 320) + "px"; }
-function mostraMusica() {
-  var it = itemAtual(), t = $("texto");
-  $("tit").textContent = it ? it.t : "Selecione uma música"; $("cant").textContent = it && it.c ? it.c : "";
-  var q = it ? (it.t + " " + it.c).trim() : "";
-  $("bLetra").href = "https://www.letras.mus.br/?q=" + encodeURIComponent(q);
-  $("bCifra").href = "https://www.cifraclub.com.br/?q=" + encodeURIComponent(q);
-  t.disabled = !it; t.value = it && dados.notas[it.k] ? dados.notas[it.k].texto || "" : "";
-  ["bLetra", "bCifra", "colar", "limparEsta"].forEach(function (id) { var e = $(id); if (id === "bLetra" || id === "bCifra") { e.style.pointerEvents = it ? "" : "none"; e.style.opacity = it ? "" : ".5"; } else e.disabled = !it; });
-  $("salvo").textContent = ""; ajustaAltura();
-  if (dados.config.leitura) { $("dicaLeitura").hidden = false; $("dicaLeitura").textContent = t.value ? "" : "Sem anotação para esta música. Toque em Editar para escrever."; $("dicaLeitura").hidden = !!t.value; }
+// ---------- página única com todas as músicas ----------
+var filtroCulto = "todos";
+function idSecao(k) { return "m-" + k.replace(/[^a-z0-9]+/g, "-"); }
+function ajustaAltura(t) { t.style.height = "auto"; t.style.height = Math.max(t.scrollHeight + 4, dados.config.leitura ? 0 : 160) + "px"; }
+function ajustaTodas() { [].forEach.call(document.querySelectorAll(".texto"), ajustaAltura); }
+function desenhaFiltros() {
+  var c = $("culto"); c.textContent = "";
+  var o = document.createElement("option"); o.value = "todos"; o.textContent = "Todos os cultos (" + todas().length + " músicas)"; c.appendChild(o);
+  grupos.forEach(function (g, idx) { var op = document.createElement("option"); op.value = String(idx); op.textContent = g.rotulo + " (" + g.itens.length + ")"; c.appendChild(op); });
+  if (filtroCulto !== "todos" && !grupos[+filtroCulto]) filtroCulto = "todos";
+  c.value = filtroCulto;
 }
-function salvarTexto(agora) {
-  var it = itemAtual(); if (!it) return;
-  function faz() {
-    var txt = $("texto").value;
-    if (txt) dados.notas[it.k] = { t: it.t, c: it.c, texto: txt, em: Date.now() }; else delete dados.notas[it.k];
-    var ok = gravar();
-    $("salvo").textContent = ok ? "Salvo ✓" : "Não consegui salvar (sem espaço no aparelho)"; $("salvo").className = "status" + (ok ? " ok" : "");
-    var o = $("musica").querySelector('option[value="' + it.k.replace(/"/g, '\\"') + '"]');
-    if (o) o.textContent = (txt ? "● " : "○ ") + it.t + (it.c ? " — " + it.c : "");
-  }
+function atualizaIr() {
+  var ir = $("ir"); ir.textContent = "";
+  var o = document.createElement("option"); o.value = ""; o.textContent = "Escolha…"; ir.appendChild(o);
+  grupos.forEach(function (g, idx) {
+    if (filtroCulto !== "todos" && String(idx) !== filtroCulto) return;
+    g.itens.forEach(function (i) { var op = document.createElement("option"); op.value = i.k; op.textContent = rotuloOpcao(i); ir.appendChild(op); });
+  });
+}
+function desenhaTudo() {
+  var box = $("lista"); box.textContent = "";
+  var n = 0;
+  grupos.forEach(function (g, idx) {
+    if (filtroCulto !== "todos" && String(idx) !== filtroCulto) return;
+    var tit = document.createElement("h2"); tit.className = "grupo-titulo"; tit.textContent = g.rotulo; tit.dataset.grupo = idx;
+    box.appendChild(tit);
+    var algum = false;
+    g.itens.forEach(function (i) {
+      n++;
+      var tem = !!(dados.notas[i.k] && dados.notas[i.k].texto);
+      if (tem) algum = true;
+      var art = document.createElement("article"); art.className = "musica" + (tem ? "" : " vazia"); art.id = idSecao(i.k); art.dataset.k = i.k;
+      var topo = document.createElement("div"); topo.className = "musica-topo";
+      var h3 = document.createElement("h3"); h3.textContent = i.t; topo.appendChild(h3);
+      if (i.c) { var sp = document.createElement("span"); sp.textContent = i.c; topo.appendChild(sp); }
+      art.appendChild(topo);
+      var fer = document.createElement("div"); fer.className = "ferramentas";
+      var q = (i.t + " " + i.c).trim();
+      var bl = document.createElement("a"); bl.className = "btn"; bl.target = "_blank"; bl.rel = "noopener noreferrer"; bl.textContent = "Buscar letra"; bl.href = "https://www.letras.mus.br/?q=" + encodeURIComponent(q);
+      var bc = document.createElement("a"); bc.className = "btn"; bc.target = "_blank"; bc.rel = "noopener noreferrer"; bc.textContent = "Buscar cifra"; bc.href = "https://www.cifraclub.com.br/?q=" + encodeURIComponent(q);
+      var cp = document.createElement("button"); cp.type = "button"; cp.className = "btn"; cp.dataset.acao = "colar"; cp.textContent = "Colar o que copiei";
+      var lm = document.createElement("button"); lm.type = "button"; lm.className = "btn danger"; lm.dataset.acao = "limpar"; lm.textContent = "Limpar";
+      [bl, bc, cp, lm].forEach(function (x) { fer.appendChild(x); });
+      art.appendChild(fer);
+      var ta = document.createElement("textarea"); ta.className = "texto"; ta.spellcheck = false; ta.setAttribute("aria-label", "Anotação: " + i.t);
+      ta.placeholder = "Cole ou escreva aqui a letra ou a cifra desta música…"; ta.value = tem ? dados.notas[i.k].texto : "";
+      art.appendChild(ta); box.appendChild(art);
+    });
+    if (!algum) tit.classList.add("vazio");
+  });
+  if (!n) { var v = document.createElement("p"); v.className = "vazio-msg"; v.textContent = "Nenhuma música no repertório ainda. Use + Outra música."; box.appendChild(v); }
+  atualizaIr(); aplicaConfig();
+}
+
+// ---------- gravação automática ----------
+var gravaTimer = null, pendente = {};
+function marcaStatus(ok, txt) { var e = $("salvo"); e.textContent = txt; e.className = "status" + (ok ? " ok" : ""); }
+function gravarPendentes() {
   clearTimeout(gravaTimer);
-  if (agora) faz(); else { $("salvo").textContent = "Salvando…"; $("salvo").className = "status"; gravaTimer = setTimeout(faz, 250); }
+  var ks = Object.keys(pendente); if (!ks.length) return;
+  ks.forEach(function (k) {
+    var it = itemPorK(k), txt = pendente[k];
+    if (txt) dados.notas[k] = { t: it ? it.t : (dados.notas[k] || {}).t || k, c: it ? it.c : (dados.notas[k] || {}).c || "", texto: txt, em: Date.now() }; else delete dados.notas[k];
+    var sec = document.getElementById(idSecao(k)); if (sec) sec.classList.toggle("vazia", !txt);
+  });
+  pendente = {};
+  var ok = gravar();
+  marcaStatus(ok, ok ? "Salvo ✓" : "Não consegui salvar (sem espaço no aparelho)");
+  atualizaIr();
 }
-$("texto").addEventListener("input", function () { ajustaAltura(); salvarTexto(false); });
-$("texto").addEventListener("blur", function () { salvarTexto(true); });
-document.addEventListener("visibilitychange", function () { if (document.hidden) salvarTexto(true); });
-window.addEventListener("pagehide", function () { salvarTexto(true); });
+$("lista").addEventListener("input", function (e) {
+  var t = e.target; if (!t.classList || !t.classList.contains("texto")) return;
+  var k = t.closest(".musica").dataset.k;
+  ajustaAltura(t); pendente[k] = t.value; marcaStatus(false, "Salvando…");
+  clearTimeout(gravaTimer); gravaTimer = setTimeout(gravarPendentes, 250);
+});
+$("lista").addEventListener("focusout", function () { gravarPendentes(); });
+document.addEventListener("visibilitychange", function () { if (document.hidden) gravarPendentes(); });
+window.addEventListener("pagehide", gravarPendentes);
 
-function escolher(k) { salvarTexto(true); dados.atual = k; gravar(); $("musica").value = k; mostraMusica(); }
-$("musica").addEventListener("change", function () { escolher(this.value); });
-function vizinha(d) { var i = lista.map(function (x) { return x.k; }).indexOf(dados.atual); if (i < 0 || !lista.length) return; escolher(lista[(i + d + lista.length) % lista.length].k); }
-$("ant").addEventListener("click", function () { vizinha(-1); });
-$("prox").addEventListener("click", function () { vizinha(1); });
+$("lista").addEventListener("click", function (e) {
+  var b = e.target.closest ? e.target.closest("[data-acao]") : null; if (!b) return;
+  var art = b.closest(".musica"), k = art.dataset.k, ta = art.querySelector(".texto"), it = itemPorK(k);
+  if (b.dataset.acao === "limpar") {
+    if (!ta.value || !confirm("Apagar a anotação de \"" + (it ? it.t : "esta música") + "\"?")) return;
+    ta.value = ""; ajustaAltura(ta); pendente[k] = ""; gravarPendentes();
+  } else if (b.dataset.acao === "colar") {
+    if (!navigator.clipboard || !navigator.clipboard.readText) { marcaStatus(false, "Seu navegador não deixa colar por aqui. Cole direto na caixa."); ta.focus(); return; }
+    navigator.clipboard.readText().then(function (txt) {
+      if (!txt) { marcaStatus(false, "Não há nada copiado."); return; }
+      if (ta.value && !confirm("Já existe texto nesta música. Substituir pelo que você copiou?")) return;
+      ta.value = txt.replace(/\r\n/g, "\n"); ajustaAltura(ta); pendente[k] = ta.value; gravarPendentes();
+    }).catch(function () { marcaStatus(false, "Não consegui ler a área de transferência. Cole direto na caixa."); ta.focus(); });
+  }
+});
+$("culto").addEventListener("change", function () { gravarPendentes(); filtroCulto = this.value; desenhaTudo(); window.scrollTo(0, 0); });
+$("ir").addEventListener("change", function () {
+  if (!this.value) return;
+  var sec = document.getElementById(idSecao(this.value)); if (sec) { sec.scrollIntoView({ behavior: "smooth", block: "start" }); this.value = ""; }
+});
 $("outra").addEventListener("click", function () {
   var t = (prompt("Nome da música:") || "").trim(); if (!t) return;
   var c = (prompt("Cantor ou banda (pode deixar vazio):") || "").trim();
   var k = chave(t, c);
   if (!dados.extras.some(function (e) { return chave(e.t, e.c) === k; })) dados.extras.push({ t: t, c: c });
-  salvarTexto(true); dados.atual = k; gravar(); montaLista(apiAtual); desenhaSelect(); mostraMusica(); $("texto").focus();
-});
-$("colar").addEventListener("click", function () {
-  if (!navigator.clipboard || !navigator.clipboard.readText) { $("salvo").textContent = "Seu navegador não deixa colar por aqui. Cole direto na caixa."; return; }
-  navigator.clipboard.readText().then(function (txt) {
-    if (!txt) { $("salvo").textContent = "Não há nada copiado."; return; }
-    var t = $("texto"); if (t.value && !confirm("Já existe texto nesta música. Substituir pelo que você copiou?")) return;
-    t.value = txt.replace(/\r\n/g, "\n"); ajustaAltura(); salvarTexto(true);
-  }).catch(function () { $("salvo").textContent = "Não consegui ler a área de transferência. Cole direto na caixa."; });
-});
-$("limparEsta").addEventListener("click", function () {
-  var it = itemAtual(); if (!it || !$("texto").value) return;
-  if (!confirm("Apagar a anotação de \"" + it.t + "\"?")) return;
-  $("texto").value = ""; ajustaAltura(); salvarTexto(true);
+  gravarPendentes(); gravar(); filtroCulto = "todos"; montaLista(apiAtual); desenhaFiltros(); desenhaTudo();
+  var sec = document.getElementById(idSecao(k)); if (sec) { sec.scrollIntoView({ block: "start" }); var ta = sec.querySelector(".texto"); if (ta) ta.focus(); }
 });
 $("limparTudo").addEventListener("click", function () {
   var n = Object.keys(dados.notas).length;
   if (!confirm(n ? "Apagar TODAS as anotações deste aparelho (" + n + (n === 1 ? " música" : " músicas") + ")? Isso não pode ser desfeito." : "Não há anotações para apagar.")) return;
   if (!n) return;
-  dados.notas = {}; dados.extras = []; gravar(); montaLista(apiAtual); desenhaSelect(); mostraMusica();
-  $("salvo").textContent = "Tudo apagado."; $("salvo").className = "status ok";
+  pendente = {}; dados.notas = {}; dados.extras = []; gravar(); montaLista(apiAtual); desenhaFiltros(); desenhaTudo();
+  marcaStatus(true, "Tudo apagado.");
 });
 
 // ---------- aparência: fonte, tamanho, modo leitura ----------
 function aplicaConfig() {
-  var c = dados.config, t = $("texto");
-  t.style.fontFamily = FONTES[c.fonte] || FONTES.montserrat; t.style.fontSize = c.tam + "px";
-  t.classList.toggle("mono", c.fonte === "mono"); t.wrap = c.fonte === "mono" ? "off" : "soft";
-  $("fonte").value = c.fonte; $("tamTxt").textContent = c.tam + " px"; $("vel").value = c.vel;
+  var c = dados.config;
+  [].forEach.call(document.querySelectorAll(".texto"), function (t) {
+    t.style.fontFamily = FONTES[c.fonte] || FONTES.montserrat; t.style.fontSize = c.tam + "px";
+    t.classList.toggle("mono", c.fonte === "mono"); t.wrap = c.fonte === "mono" ? "off" : "soft"; t.readOnly = !!c.leitura;
+  });
+  $("fonte").value = c.fonte; $("tamTxt").textContent = c.tam + " px"; $("vel").value = c.vel; $("velTxt").textContent = c.vel;
   document.getElementById("app").classList.toggle("leitura", !!c.leitura);
-  $("leitura").textContent = c.leitura ? "Editar" : "Modo leitura"; t.readOnly = !!c.leitura;
-  ajustaAltura();
+  $("leitura").textContent = c.leitura ? "Editar" : "Modo leitura";
+  ajustaTodas();
 }
 $("fonte").addEventListener("change", function () { dados.config.fonte = this.value; gravar(); aplicaConfig(); });
 $("menos").addEventListener("click", function () { dados.config.tam = Math.max(12, dados.config.tam - 2); gravar(); aplicaConfig(); });
 $("mais").addEventListener("click", function () { dados.config.tam = Math.min(64, dados.config.tam + 2); gravar(); aplicaConfig(); });
-$("vel").addEventListener("input", function () { dados.config.vel = +this.value; gravar(); });
-$("leitura").addEventListener("click", function () { salvarTexto(true); dados.config.leitura = !dados.config.leitura; gravar(); aplicaConfig(); mostraMusica(); window.scrollTo(0, 0); });
+$("vel").addEventListener("input", function () { dados.config.vel = +this.value; $("velTxt").textContent = this.value; gravar(); });
+$("leitura").addEventListener("click", function () { gravarPendentes(); dados.config.leitura = !dados.config.leitura; gravar(); aplicaConfig(); window.scrollTo(0, 0); });
 
-// ---------- rolagem automática ----------
+// ---------- rolagem automática (devagar: de 2 a 40 pixels por segundo) ----------
 var rolando = false, acum = 0, ultimo = 0, quadro = null, tela = null;
 function passo(ts) {
   if (!rolando) return;
   var dt = Math.min(0.1, (ts - ultimo) / 1000); ultimo = ts;
-  acum += dados.config.vel * 8 * dt;
+  acum += dados.config.vel * 2 * dt;
   var px = Math.floor(acum);
   if (px >= 1) { window.scrollBy(0, px); acum -= px; }
   if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2) { parar(); return; }
@@ -293,12 +335,12 @@ document.addEventListener("keydown", function (e) { if (e.key === "Escape" && ro
 // ---------- carga: repertório do app (guarda uma cópia para funcionar sem internet) ----------
 var apiAtual = null;
 try { apiAtual = JSON.parse(localStorage.getItem(KEY_API) || "null"); } catch (e) {}
-function iniciaTela() { montaLista(apiAtual); desenhaSelect(); aplicaConfig(); mostraMusica(); }
+function iniciaTela() { montaLista(apiAtual); desenhaFiltros(); desenhaTudo(); }
 iniciaTela();
 fetch(API_URL, { cache: "no-store" }).then(function (r) { if (!r.ok) throw new Error("http"); return r.json(); }).then(function (j) {
   apiAtual = { repertorios: j.repertorios || [] };
   try { localStorage.setItem(KEY_API, JSON.stringify(apiAtual)); } catch (e) {}
-  salvarTexto(true); montaLista(apiAtual); desenhaSelect(); mostraMusica();
+  gravarPendentes(); montaLista(apiAtual); desenhaFiltros(); desenhaTudo();
   $("apiMsg").textContent = "Repertório atualizado.";
 }).catch(function () { $("apiMsg").textContent = apiAtual ? "Sem conexão: mostrando o último repertório salvo." : "Sem conexão com o repertório. Você ainda pode usar + Outra música."; });
 </script>
