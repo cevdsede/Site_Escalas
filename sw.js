@@ -11,6 +11,8 @@ var SHELL = [
   "escala/index.html",
   "como-usar/",
   "como-usar/index.html",
+  "reveillon/",
+  "reveillon/index.html",
   "musicas/biblioteca-musicas.html",
   "musicas/repertorio.html",
   "logo%20louvor.png",

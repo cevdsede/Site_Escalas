@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#3f51b5">
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="icon" type="image/png" href="../icons/icon-192.png">
+<link rel="apple-touch-icon" href="../icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Escala">
+<title>Réveillon</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400,500,600,700,800&display=swap">
+<link rel="stylesheet" href="../theme.css">
+<script src="../theme.js"></script>
+<script src="../site.js" defer></script>
+<style>
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); background-image: var(--page-bg); background-attachment: fixed; color: var(--text); font-family: var(--font); font-size: 15px; line-height: 1.45; min-height: 100vh; padding: 16px clamp(16px, 3vw, 40px) 48px; }
+.wrap { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 22px; }
+header { display: flex; flex-direction: column; gap: 6px; }
+h1 { color: var(--brand-text); font-weight: 700; font-size: clamp(30px, 6vw, 44px); line-height: 1.05; margin: 0; letter-spacing: -0.02em; }
+.sub { color: var(--muted); margin: 0; }
+.legenda { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--muted); align-items: center; }
+.filtro { display: flex; flex-direction: column; gap: 10px; }
+.filtro-label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+.pills { display: flex; flex-wrap: wrap; gap: 8px; }
+.pill { font: inherit; font-weight: 500; font-size: 14px; color: var(--text); background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: 6px 14px; cursor: pointer; }
+.pill:hover { border-color: var(--brand-text); }
+.pill[aria-pressed="true"] { background: var(--brand); border-color: var(--brand); color: var(--on-brand); }
+.pill:focus-visible { outline: 2px solid var(--brand-text); outline-offset: 2px; }
+.resumo { color: var(--brand-text); font-weight: 600; min-height: 1.3em; }
+.bandas { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 460px), 1fr)); gap: 20px; align-items: start; }
+.banda { background: var(--surface); box-shadow: var(--shadow); border-radius: var(--radius); padding: 20px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.banda h2 { margin: 0; font-size: 22px; color: var(--brand-text); }
+.banda h3 { margin: 4px 0 0; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+.equipe { display: grid; gap: 8px; }
+.funcao { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 8px; align-items: start; }
+.fn-nome { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); padding-top: 3px; }
+.fn-nome svg { flex: none; }
+.pessoas { display: flex; flex-wrap: wrap; gap: 4px 6px; }
+.pessoa { display: inline-flex; align-items: center; gap: 4px; font-weight: 500; padding: 1px 8px; border-radius: 999px; border: 1px solid transparent; }
+.pessoa.min { font-weight: 700; color: var(--brand-text); background: var(--brand-soft); }
+.pessoa.incerto { border: 1px dashed var(--muted); color: var(--muted); }
+.pessoa .nota { font-size: 12px; font-weight: 400; color: var(--muted); }
+.pessoa.me { outline: 2px solid var(--coral); outline-offset: 1px; }
+.musicas { display: grid; gap: 0; }
+.musica { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 4px 10px; padding: 9px 0; border-top: 1px solid var(--border); align-items: start; }
+.musica:first-child { border-top: 0; }
+.musica .n { font-weight: 700; color: var(--muted); font-variant-numeric: tabular-nums; padding-top: 1px; }
+.musica .t { font-weight: 600; color: var(--text); text-decoration: none; overflow-wrap: break-word; }
+.musica .t:hover { color: var(--brand-text); text-decoration: underline; }
+.musica .meta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; font-size: 13px; color: var(--muted); }
+.musica.me { background: var(--brand-soft); border-radius: 10px; padding-left: 8px; padding-right: 8px; }
+@media (max-width: 480px) { .funcao { grid-template-columns: 1fr; gap: 2px; } .banda { padding: 16px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav class="site-nav rounded" aria-label="Menu principal">
+    <div class="site-nav-in">
+      <a class="site-brand" href="../"><img src="../logo%20louvor.png" alt="" width="34" height="34"><span>Louvor CEVD</span></a>
+      <div class="site-links"><a href="../">Início</a><a href="../escala/">Escala</a><a href="../musicas/biblioteca-musicas.html">Músicas</a><a href="../musicas/repertorio.html">Repertório</a></div>
+      <button type="button" class="theme-btn" data-theme-toggle></button>
+    </div>
+  </nav>
+  <header>
+    <h1>Réveillon</h1>
+    <p class="sub">As duas bandas e as músicas de cada uma</p>
+    <div class="legenda" aria-label="Legenda">
+      <span id="lgMin"></span>
+      <span><span class="pessoa incerto">Nome*</span> ainda não confirmado</span>
+    </div>
+  </header>
+  <div class="filtro">
+    <span class="filtro-label">Filtrar por pessoa</span>
+    <div class="pills" id="pills"></div>
+    <div class="resumo" id="resumo" aria-live="polite"></div>
+  </div>
+  <main class="bandas" id="bandas"></main>
+</div>
+<script>
+var MIC = '<rect x="9" y="6.5" width="6" height="9" rx="3"/><path d="M6 11.5v1a6 6 0 0 0 12 0v-1M12 18.5v2.5M9 21h6"/>';
+var COROA = '<path d="M8 5.6l.9-3.2 3.1 2 3.1-2 .9 3.2z" stroke="#eab308" fill="#eab308" fill-opacity=".35"/>';
+var ICONES = {
+  min: '<g transform="translate(1.8 3.6) scale(.85)">' + MIC + '</g><path d="M7.6 6.2L6.6 1.6l3.3 2.4L12 1l2.1 3 3.3-2.4-1 4.6z" stroke="#eab308" fill="#eab308" fill-opacity=".35"/>',
+  back: MIC,
+  voc: MIC,
+  tec: '<rect x="2.5" y="7" width="19" height="11" rx="2"/><path d="M7.3 13v5M12 13v5M16.7 13v5"/><path d="M7.3 7v6M12 7v6M16.7 7v6" stroke-width="2.8"/>',
+  sax: '<path d="M8.5 3l3.5 2.5V15a4 4 0 0 0 4 4h.5a3.5 3.5 0 0 0 3.5-3.5V12M18.5 12h3"/><circle cx="12" cy="8.5" r=".9"/><circle cx="12" cy="11.5" r=".9"/><circle cx="12" cy="14.5" r=".9"/>',
+  gui: '<g transform="translate(12 12) rotate(45) scale(.8) translate(-12 -12)"><rect x="10.4" y="0.8" width="3.2" height="3.6" rx=".8"/><path d="M11 4.4v8M13 4.4v8"/><rect x="6.6" y="11.2" width="10.8" height="11.4" rx="5.2"/><path d="M9.6 16h4.8M9.6 19h4.8"/></g>',
+  bai: '<g transform="translate(12 12) rotate(45) scale(.8) translate(-12 -12)"><rect x="10.4" y="0.3" width="3.2" height="3.6" rx=".8"/><path d="M11 3.9v10M13 3.9v10"/><rect x="7.4" y="12.6" width="9.2" height="10" rx="4.4"/><path d="M10 17h4M10 19.8h4"/></g>',
+  vio: '<g transform="translate(12 12) rotate(45) scale(.8) translate(-12 -12)"><rect x="10.4" y="0.8" width="3.2" height="3.4" rx=".8"/><path d="M11 4.2v6.6M13 4.2v6.6"/><path d="M12 9.2c-2.2 0-3.6 1.2-3.6 2.8 0 1.1.8 1.7 1.2 2.3-1.8.7-3.2 2.1-3.2 4 0 2.6 2.4 4.2 5.6 4.2s5.6-1.6 5.6-4.2c0-1.9-1.4-3.3-3.2-4 .4-.6 1.2-1.2 1.2-2.3 0-1.6-1.4-2.8-3.6-2.8z"/><circle cx="12" cy="17" r="1.3"/></g>',
+  bat: '<ellipse cx="12" cy="10.5" rx="7.5" ry="2.8"/><path d="M4.5 10.5v6c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8v-6M7 3.5l4 5.5M17 3.5l-4 5.5"/>'
+};
+function iconeSvg(k, cor, tam) {
+  var t = tam || 16;
+  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="' + t + '" height="' + t + '" fill="none" stroke="' + (cor || "currentColor") +
+    '" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' + (ICONES[k] || "") + '</svg>';
+}
+
+
+// Dados do Réveillon. "min" = ministro; "incerto" = ainda não confirmado; "id" = cadastro no app (quem não tem fica sem id).
+var BANDAS = [
+  {
+    nome: "Banda Principal",
+    funcoes: [
+      ["back", "Vozes", [
+        { n: "Jhordan", min: 1, id: "23d2d224-8f94-4e4f-ab13-7e8868e20611" },
+        { n: "Marilei", min: 1, id: "3ed7eb98-bae2-4646-ab89-7efa19f414fd" },
+        { n: "Cawan", min: 1, id: "6d601902-7f2a-4ad6-8045-5bbdd4c71f41" },
+        { n: "Aleane", id: "24d79386-6eea-4478-8f2c-5611192b7a0c" },
+        { n: "Rosy", id: "2ee9bbd2-f0e0-4e42-b7ca-a1eba002783b" },
+        { n: "Vera" }
+      ]],
+      ["vio", "Violão", [{ n: "Mikeias", id: "35be7e54-5d03-4e92-9304-abe4ca3885e8" }]],
+      ["gui", "Guitarra", [{ n: "Marcos", id: "1563eb41-f8ad-4ff8-a141-778e4e73a288" }]],
+      ["bai", "Baixo", [{ n: "Jessé", id: "c17bccf7-57e8-4a89-96e0-afbdc7179196" }]],
+      ["bat", "Bateria", [{ n: "Lucas", id: "03d35d69-0c7b-4a35-8019-06ff299670e0" }]],
+      ["tec", "Teclado", [{ n: "Ewerton", id: "e74c904e-6dcd-4536-af23-74401f842f22" }]],
+      ["sax", "Sax", [{ n: "Gabriel" }]]
+    ],
+    musicas: [
+      { t: "Moises", c: "Fernandinho", min: ["Jhordan"] },
+      { t: "Infinitamente Mais", c: "Fernandinho", min: ["Jhordan"] },
+      { t: "Mil Cairão", c: "Fernandinho", min: ["Jhordan"] },
+      { t: "Um dia em Tua casa", c: "Fernandinho", min: ["Jhordan"] },
+      { t: "Graças", c: "Israel Salazar", min: ["Jhordan"] },
+      { t: "Medley | Gratidão + Novo Dia + Me Ama", c: "", min: ["Cawan"] },
+      { t: "Aclame Ao Senhor", c: "Felipe Rodrigues", min: ["Marilei"] },
+      { t: "Santo Pra Sempre", c: "Gabriel Guedes", min: ["Marilei"] },
+      { t: "Se Eu Não Te Ouvir", c: "Sarah Farias", min: ["Marilei"] }
+    ]
+  },
+  {
+    nome: "Banda Jovens",
+    funcoes: [
+      ["min", "Ministro", [{ n: "Cawan", min: 1, id: "6d601902-7f2a-4ad6-8045-5bbdd4c71f41" }]],
+      ["back", "Backs", [{ n: "Aleane", id: "24d79386-6eea-4478-8f2c-5611192b7a0c" }]],
+      ["gui", "Guitarra", [{ n: "Ewerton", id: "e74c904e-6dcd-4536-af23-74401f842f22" }]],
+      ["bai", "Baixo", [{ n: "Marcos", id: "1563eb41-f8ad-4ff8-a141-778e4e73a288", nota: "Ex Gago" }]],
+      ["bat", "Bateria", [{ n: "Felipe Silva", id: "b64a4caa-b645-414e-a213-d3076076922b" }]],
+      ["sax", "Sax", [{ n: "Gabriel" }]],
+      ["tec", "Teclado", [{ n: "Isadora", incerto: 1 }]]
+    ],
+    musicas: [
+      { t: "Buscar-me-eis e me Achareis", c: "Alexsander Lúcio", min: ["Cawan"] }
+    ]
+  }
+];
+
+var selecionado = null;
+function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+function ehMinistro(banda, nome) {
+  return banda.funcoes.some(function (f) { return f[2].some(function (p) { return p.n === nome && p.min; }); });
+}
+function chip(p, banda) {
+  var c = el("span", "pessoa" + (p.min ? " min" : "") + (p.incerto ? " incerto" : "") + (p.n === selecionado ? " me" : ""));
+  if (p.id) c.setAttribute("data-membro", p.id);
+  if (p.min) { var i = el("span"); i.innerHTML = iconeSvg("min", "currentColor", 14); c.appendChild(i.firstChild); }
+  c.appendChild(document.createTextNode(p.n + (p.incerto ? "*" : "")));
+  if (p.incerto) c.title = "Ainda não confirmado";
+  if (p.nota) c.appendChild(el("span", "nota", "(" + p.nota + ")"));
+  return c;
+}
+function nomesTodos() {
+  var vistos = {}, lista = [];
+  BANDAS.forEach(function (b) { b.funcoes.forEach(function (f) { f[2].forEach(function (p) { if (!vistos[p.n]) { vistos[p.n] = 1; lista.push(p.n); } }); }); });
+  return lista.sort(function (a, b) { return a.localeCompare(b, "pt-BR"); });
+}
+function desenhaPills() {
+  var box = document.getElementById("pills"); box.textContent = "";
+  [null].concat(nomesTodos()).forEach(function (n) {
+    var b = el("button", "pill", n || "Todos"); b.type = "button";
+    b.setAttribute("aria-pressed", String(n === selecionado));
+    b.addEventListener("click", function () { selecionado = (n === selecionado ? null : n); desenhaPills(); desenha(); });
+    box.appendChild(b);
+  });
+}
+function resumoDe(nome) {
+  if (!nome) return "";
+  var partes = [];
+  BANDAS.forEach(function (b) {
+    var fs = [];
+    b.funcoes.forEach(function (f) { if (f[2].some(function (p) { return p.n === nome; })) fs.push(f[1]); });
+    var ms = b.musicas.filter(function (m) { return m.min.indexOf(nome) >= 0; }).length;
+    if (fs.length) partes.push(b.nome + ": " + fs.join(", ") + (ms ? " · ministra " + ms + (ms === 1 ? " música" : " músicas") : ""));
+  });
+  return nome + " — " + (partes.length ? partes.join(" | ") : "não está em nenhuma banda");
+}
+function desenha() {
+  var main = document.getElementById("bandas"); main.textContent = "";
+  document.getElementById("resumo").textContent = resumoDe(selecionado);
+  BANDAS.forEach(function (b) {
+    var card = el("section", "banda");
+    card.appendChild(el("h2", "", b.nome));
+    card.appendChild(el("h3", "", "Escala"));
+    var eq = el("div", "equipe");
+    b.funcoes.forEach(function (f) {
+      var linha = el("div", "funcao");
+      var nome = el("span", "fn-nome"); nome.innerHTML = iconeSvg(f[0], "currentColor", 16); nome.appendChild(document.createTextNode(f[1]));
+      linha.appendChild(nome);
+      var ps = el("div", "pessoas"); f[2].forEach(function (p) { ps.appendChild(chip(p, b)); });
+      linha.appendChild(ps); eq.appendChild(linha);
+    });
+    card.appendChild(eq);
+    card.appendChild(el("h3", "", "Músicas (" + b.musicas.length + ")"));
+    var lista = el("div", "musicas");
+    b.musicas.forEach(function (m, i) {
+      var li = el("div", "musica" + (selecionado && m.min.indexOf(selecionado) >= 0 ? " me" : ""));
+      li.appendChild(el("span", "n", String(i + 1)));
+      var corpo = el("div");
+      var a = el("a", "t", m.t); a.href = "../musicas/biblioteca-musicas.html?q=" + encodeURIComponent(m.t.split("|").pop().split("+")[0].trim()); a.title = "Procurar na Biblioteca de Músicas";
+      corpo.appendChild(a);
+      var meta = el("div", "meta");
+      if (m.c) meta.appendChild(el("span", "", m.c));
+      m.min.forEach(function (n) {
+        var pessoa = null;
+        b.funcoes.forEach(function (f) { f[2].forEach(function (p) { if (p.n === n) pessoa = p; }); });
+        meta.appendChild(chip(pessoa || { n: n, min: 1 }, b));
+      });
+      corpo.appendChild(meta); li.appendChild(corpo); lista.appendChild(li);
+    });
+    card.appendChild(lista);
+    main.appendChild(card);
+  });
+}
+document.getElementById("lgMin").innerHTML = iconeSvg("min", "currentColor", 14) + " Ministro";
+desenhaPills(); desenha();
+</script>
+</body>
+</html>
